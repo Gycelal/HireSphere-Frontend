@@ -3,7 +3,7 @@ const LanderLayout = () => {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-gray-900 to-slate-800 flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-[#0f0c29] to-[#302b63] flex flex-col relative overflow-hidden">
       {/* Subtle background pattern */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.1),transparent_50%)]" />
       <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.02)_50%,transparent_75%)]" />

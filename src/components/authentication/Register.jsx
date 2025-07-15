@@ -232,7 +232,7 @@ const Register = () => {
                 <button
                   type='submit'
                   disabled={isSubmitting}
-                  className='btn-primary w-full flex items-center justify-center gap-2 text-center disabled:opacity-50 disabled:cursor-not-allowed'
+                  className='bg-white text-black px-8 py-2 rounded font-medium hover:bg-gray-400 w-full flex items-center justify-center gap-2 text-center disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer'
                 >
                   {isSubmitting ? (
                     <LoaderCircle className='animate-spin w-5 h-5' />

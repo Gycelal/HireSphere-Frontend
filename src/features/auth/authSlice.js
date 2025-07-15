@@ -5,10 +5,8 @@ import { loginThunk } from "./authThunks";
 
 const initialState = {
     user: null,
-    isAuthenticated: false,
     loading: false,
     error: null,
-    token: null,
 }
 
 const authSlice = createSlice({
@@ -26,33 +24,15 @@ const authSlice = createSlice({
         // login
         .addCase(loginThunk.pending,(state)=>{
             state.loading = true;
-            state.error = null
         })
-        .addCase(loginThunk.fulfilled,(state)=>{
+        .addCase(loginThunk.fulfilled,(state,action)=>{
             state.loading = false;
-            state.user = action.payload.user;
-            state.token = action.payload.token;
-            state.isAuthenticated = true;
+            state.user = action.payload;
+
         })
         .addCase(loginThunk.rejected,(state)=>{
             state.loading = false;
-            state.error = action.payload || 'Login Failed.'
         })
-        // register
-        // .addCase(registerThunk.pending,(state)=>{
-        //     state.loading = true;
-        //     state.error = null;
-        // })
-        // .addCase(registerThunk.fulfilled,(state)=>{
-        //     state.loading = false;
-        //     state.user = action.payload.user;
-        //     state.token = action.payload.token;
-        //     state.isAuthenticated = true;
-        // })
-        // .addCase(registerThunk.rejected,(state)=>{
-        //     state.loading = false;
-        //     state.error = action.payload || 'Registration Failed';
-        // })
     }
 })
 

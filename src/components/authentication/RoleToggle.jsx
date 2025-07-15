@@ -15,7 +15,7 @@ const RoleToggle = ({role, setRole ,setFieldValue, resetForm}) => {
           onClick={() => {handleClick('candidate')}}
           className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
             role === 'candidate'
-              ? 'bg-blue-500 text-white shadow-lg'
+              ? 'bg-emerald-500 text-white shadow-lg'
               : 'text-gray-400 hover:text-white'
           }`}
         >

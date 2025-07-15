@@ -3,13 +3,13 @@ import * as Yup from 'yup'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { loginThunk } from '../../features/auth/authThunks'
-import { loginUser } from '../../api/auth'
+import { toast } from 'sonner'
 
 const Login = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const handleForgotPassword = () => navigate('/verify-email',{})
+  const handleForgotPassword = () => navigate('/verify-email')
 
   const validationSchema = Yup.object().shape({
     email: Yup.string().email('Invalid email').required('Email is required'),
@@ -18,12 +18,32 @@ const Login = () => {
 
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {
     try {
-      const resultAction = await dispatch(loginThunk(values))
-      if (!loginUser.fulfilled.match(resultAction)) {
-        setErrors({ general: resultAction.payload || 'Login failed' })
+      const response = await dispatch(loginThunk(values))
+
+      if (loginThunk.fulfilled.match(response)) {
+        toast.success('Login successful!')
+        navigate('/home')
+      } else {
+        const errors = response.payload
+
+        if (
+          Array.isArray(errors?.code) &&
+          errors.code.includes('unverified_user')
+        ) {
+          toast.warning(errors.detail?.[0] || 'Please verify your account.')
+          navigate('/verify-otp', { state: { email: values.email } })
+        } else if (errors?.email) {
+          setErrors({ email: errors.email[0] })
+          toast.error('Please fix the email field.')
+        } else if (errors?.non_field_errors) {
+          toast.error(errors.non_field_errors[0])
+        } else {
+          toast.error('Login failed. Please try again.')
+        }
       }
     } catch (err) {
-      setErrors({ general: 'Something went wrong' })
+      console.error('Unexpected error during login:', err)
+      toast.error('Unexpected error. Please try again.')
     } finally {
       setSubmitting(false)
     }
@@ -34,8 +54,8 @@ const Login = () => {
     // TODO: implement Google OAuth
   }
 
-  const handleSignUp = ()=>{
-    navigate('/register',{state:{initialRole:'candidate'}})
+  const handleSignUp = () => {
+    navigate('/register', { state: { initialRole: 'candidate' } })
   }
 
   return (
@@ -86,10 +106,12 @@ const Login = () => {
                   />
                 </div>
 
-                <button type='submit' className='btn-primary w-full'>
+                <button
+                  type='submit'
+                  className='bg-white text-black px-8 py-2 rounded font-medium w-full cursor-pointer hover:bg-gray-400 transition-colors'
+                >
                   Sign In
                 </button>
-
                 <div className='relative my-6'>
                   <div className='absolute inset-0 flex items-center'>
                     <div className='w-full border-t border-white/20'></div>

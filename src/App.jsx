@@ -5,7 +5,10 @@ import VerifyEmail from './components/authentication/VerifyEmail'
 import VerifyOtp from './components/authentication/VerifyOtp'
 import Login from './components/authentication/Login'
 import Register from './components/authentication/Register'
+import ResetPassword from './components/authentication/ResetPassword'
 import {Toaster} from 'sonner'
+import Home from './pages/Home'
+
 function App() {
   return (
     <Router>
@@ -18,7 +21,9 @@ function App() {
           <Route path='/register' element={<Register/>}/>
           <Route path='/verify-email' element={<VerifyEmail/>}/>
           <Route path='/verify-otp' element={<VerifyOtp/>}/>
+          <Route path='/reset-password' element={<ResetPassword/>}/>
         </Route>
+        <Route path='/home' element={<Home/>}/>
       </Routes>
     </Router>
   )

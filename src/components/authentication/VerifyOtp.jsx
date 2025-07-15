@@ -126,7 +126,7 @@ export default function VerifyOtp() {
             <button
               type='submit'
               disabled={isLoading || otp.some(digit => !digit)}
-              className='bg-white text-black px-8 py-2 rounded font-medium hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors'
+              className='bg-white text-black px-8 py-2 rounded font-medium hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer'
             >
               {isLoading ? (
                 <LoaderCircle className='animate-spin' />
