@@ -9,6 +9,7 @@ const initialState = {
     error: null,
 }
 
+
 const authSlice = createSlice({
     name:'auth',
     initialState,
@@ -27,7 +28,7 @@ const authSlice = createSlice({
         })
         .addCase(loginThunk.fulfilled,(state,action)=>{
             state.loading = false;
-            state.user = action.payload;
+            state.user = action.payload.user;
 
         })
         .addCase(loginThunk.rejected,(state)=>{
