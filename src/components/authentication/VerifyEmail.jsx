@@ -1,30 +1,25 @@
 import { Formik, Form, Field, ErrorMessage } from 'formik'
 import * as Yup from 'yup'
 import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { forgotPassword } from '../../api/auth'
+import {toast} from 'sonner'
+
 
 const VerifyEmail = () => {
   const navigate = useNavigate()
-  const [isLoading, setIsLoading] = useState(false)
 
-  const initialValues = {
-    email: ''
-  }
-
-  const validationSchema = Yup.object({
-    email: Yup.string()
-      .email('Invalid email address')
-      .required('Email is required')
-  })
-
-  const handleSubmit = values => {
+  const handleSubmit = async (values, { setSubmitting }) => {
     console.log('Email submitted for verification:', values.email)
-    setIsLoading(true)
-    navigate('/verify-otp', { state: { email: values.email } })
-  }
-
-  const handleBack = () => {
-    navigate(-1) // Go back to previous page
+    setSubmitting(true)
+    try{
+      await forgotPassword({email: values.email})
+      toast.success('Verification email sent! Please check your inbox.')
+      navigate('/login')
+    }catch (error) {
+      toast.error('Failed to send verification email.')
+    }finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -36,11 +31,15 @@ const VerifyEmail = () => {
         </h2>
 
         <Formik
-          initialValues={initialValues}
-          validationSchema={validationSchema}
+          initialValues={{ email: '' }}
+          validationSchema={Yup.object({
+            email: Yup.string()
+              .email('Invalid email address')
+              .required('Email is required')
+          })}
           onSubmit={handleSubmit}
         >
-          {({ errors, touched }) => (
+          {({ errors, touched, isSubmitting }) => (
             <Form className='space-y-4'>
               <div>
                 <Field
@@ -64,11 +63,11 @@ const VerifyEmail = () => {
                   type='submit'
                   className='bg-white text-black px-8 py-2 rounded font-medium hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer'
                 >
-                  {isLoading ? 'Verifying...' : 'Verify Email'}
+                  {isSubmitting ? 'Verifying...' : 'Verify Email'}
                 </button>
               </div>
               <p
-                onClick={handleBack}
+                onClick={() => navigate('/login')}
                 className='text-center text-green-400 cursor-pointer hover:underline'
               >
                 Back to Sign in?

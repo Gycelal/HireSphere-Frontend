@@ -20,3 +20,10 @@ export const loginUser = (data) =>{
     return axios.post(`${baseURL}/api/accounts/login/`,data)
 }
 
+export const forgotPassword = (data) =>{
+    return axios.post(`${baseURL}/api/accounts/forgot-password/`,data)
+}
+
+export const resetPassword = (data) =>{
+    return axios.post(`${baseURL}/api/accounts/reset-password/`,data)
+}

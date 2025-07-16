@@ -21,7 +21,7 @@ function App() {
           <Route path='/register' element={<Register/>}/>
           <Route path='/verify-email' element={<VerifyEmail/>}/>
           <Route path='/verify-otp' element={<VerifyOtp/>}/>
-          <Route path='/reset-password' element={<ResetPassword/>}/>
+          <Route path='/reset-password/:uid/:token' element={<ResetPassword/>}/>
         </Route>
         <Route path='/home' element={<Home/>}/>
       </Routes>
