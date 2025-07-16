@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom"
-const LanderLayout = () => {
+const AuthPage = () => {
 
 
   return (
@@ -73,4 +73,4 @@ const LanderLayout = () => {
   )
 }
 
-export default LanderLayout
+export default AuthPage
