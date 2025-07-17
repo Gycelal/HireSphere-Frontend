@@ -7,7 +7,8 @@ import Register from './components/authentication/Register'
 import ResetPassword from './components/authentication/ResetPassword'
 import {Toaster} from 'sonner'
 import Home from './pages/user/Home'
-import AuthPage from './pages/user/AuthPage'
+import AuthPage from './pages/user/UserAuth'
+import AdminAuth from './pages/admin/AdminAuth'
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path='/reset-password/:uid/:token' element={<ResetPassword/>}/>
         </Route>
         <Route path='/home' element={<Home/>}/>
+        <Route path='/admin-login' element={<AdminAuth/>}/>
       </Routes>
     </Router>
   )
