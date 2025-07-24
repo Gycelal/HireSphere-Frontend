@@ -9,6 +9,7 @@ import {Toaster} from 'sonner'
 import Home from './pages/user/Home'
 import AuthPage from './pages/user/UserAuth'
 import AdminAuth from './pages/admin/AdminAuth'
+import {CompleteProfile} from './components/authentication/CompleteProfile'
 
 function App() {
   return (
@@ -23,9 +24,11 @@ function App() {
           <Route path='/verify-email' element={<VerifyEmail/>}/>
           <Route path='/verify-otp' element={<VerifyOtp/>}/>
           <Route path='/reset-password/:uid/:token' element={<ResetPassword/>}/>
+          <Route path='/complete-profile' element={<CompleteProfile/>}/>
         </Route>
         <Route path='/home' element={<Home/>}/>
         <Route path='/admin-login' element={<AdminAuth/>}/>
+        
       </Routes>
     </Router>
   )

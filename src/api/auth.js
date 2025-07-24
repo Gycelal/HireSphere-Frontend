@@ -1,29 +1,41 @@
-import axios from 'axios';
+import axiosPublic from './axiosPublic'
+import axiosPrivate from './axiosPrivate'
 
 
-const baseURL = import.meta.env.VITE_API_BASE_URL;
+// Public
 
-export const registerUser = (data) =>{
-    return axios.post(`${baseURL}/api/accounts/register/`,data)
+export const registerUser = data => {
+  return axiosPublic.post('/api/accounts/register/', data)
 }
 
-export const verifyOtp = (data) =>{
-    return axios.post(`${baseURL}/api/accounts/verify-otp/`,data)
+export const googleAuth = data => {
+  return axiosPublic.post('/api/accounts/google/', data)
 }
 
-export const resendOtp = (data) =>{
-    return axios.post(`${baseURL}/api/accounts/resend-otp/`,data)
+export const verifyOtp = data => {
+  return axiosPublic.post('/api/accounts/verify-otp/', data)
+}
+
+export const resendOtp = data => {
+  return axiosPublic.post(`/api/accounts/resend-otp/`, data)
+}
+
+export const loginUser = data => {
+  return axiosPublic.post('/api/accounts/login/', data)
+}
+
+export const forgotPassword = data => {
+  return axiosPublic.post('/api/accounts/forgot-password/', data)
+}
+
+export const resetPassword = data => {
+  return axiosPublic.post('/api/accounts/reset-password/', data)
 }
 
 
-export const loginUser = (data) =>{
-    return axios.post(`${baseURL}/api/accounts/login/`,data)
-}
 
-export const forgotPassword = (data) =>{
-    return axios.post(`${baseURL}/api/accounts/forgot-password/`,data)
-}
+// Private
 
-export const resetPassword = (data) =>{
-    return axios.post(`${baseURL}/api/accounts/reset-password/`,data)
+export const completeProfile = data => {
+  return axiosPrivate.post('/api/accounts/complete-profile/', data)
 }

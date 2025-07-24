@@ -68,6 +68,7 @@ const Register = () => {
       toast.success(response.data.message)
       navigate('/verify-otp', { state: { email: values.email } })
     } catch (err) {
+      console.log('err',err)
       const backendErrors = err.response?.data
       // setting backendErrors
       if (typeof backendErrors === 'object') {
@@ -82,6 +83,7 @@ const Register = () => {
       setSubmitting(false)
     }
   }
+
 
   return (
     <div className='flex-1 flex items-center justify-center px-6 py-8'>
