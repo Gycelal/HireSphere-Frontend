@@ -8,19 +8,37 @@ import {toast} from 'sonner'
 const VerifyEmail = () => {
   const navigate = useNavigate()
 
-  const handleSubmit = async (values, { setSubmitting }) => {
-    console.log('Email submitted for verification:', values.email)
-    setSubmitting(true)
-    try{
-      await forgotPassword({email: values.email})
-      toast.success('Verification email sent! Please check your inbox.')
-      navigate('/login')
-    }catch (error) {
-      toast.error('Failed to send verification email.')
-    }finally {
-      setSubmitting(false)
+  const handleSubmit = async (values, { setSubmitting, setErrors }) => {
+  console.log('Email submitted for verification:', values.email);
+  setSubmitting(true);
+
+  try {
+    const response = await forgotPassword({ email: values.email }); 
+    console.log('response:', response);
+
+    toast.success('Verification email sent! Please check your inbox.');
+    navigate('/login');
+  } catch (error) {
+    const errData = error?.response?.data;
+
+    if (typeof errData === 'object') {
+      if (errData.email) {
+        setErrors({ email: errData.email[0] });
+      }
+
+      if (errData.non_field_errors) {
+        toast.error(errData.non_field_errors[0]);
+      } else if (errData.detail) {
+        toast.error(errData.detail);
+      }
+    } else {
+      toast.error('Failed to send verification email.');
     }
+  } finally {
+    setSubmitting(false);
   }
+};
+
 
   return (
     <div className='flex-1 flex items-center justify-center px-6 py-i'>
