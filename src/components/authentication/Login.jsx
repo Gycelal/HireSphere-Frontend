@@ -6,7 +6,7 @@ import { loginThunk } from '../../features/auth/authThunks'
 import { toast } from 'sonner'
 import GoogleButton from '../ui/GoogleButton'
 
-const Login = ({ role }) => {
+const Login = ({ admin=false }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -50,12 +50,6 @@ const Login = ({ role }) => {
       setSubmitting(false)
     }
   }
-
-  const handleGoogleSignIn = () => {
-    console.log('Google sign in clicked')
-    // TODO: implement Google OAuth
-  }
-
   const handleSignUp = () => {
     navigate('/register', { state: { initialRole: 'candidate' } })
   }
@@ -114,7 +108,9 @@ const Login = ({ role }) => {
                 >
                   Sign In
                 </button>
-                <div className='relative my-6'>
+                {!admin && (
+                  <>
+                  <div className='relative my-6'>
                   <div className='absolute inset-0 flex items-center'>
                     <div className='w-full border-t border-white/20'></div>
                   </div>
@@ -123,24 +119,28 @@ const Login = ({ role }) => {
                   </div>
                 </div>
 
-                <GoogleButton handleGoogleSignIn={handleGoogleSignIn} />
+                <GoogleButton/>
                 <p
                   onClick={handleForgotPassword}
                   className='text-center text-red-500 hover:underline cursor-pointer'
                 >
                   Forgot password?
                 </p>
+                  </>
+                )}
               </Form>
             )}
           </Formik>
         </div>
 
-        <div className='text-center mt-6 text-gray-400'>
+        {!admin && (
+          <div className='text-center mt-6 text-gray-400'>
           Don’t have an account?{' '}
           <a onClick={handleSignUp} className='text-blue-400 hover:underline'>
             Sign up
           </a>
         </div>
+        )}
       </div>
     </div>
   )

@@ -1,6 +1,5 @@
-import React from 'react';
-import SplitText from '../../components/ui/SplitText';
-import Login from '../../components/authentication/Login';
+import SplitText from '../../components/ui/SplitText'
+import Login from '../../components/authentication/Login'
 
 const AdminAuth = () => {
   return (
@@ -17,11 +16,11 @@ const AdminAuth = () => {
       </div>
 
       {/* Tagline Section */}
-      <div className='flex justify-center pb-16'>
-        <div className='text-center'>
+      <div className='flex justify-center px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 py-10 sm:py-12 md:py-16'>
+        <div className='text-center max-w-4xl'>
           <SplitText
             text='Welcome to the system administration layer of Hiresphere.'
-            className="text-white text-lg sm:text-3xl lg:text-4xl font-bold text-center"
+            className='text-white text-base sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold leading-snug sm:leading-snug md:leading-tight lg:leading-tight text-center'
             delay={100}
             duration={0.6}
             ease='power3.out'
@@ -35,21 +34,19 @@ const AdminAuth = () => {
         </div>
       </div>
 
-      {/* Login Content Section */}
       <div className='flex-1 flex items-center justify-center px-4'>
         <div className='w-full max-w-md'>
-          <Login />
+          <Login admin={true} />
         </div>
       </div>
 
-      {/* Footer Section */}
       <footer className='py-8 text-center'>
         <div className='text-sm text-gray-500'>
           © 2025 Hiresphere. All rights reserved.
         </div>
       </footer>
     </div>
-  );
-};
+  )
+}
 
-export default AdminAuth;
+export default AdminAuth
