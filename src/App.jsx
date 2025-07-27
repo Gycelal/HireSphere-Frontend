@@ -10,7 +10,7 @@ import Home from './pages/user/Home'
 import AuthPage from './pages/user/UserAuth'
 import AdminAuth from './pages/admin/AdminAuth'
 import {CompleteProfile} from './components/authentication/CompleteProfile'
-
+import SystemAdminLayout from './layouts/SystemAdminLayout'
 function App() {
   return (
     <Router>
@@ -26,8 +26,22 @@ function App() {
           <Route path='/reset-password/:uid/:token' element={<ResetPassword/>}/>
           <Route path='/complete-profile' element={<CompleteProfile/>}/>
         </Route>
-        <Route path='/home' element={<Home/>}/>
+
+        {/* System admin login */}
         <Route path='/admin-login' element={<AdminAuth/>}/>
+
+        {/* Routes that share admin layout */}
+        <Route path='/admin' element={<SystemAdminLayout/>}>
+
+        </Route>
+
+
+      
+
+
+        
+        <Route path='/home' element={<Home/>}/>
+        
         
       </Routes>
     </Router>
