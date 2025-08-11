@@ -1,5 +1,5 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
-import { loginUser, googleAuth, completeProfile } from '../../api/auth';
+import { loginUser, googleAuth, completeProfile, adminLogin, adminLogout, userLogout } from '../../api/auth';
 
 
 
@@ -18,6 +18,20 @@ export const loginThunk = createAsyncThunk(
   }
 );
 
+export const adminLoginThunk = createAsyncThunk(
+  'auth/admin-login',
+  async(formData,{rejectWithValue}) => {
+    try{
+      const response = await adminLogin(formData);
+      console.log('Logi response:',response);
+      return response.data;
+    }catch(error){
+      console.log('Login error:',error.response?.data);
+      return rejectWithValue(error.response?.data || {non_field_errors:['Login Failed.']})
+    }
+  }
+)
+
 
 
 export const googleAuthThunk = createAsyncThunk(
@@ -34,6 +48,32 @@ export const googleAuthThunk = createAsyncThunk(
     }
   }
 )
+
+export const userLogoutthunk = createAsyncThunk(
+  'auth/userLogout',
+  async(_,{rejectWithValue}) =>{
+    try{
+      const response = await userLogout()
+      return response.data
+    }catch(error){
+      return rejectWithValue(error.response?.data || 'Logout failed')
+    }
+  }
+)
+
+
+export const adminLogoutThunk = createAsyncThunk(
+  'auth/adminLogout',
+  async(_,{rejectWithValue}) =>{
+    try{
+      const response = await adminLogout()
+      return response.data
+    }catch(error){
+      return rejectWithValue(error.response?.data || 'Logout failed.');
+    }
+  }
+)
+
 
 export const completeProfileThunk = createAsyncThunk(
   'auth/completeProfile',

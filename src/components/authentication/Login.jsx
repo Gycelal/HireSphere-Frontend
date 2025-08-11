@@ -2,11 +2,11 @@ import { Field, Formik, Form, ErrorMessage } from 'formik'
 import * as Yup from 'yup'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { loginThunk } from '../../features/auth/authThunks'
+import { loginThunk, adminLoginThunk } from '../../features/auth/authThunks'
 import { toast } from 'sonner'
 import GoogleButton from '../ui/GoogleButton'
 
-const Login = ({ admin=false }) => {
+const Login = ({ isAdmin = false }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
@@ -19,12 +19,19 @@ const Login = ({ admin=false }) => {
 
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {
     try {
-      const response = await dispatch(loginThunk(values))
+      const thunkToUse = isAdmin ? adminLoginThunk : loginThunk
+      const response = await dispatch(thunkToUse(values))
+
       console.log('Login response:', response)
 
-      if (loginThunk.fulfilled.match(response)) {
+      if (thunkToUse.fulfilled.match(response)) {
         toast.success('Login successful!')
-        navigate('/home')
+        navigate('/admin-dashboard')
+        // if (isAdmin) {
+        //   navigate('/admin-dashboard')
+        // } else {
+        //   navigate('/home')
+        // }
       } else {
         const errors = response.payload
 
@@ -108,24 +115,26 @@ const Login = ({ admin=false }) => {
                 >
                   Sign In
                 </button>
-                {!admin && (
+                {!isAdmin && (
                   <>
-                  <div className='relative my-6'>
-                  <div className='absolute inset-0 flex items-center'>
-                    <div className='w-full border-t border-white/20'></div>
-                  </div>
-                  <div className='relative flex justify-center text-sm'>
-                    <span className='px-2 text-gray-400'>Or continue with</span>
-                  </div>
-                </div>
+                    <div className='relative my-6'>
+                      <div className='absolute inset-0 flex items-center'>
+                        <div className='w-full border-t border-white/20'></div>
+                      </div>
+                      <div className='relative flex justify-center text-sm'>
+                        <span className='px-2 text-gray-400'>
+                          Or continue with
+                        </span>
+                      </div>
+                    </div>
 
-                <GoogleButton/>
-                <p
-                  onClick={handleForgotPassword}
-                  className='text-center text-red-500 hover:underline cursor-pointer'
-                >
-                  Forgot password?
-                </p>
+                    <GoogleButton />
+                    <p
+                      onClick={handleForgotPassword}
+                      className='text-center text-red-500 hover:underline cursor-pointer'
+                    >
+                      Forgot password?
+                    </p>
                   </>
                 )}
               </Form>
@@ -133,13 +142,13 @@ const Login = ({ admin=false }) => {
           </Formik>
         </div>
 
-        {!admin && (
+        {!isAdmin && (
           <div className='text-center mt-6 text-gray-400'>
-          Don’t have an account?{' '}
-          <a onClick={handleSignUp} className='text-blue-400 hover:underline'>
-            Sign up
-          </a>
-        </div>
+            Don’t have an account?{' '}
+            <a onClick={handleSignUp} className='text-blue-400 hover:underline'>
+              Sign up
+            </a>
+          </div>
         )}
       </div>
     </div>

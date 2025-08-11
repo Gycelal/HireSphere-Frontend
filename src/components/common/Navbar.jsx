@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux'
-import { Bell, Menu, MoonStar, Sun } from 'lucide-react'
+import { Bell, MoonStar, Sun } from 'lucide-react'
 import { toggleTheme } from '../../features/theme/themeSlice'
 
 const Navbar = () => {
@@ -7,9 +7,8 @@ const Navbar = () => {
 
   const theme = useSelector((state)=>state.theme.theme)
   const dispatch = useDispatch()
-
   const handleThemeToggle = ()=>{
-    dispatch(toggleTheme)
+    dispatch(toggleTheme())
     const html = document.documentElement
     const newTheme = theme === 'dark' ? 'light' : 'dark'
     html.classList.toggle('dark',newTheme === 'dark')

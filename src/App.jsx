@@ -11,6 +11,8 @@ import AuthPage from './pages/user/UserAuth'
 import AdminAuth from './pages/admin/AdminAuth'
 import {CompleteProfile} from './components/authentication/CompleteProfile'
 import SystemAdminLayout from './layouts/SystemAdminLayout'
+import Dashboard from './pages/admin/Dashboard'
+import AdminCompanyApprovals from './pages/admin/AdminCompanyApprovals'
 function App() {
   return (
     <Router>
@@ -31,15 +33,10 @@ function App() {
         <Route path='/admin-login' element={<AdminAuth/>}/>
 
         {/* Routes that share admin layout */}
-        <Route path='/admin' element={<SystemAdminLayout/>}>
-
+        <Route element={<SystemAdminLayout/>}>
+          <Route path='/admin-dashboard' element={<Dashboard/>}/>
+          <Route path='/approvals' element={<AdminCompanyApprovals/>}/>
         </Route>
-
-
-      
-
-
-        
         <Route path='/home' element={<Home/>}/>
         
         

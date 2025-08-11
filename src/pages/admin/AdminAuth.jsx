@@ -36,7 +36,7 @@ const AdminAuth = () => {
 
       <div className='flex-1 flex items-center justify-center px-4'>
         <div className='w-full max-w-md'>
-          <Login admin={true} />
+          <Login isAdmin={true} />
         </div>
       </div>
 

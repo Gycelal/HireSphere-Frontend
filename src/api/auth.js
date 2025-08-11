@@ -32,10 +32,20 @@ export const resetPassword = data => {
   return axiosPublic.post('/api/accounts/reset-password/', data)
 }
 
-
+export const adminLogin = data =>{
+  return axiosPublic.post('/api/adminpanel/admin-login/',data)
+}
 
 // Private
 
 export const completeProfile = data => {
   return axiosPrivate.post('/api/accounts/complete-profile/', data)
+}
+
+export const adminLogout = () =>{
+  return axiosPrivate.post('api/adminpanel/admin-logout/')
+}
+
+export const userLogout = () =>{
+  return axiosPrivate.post('api/accounts/logout/')
 }
