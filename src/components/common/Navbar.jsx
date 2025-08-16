@@ -1,22 +1,26 @@
 import { useSelector, useDispatch } from 'react-redux'
 import { Bell, MoonStar, Sun } from 'lucide-react'
 import { toggleTheme } from '../../features/theme/themeSlice'
-
+import Button from '../ui/Button'
+import { useNavigate } from 'react-router-dom'
 const Navbar = () => {
   
 
   const theme = useSelector((state)=>state.theme.theme)
   const dispatch = useDispatch()
+
+  const user = useSelector((state) => state.auth.user)
+  const role = user.role  
+
+  const navigate = useNavigate()
+
+
   const handleThemeToggle = ()=>{
     dispatch(toggleTheme())
     const html = document.documentElement
     const newTheme = theme === 'dark' ? 'light' : 'dark'
     html.classList.toggle('dark',newTheme === 'dark')
   }
-
- 
-
-
   return (
     <header
       className='w-full h-16 bg-white dark:bg-gray-900 
@@ -43,6 +47,11 @@ const Navbar = () => {
             <MoonStar className='w-5 h-5 text-gray-700 dark:text-gray-300' />
           )}
         </button>
+        {role === 'company_admin' && (
+        <Button variant='purple' onClick={() => navigate('/post-job')}>
+          Post a Job
+        </Button>
+        )}
       </div>
     </header>
   )

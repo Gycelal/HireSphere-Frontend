@@ -6,13 +6,17 @@ import Login from './components/authentication/Login'
 import Register from './components/authentication/Register'
 import ResetPassword from './components/authentication/ResetPassword'
 import {Toaster} from 'sonner'
-import Home from './pages/user/Home'
+import Home from './pages/user/candidate/Home'
 import AuthPage from './pages/user/UserAuth'
 import AdminAuth from './pages/admin/AdminAuth'
 import {CompleteProfile} from './components/authentication/CompleteProfile'
 import SystemAdminLayout from './layouts/SystemAdminLayout'
 import Dashboard from './pages/admin/Dashboard'
 import AdminCompanyApprovals from './pages/admin/AdminCompanyApprovals'
+import CompanyAdminLayout from './layouts/CompanyAdminLayout'
+import CompanyDashboard from './pages/user/company/CompanyDashboard'
+import PostJobFlow from './pages/user/company/PostJobFlow'
+
 function App() {
   return (
     <Router>
@@ -37,6 +41,14 @@ function App() {
           <Route path='/admin-dashboard' element={<Dashboard/>}/>
           <Route path='/approvals' element={<AdminCompanyApprovals/>}/>
         </Route>
+
+        {/* Routes that share company admin layout */}
+        <Route element={<CompanyAdminLayout/>}>
+          <Route path='/company-dashboard' element={<CompanyDashboard/>}/>
+          <Route path='/post-job' element={<PostJobFlow/>}/>
+        </Route>
+
+
         <Route path='/home' element={<Home/>}/>
         
         

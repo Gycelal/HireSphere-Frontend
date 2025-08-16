@@ -25,7 +25,6 @@ export const CandidateLayout = () => {
         />
         <div className='flex flex-col flex-1 border-l border-gray-200 dark:border-gray-800'>
           <Navbar />
-
           <main className='flex-1 overflow-auto bg-white dark:bg-gray-900 p-4'>
             <Outlet />
           </main>

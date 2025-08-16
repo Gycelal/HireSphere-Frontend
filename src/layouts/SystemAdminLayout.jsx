@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux'
 const SystemAdminLayout = () => {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const user = useSelector(state => state.auth.user)
-  const role = user.role
+  const role = user?.role
 
   const onToggleSidebar = () => {
     setIsCollapsed(!isCollapsed)

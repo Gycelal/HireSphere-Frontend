@@ -7,6 +7,8 @@ import { toast } from 'sonner'
 import { PanelLeftOpen } from 'lucide-react'
 
 const SidebarHeader = ({ isCollapsed, isHovered, onToggleSidebar }) => {
+  const user = useSelector(state => state.auth.user)
+  const role = user.role
   return (
     <div className='p-4 pb-2 border-b border-gray-300 dark:border-gray-700'>
       <div className='flex items-center justify-between'>
@@ -33,9 +35,16 @@ const SidebarHeader = ({ isCollapsed, isHovered, onToggleSidebar }) => {
               <h1 className='text-gray-900 dark:text-white font-semibold text-base leading-tight'>
                 HireSphere
               </h1>
-              <p className='text-gray-600 dark:text-gray-300 text-xs'>
+              {role === 'admin' && (<p className='text-gray-600 dark:text-gray-300 text-xs'>
                 Admin Panel
-              </p>
+              </p>)}
+              {role === 'company_admin' && (<p className='text-gray-600 dark:text-gray-300 text-xs'>
+                Company Control Panel
+              </p>)}
+              {role === 'candidate' && (<p className='text-gray-600 dark:text-gray-300 text-xs'>
+                Candidate Control Panel
+              </p>)}
+              
             </div>
             <button
               className='p-2 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition'

@@ -8,7 +8,9 @@ const variants = {
   secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-300',
   danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
   ghost: 'bg-transparent hover:bg-gray-100 text-gray-800 dark:hover:bg-gray-700 dark:text-white',
+  purple: 'bg-purple-600 text-white hover:bg-purple-700 focus:ring-purple-500',
 };
+
 
 const sizes = {
   sm: 'px-3 py-1.5 text-sm',

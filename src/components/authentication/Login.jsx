@@ -26,12 +26,22 @@ const Login = ({ isAdmin = false }) => {
 
       if (thunkToUse.fulfilled.match(response)) {
         toast.success('Login successful!')
-        navigate('/admin-dashboard')
-        // if (isAdmin) {
-        //   navigate('/admin-dashboard')
-        // } else {
-        //   navigate('/home')
-        // }
+        const role = response.payload.user.role
+        console.log('User role:', role)
+        switch (role) {
+          case 'admin':
+            navigate('/admin-dashboard')
+            break
+          case 'company_admin':
+            navigate('/company-dashboard')
+            break
+          case 'candidate':
+            navigate('/home')
+            break
+          default:
+            navigate('/')
+            break
+        }
       } else {
         const errors = response.payload
 
