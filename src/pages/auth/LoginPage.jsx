@@ -4,7 +4,7 @@ import GoogleButton from "../../components/common/GoogleButton";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "../../validation/authSchemas";
-import axios from "axios";
+import api from "../../services/api";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -19,7 +19,8 @@ export default function LoginPage() {
     try{
       setLoading(true)
       console.log("Form data:", data);
-      const response = await axios.post('http://127.0.0.1:8000/api/accounts/login/', data)
+      const response = await api.post('accounts/login/', data)
+      console.log(response)
     }catch(error){
       setError("root", {type: "server", message: error.response?.data?.detail || "Login failed. Please try again."})
       console.log("Login failed:", error.response.data);
