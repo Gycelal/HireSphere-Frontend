@@ -5,7 +5,7 @@ const OTP_LENGTH    = 6;
 const RESEND_SECS   = 30;
 
 export default function OtpVerificationPage() {
-  // ── State ────────────────────────────────────────────────────────────────
+  
   const location              = useLocation();
   const email                 = location.state?.email ?? "your email";
 
@@ -17,7 +17,6 @@ export default function OtpVerificationPage() {
 
   const inputRefs = useRef([]);
 
-  // ── Timer ────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (timer <= 0) { setCanResend(true); return; }
     const id = setTimeout(() => setTimer((t) => t - 1), 1000);
@@ -27,9 +26,9 @@ export default function OtpVerificationPage() {
   const formatTimer = (s) =>
     `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 
-  // ── Input handlers ───────────────────────────────────────────────────────
+  
   const handleChange = useCallback((index, value) => {
-    // Accept only single digit
+    
     const char = value.replace(/\D/g, "").slice(-1);
     setDigits((prev) => {
       const next = [...prev];

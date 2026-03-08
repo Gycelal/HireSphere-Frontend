@@ -1,22 +1,7 @@
-import { useState } from "react";
 import { Outlet, Link } from "react-router-dom";
+import ThemeToggle from "../components/common/ThemeToggle";
 
 export default function AuthLayout() {
-  const [isDark, setIsDark] = useState(() => {
-    return document.documentElement.classList.contains("dark");
-  });
-
-  const toggleTheme = () => {
-    const root = document.documentElement;
-    if (root.classList.contains("dark")) {
-      root.classList.remove("dark");
-      setIsDark(false);
-    } else {
-      root.classList.add("dark");
-      setIsDark(true);
-    }
-  };
-
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-950 transition-colors duration-200">
 
@@ -37,15 +22,7 @@ export default function AuthLayout() {
         </Link>
 
         {/* Theme Toggle */}
-        <button
-          onClick={toggleTheme}
-          aria-label="Toggle theme"
-          className="w-9 h-9 flex items-center justify-center rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
-        >
-          <span className="material-symbols-outlined text-[1.25rem]">
-            {isDark ? "light_mode" : "dark_mode"}
-          </span>
-        </button>
+        <ThemeToggle/>
       </header>
 
       {/* ── Main Content ── */}

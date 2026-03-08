@@ -4,14 +4,19 @@ import GoogleButton from "../../components/common/GoogleButton";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "../../validation/authSchemas";
-import api from "../../services/api";
+import { publicApi } from "../../services/api";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "../../store/slices/authSlice";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
 
 
-  const { register, handleSubmit,setError, formState: {errors} } = useForm({
+  const { register, handleSubmit, setError, formState: {errors} } = useForm({
     resolver: zodResolver(loginSchema)
   })
 
@@ -19,8 +24,17 @@ export default function LoginPage() {
     try{
       setLoading(true)
       console.log("Form data:", data);
-      const response = await api.post('accounts/login/', data)
-      console.log(response)
+      const response = await publicApi.post('accounts/login/', data)
+      console.log(response.data)
+      localStorage.setItem("access", response.data.access)
+      dispatch(loginSuccess({user: response.data.user}))
+
+      if (response.data.user.role === "candidate"){
+        navigate("/candidate/home")
+      }else{
+        navigate("/recruiter/dashboard")
+      }
+
     }catch(error){
       setError("root", {type: "server", message: error.response?.data?.detail || "Login failed. Please try again."})
       console.log("Login failed:", error.response.data);

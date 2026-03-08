@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import ThemeToggle from '../common/ThemeToggle'
+import { useSelector } from 'react-redux'
 
 
 
@@ -32,7 +34,7 @@ function Logo () {
   )
 }
 
-// ─── Nav Link ─────────────────────────────────────────────────────────────────
+// Nav Link
 function NavLink ({ label, mobile = false }) {
   const base = mobile
     ? 'block w-full px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 text-gray-700 dark:text-gray-300 hover:bg-violet-50 dark:hover:bg-violet-950 hover:text-violet-600 dark:hover:text-violet-400'
@@ -48,25 +50,8 @@ function NavLink ({ label, mobile = false }) {
   )
 }
 
-// ─── Theme Toggle ─────────────────────────────────────────────────────────────
-function ThemeToggle ({ dark, onToggle }) {
-  return (
-    <button
-      onClick={onToggle}
-      aria-label='Toggle dark mode'
-      className='relative flex items-center justify-center w-9 h-9 rounded-full text-gray-500 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950 transition-all duration-200'
-    >
-      <span
-        className='material-symbols-outlined text-[1.25rem] transition-transform duration-300'
-        style={{ transform: dark ? 'rotate(0deg)' : 'rotate(180deg)' }}
-      >
-        {dark ? 'light_mode' : 'dark_mode'}
-      </span>
-    </button>
-  )
-}
 
-// ─── Notification Bell ────────────────────────────────────────────────────────
+// Notification Bell
 function NotificationBell () {
   const [hasNew] = useState(true)
   return (
@@ -84,7 +69,7 @@ function NotificationBell () {
   )
 }
 
-// ─── Profile Avatar (links to dashboard) ─────────────────────────────────────
+// Profile Avatar
 function ProfileAvatar () {
   return (
     <a
@@ -98,8 +83,8 @@ function ProfileAvatar () {
 
 }
 
-// ─── Public Actions ───────────────────────────────────────────────────────────
-function PublicActions ({ mobile = false }) {
+// Public Actions
+function PublicActions ({mobile = false }) {
   if (mobile) {
     return (
       <div className='flex flex-col gap-2 mt-2 px-1'>
@@ -132,23 +117,24 @@ function PublicActions ({ mobile = false }) {
       >
         Get Started
       </Link>
+      <ThemeToggle />
     </div>
   )
 }
 
-// ─── Candidate Actions ────────────────────────────────────────────────────────
-function CandidateActions ({ dark, onToggle }) {
+// Candidate Actions
+function CandidateActions () {
   return (
     <div className='flex items-center gap-1'>
       <NotificationBell />
-      <ThemeToggle dark={dark} onToggle={onToggle} />
+      <ThemeToggle  />
       <div className='w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1' />
       <ProfileAvatar />
     </div>
   )
 }
 
-// ─── Hamburger ────────────────────────────────────────────────────────────────
+// Hamburger
 function Hamburger ({ open, onToggle }) {
   return (
     <button
@@ -164,7 +150,7 @@ function Hamburger ({ open, onToggle }) {
   )
 }
 
-// ─── Mobile Menu ──────────────────────────────────────────────────────────────
+// Mobile Menu
 function MobileMenu ({ open, userRole, dark, onToggle }) {
   const links = NAV_CONFIG[userRole]?.links ?? []
 
@@ -181,7 +167,7 @@ function MobileMenu ({ open, userRole, dark, onToggle }) {
 
         {userRole === 'candidate' && (
           <div className='flex items-center gap-2 px-4 py-3 mt-1'>
-            <ThemeToggle dark={dark} onToggle={onToggle} />
+            <ThemeToggle />
             <span className='text-sm text-gray-500 dark:text-gray-400'>
               {dark ? 'Light mode' : 'Dark mode'}
             </span>
@@ -194,17 +180,16 @@ function MobileMenu ({ open, userRole, dark, onToggle }) {
   )
 }
 
-// ─── Main Navbar ──────────────────────────────────────────────────────────────
-export default function HireSphereNavbar ({ userRole = 'public' }) {
+// Main Navbar
+export default function HireSphereNavbar () {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [dark, setDark] = useState(false)
+  
+  const {user} = useSelector((state)=>state.auth)
+  const role = user?.role
 
-  const links = NAV_CONFIG[userRole]?.links ?? []
+  
+  const links = NAV_CONFIG[role]?.links ?? []
 
-  // Apply dark class to <html>
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', dark)
-  }, [dark])
 
   return (
     <nav className='sticky top-0 z-50 w-full bg-white/90 dark:bg-gray-950/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 shadow-sm shadow-gray-100/60 dark:shadow-black/30 transition-colors duration-300'>
@@ -223,10 +208,9 @@ export default function HireSphereNavbar ({ userRole = 'public' }) {
 
           {/* Right: Actions */}
           <div className='hidden md:flex items-center gap-3'>
-            {userRole === 'public' && <PublicActions />}
-            {userRole === 'candidate' && (
-              <CandidateActions dark={dark} onToggle={() => setDark(d => !d)} />
-            )}
+            {role === 'candidate' ? (
+              <CandidateActions  />
+            ): <PublicActions />}
           </div>
 
           {/* Mobile: Hamburger */}
@@ -240,9 +224,7 @@ export default function HireSphereNavbar ({ userRole = 'public' }) {
       <div className='max-w-7xl mx-auto w-full px-5 sm:px-8 lg:px-12'>
         <MobileMenu
           open={menuOpen}
-          userRole={userRole}
-          dark={dark}
-          onToggle={() => setDark(d => !d)}
+          userRole={role}
         />
       </div>
     </nav>
