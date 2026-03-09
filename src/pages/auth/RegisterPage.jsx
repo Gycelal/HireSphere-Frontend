@@ -6,33 +6,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { registerSchema } from '../../validation/authSchemas'
 import { publicApi } from '../../services/api'
 import toast from 'react-hot-toast'
-
-//Shared input wrapper
-function Field ({ id, label, icon, children }) {
-  return (
-    <div className='flex flex-col gap-1.5'>
-      <label
-        htmlFor={id}
-        className='text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide'
-      >
-        {label}
-      </label>
-      <div className='relative'>
-        <span className='material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[1.1rem] text-gray-400 dark:text-gray-500 pointer-events-none select-none'>
-          {icon}
-        </span>
-        {children}
-      </div>
-    </div>
-  )
-}
-
-const inputClass =
-  'w-full pl-9 pr-4 py-2.5 rounded-xl text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-200'
+import Field from '../../components/common/Field'
+import { inputClass } from '../../components/common/Field'
 
 //RegisterPage
 export default function RegisterPage () {
-  const [role, setRole] = useState('candidate')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -42,14 +20,19 @@ export default function RegisterPage () {
     handleSubmit,
     setError,
     setValue,
-    formState: { errors }
+    formState: { errors },
+    watch
   } = useForm({
     resolver: zodResolver(registerSchema),
     mode: 'onTouched',
     reValidateMode: 'onChange',
-    shouldFocusError: true
+    shouldFocusError: true,
+    defaultValues: {
+      role: 'candidate'
+    }
   })
 
+  const role = watch('role')
   const navigate = useNavigate()
 
   const onSubmit = async data => {
@@ -59,7 +42,9 @@ export default function RegisterPage () {
       const response = await publicApi.post('accounts/register/', data)
       console.log(response.data)
       if (response.status === 201) {
-        navigate('/auth/verify-otp')
+        navigate('/auth/verify-otp', {
+          state: { user_id: response.data?.user_id }
+        })
         toast.success(response.data?.message)
       }
     } catch (error) {
@@ -104,7 +89,6 @@ export default function RegisterPage () {
             key={value}
             type='button'
             onClick={() => {
-              setRole(value)
               setValue('role', value)
             }}
             aria-pressed={role === value}
