@@ -61,5 +61,28 @@ export const registerSchema = z
 
 // Email Verification Schema
 export const emailVerificationSchema = z.object({
-
+  email: z
+      .string()
+      .trim()
+      .toLowerCase()
+      .nonempty("Email is required")
+      .email("Invalid email format")
 })
+
+export const passwordResetSchema = z.object({
+  password: z
+      .string()
+      .trim()
+      .nonempty("Password is required")
+      .min(8, "Password must be at least 8 characters long")
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[0-9]/, "Password must contain at least one number")
+      .regex(/[@$!%*?&]/, "Password must contain at least one special character"),
+
+  confirm_password: z
+    .string()
+    .nonempty("Please confirm your password")
+}).refine((data) => data.password === data.confirm_password, {
+    message: "Passwords do not match",
+    path: ["confirm_password"],
+  });

@@ -14,11 +14,19 @@ import { DashboardLayout } from './layouts/DashboardLayout'
 import { useSelector } from 'react-redux'
 import { useEffect } from 'react'
 import { Toaster } from "react-hot-toast"
+import ResetPasswordPage from './pages/auth/ResetPasswordPage'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { passwordResetSchema } from './validation/authSchemas'
 
 
 
 function App() {
   const mode = useSelector((state) => state.theme.mode);
+
+  const { register} = useForm({
+    resolver: {zodResolver: passwordResetSchema}
+  })
 
   useEffect(() => {
   document.documentElement.classList.toggle("dark", mode === "dark");
@@ -38,6 +46,7 @@ function App() {
           <Route path='register' element={<RegisterPage />} />
           <Route path='verify-otp' element={<OtpVerificationPage />} />
           <Route path='verify-email' element={<VerifyEmailPage />} />
+          <Route path='reset-password/:token' element={<ResetPasswordPage/>} />
           <Route path='admin-login' element={<AdminLoginPage />} />
         </Route>
         {/* Candidate Home layout routes */}

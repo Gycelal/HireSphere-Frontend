@@ -1,22 +1,48 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { emailVerificationSchema } from "../../validation/authSchemas";
+import { useForm } from "react-hook-form";
+import { publicApi } from "../../services/api";
+import toast from "react-hot-toast";
 
 export default function VerifyEmailPage() {
-  const [email, setEmail]     = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent]       = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!email.trim()) return;
-    setLoading(true);
-    // TODO: call send-reset-link API
-    await new Promise((r) => setTimeout(r, 1400));
-    setLoading(false);
-    setSent(true);
-  };
+  const { register, handleSubmit, watch, setError } = useForm({
+    resolver: zodResolver(emailVerificationSchema),
+    mode: 'onTouched',
+    reValidationMode: 'onChange',
+    shouldFocusError: true
 
-  // ── Post-send confirmation state ─────────────────────────────────────────
+  })
+  const email = watch("email") || ""
+
+ const onSubmit = async (data) => {
+  setLoading(true)
+
+  try {
+    const res = await publicApi.post("/accounts/forgot-password/", { email: data.email })
+    setSent(true)
+
+  } catch (error) {
+
+    if (error.response?.status === 429) {
+      toast.error(error.response.data?.error)
+
+    } else if (error.response?.data?.email) {
+      setError(error.response.data.email)
+
+    } else {
+      toast.error("Something went wrong.")
+    }
+
+  } finally {
+    setLoading(false)
+  }
+}
+  //Post-send confirmation state
   if (sent) {
     return (
       <div className="flex flex-col gap-6">
@@ -42,7 +68,7 @@ export default function VerifyEmailPage() {
 
         {/* Hint */}
         <div className="flex items-start gap-3 px-4 py-3.5 rounded-xl bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-800">
-          <span className="material-symbols-outlined text-gray-400 dark:text-gray-500 text-[1.1rem] mt-0.5 flex-shrink-0">
+          <span className="material-symbols-outlined text-gray-400 dark:text-gray-500 text-[1.1rem] mt-0.5 shrink-0">
             info
           </span>
           <p className="text-xs text-gray-400 dark:text-gray-500 leading-relaxed">
@@ -50,7 +76,7 @@ export default function VerifyEmailPage() {
             <button
               type="button"
               onClick={() => setSent(false)}
-              className="font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 transition-colors duration-200"
+              className="font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 transition-colors duration-200 cursor-pointer"
             >
               try another email address
             </button>
@@ -70,11 +96,11 @@ export default function VerifyEmailPage() {
     );
   }
 
-  // ── Default: email entry state ────────────────────────────────────────────
+  // Default: email entry state
   return (
     <div className="flex flex-col gap-6">
 
-      {/* Back */}
+      {/* Back to login */}
       <Link
         to="/auth/login"
         className="inline-flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 hover:text-violet-600 dark:hover:text-violet-400 transition-colors duration-200 w-fit"
@@ -94,7 +120,7 @@ export default function VerifyEmailPage() {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
 
         {/* Email field */}
         <div className="flex flex-col gap-1.5">
@@ -110,13 +136,10 @@ export default function VerifyEmailPage() {
             </span>
             <input
               id="email"
-              name="email"
               type="email"
               autoComplete="email"
-              required
               placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              {...register('email')}
               className="w-full pl-9 pr-4 py-2.5 rounded-xl text-sm bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all duration-200"
             />
           </div>

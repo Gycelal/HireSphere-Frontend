@@ -127,7 +127,7 @@ export default function LoginPage() {
           {/* Forgot password */}
           <div className="flex justify-end">
             <Link
-              to="/auth/forgot-password"
+              to="/auth/verify-email"
               className="text-xs font-medium text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 transition-colors duration-200"
             >
               Forgot password?
@@ -170,9 +170,9 @@ export default function LoginPage() {
         <div className="flex-1 h-px bg-gray-200 dark:bg-gray-800" />
       </div>
 
-      {/* ── Google OAuth Button ── */}
+      {/* Google OAuth Button */}
       <GoogleButton />
-      {/* ── Register Link ── */}
+      {/* Register Link */}
       <p className="text-center text-sm text-gray-400 dark:text-gray-500">
         Don't have an account?{" "}
         <Link
