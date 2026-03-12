@@ -1,4 +1,4 @@
-import {Routes, Route} from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import AuthLayout from './layouts/AuthLayout'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
@@ -10,35 +10,32 @@ import CandidateHome from './pages/candidate/CandidateHome'
 import LandingPageBody from './pages/LandingPage'
 import ProtectedRoutes from './routes/ProtectedRoutes'
 import RecruiterDashboard from './pages/recruiter/RecruiterDashboard'
-import { DashboardLayout } from './layouts/DashboardLayout'
 import { useSelector } from 'react-redux'
 import { useEffect } from 'react'
-import { Toaster } from "react-hot-toast"
+import { Toaster } from 'react-hot-toast'
 import ResetPasswordPage from './pages/auth/ResetPasswordPage'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { passwordResetSchema } from './validation/authSchemas'
+import DashboardLayout from './layouts/DashboardLayout'
 
+function App () {
+  const mode = useSelector(state => state.theme.mode)
 
-
-function App() {
-  const mode = useSelector((state) => state.theme.mode);
-
-  const { register} = useForm({
-    resolver: {zodResolver: passwordResetSchema}
+  const { register } = useForm({
+    resolver: { zodResolver: passwordResetSchema }
   })
 
   useEffect(() => {
-  document.documentElement.classList.toggle("dark", mode === "dark");
-}, [mode]);
+    document.documentElement.classList.toggle('dark', mode === 'dark')
+  }, [mode])
 
   return (
     <>
-    <Toaster position='top-right'/>
+      <Toaster position='top-right' />
       <Routes>
         {/* Route to Common Landing Page */}
-        <Route element={<HomeLayout/>}>
-          <Route path='/' element={<LandingPageBody />}/>
+        <Route element={<HomeLayout />}>
+          <Route path='/' element={<LandingPageBody />} />
         </Route>
         {/* Route To All Pages Related To Authentication */}
         <Route path='auth' element={<AuthLayout />}>
@@ -46,32 +43,35 @@ function App() {
           <Route path='register' element={<RegisterPage />} />
           <Route path='verify-otp' element={<OtpVerificationPage />} />
           <Route path='verify-email' element={<VerifyEmailPage />} />
-          <Route path='reset-password/:token' element={<ResetPasswordPage/>} />
+          <Route path='reset-password/:token' element={<ResetPasswordPage />} />
           <Route path='admin-login' element={<AdminLoginPage />} />
         </Route>
+        <Route path='dashboard' element={<DashboardLayout />}></Route>
         {/* Candidate Home layout routes */}
-        <Route element={<ProtectedRoutes allowedRole={"candidate"}/>}>
-          <Route path='candidate' element={<HomeLayout/>}>
-            <Route path='home' element={<CandidateHome/>}/>
+        <Route element={<ProtectedRoutes allowedRole={'candidate'} />}>
+          <Route path='candidate' element={<HomeLayout />}>
+            <Route path='home' element={<CandidateHome />} />
           </Route>
+          {/* candidate dashboard routes */}
+          <Route path='candidate' element={<DashboardLayout />}></Route>
         </Route>
 
-        {/* Candidate Dashbaord layout rotues */}
-        <Route element={<ProtectedRoutes allowedRole={"candidate"}/>}></Route>
+        {/* Recruiter Dashbaord layout rotues */}
+        <Route element={<ProtectedRoutes allowedRole={'recruiter'} />}>
+            {/* recruiter dashboard routes */}
+          <Route path='recruiter' element={<DashboardLayout />}>
+            
+          </Route>
+        </Route>
 
         {/* Admin Dashboard routes */}
-        <Route element={<ProtectedRoutes allowedRole={"recruiter"}/>}>
-          <Route path='recruiter' element={<DashboardLayout/>}>
-            <Route path='dashboard' element={<RecruiterDashboard/>}/>
+        <Route element={<ProtectedRoutes allowedRole={'recruiter'} />}>
+          <Route path='recruiter' element={<DashboardLayout />}>
+            
           </Route>
         </Route>
-
-
-
-        
       </Routes>
     </>
-  
   )
 }
 
