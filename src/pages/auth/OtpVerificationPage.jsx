@@ -108,7 +108,7 @@ export default function OtpVerificationPage () {
         user_id: state.user_id
       })
       if (res.status == 200) {
-        navigate('/auth/login')
+        navigate('login')
         toast.success('Account verified... Now login.')
       }
     } catch (error) {
@@ -156,7 +156,7 @@ export default function OtpVerificationPage () {
     <div className='flex flex-col gap-6'>
       {/* Back button*/}
       <Link
-        to='/auth/register'
+        to='register'
         className='inline-flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 hover:text-violet-600 dark:hover:text-violet-400 transition-colors duration-200 w-fit'
       >
         <span className='material-symbols-outlined text-[1.1rem]'>

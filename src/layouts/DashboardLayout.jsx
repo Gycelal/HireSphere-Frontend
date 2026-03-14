@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import { NAV } from '../config/navigations'
 import Topbar from '../components/common/Topbar'
 import DesktopSidebar from '../components/common/DesktopSidebar'
+import MobileDrawer from '../components/common/MobileDrawer'
 
 
 
@@ -11,9 +12,11 @@ export default function DashboardLayout () {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
 
-  const { user } = useSelector(state => state.auth.user)
-  const navItems = NAV[user.role]
-  const bottomItems = NAV[user.role].bottom
+  const user = useSelector((state)=> state.auth.user)
+  console.log("user info:", user)
+  const navItems = NAV[user.role]["main"]
+  console.log("nav items:", navItems)
+  const bottomItems = NAV[user.role]["bottom"]
   const notificationCount = null
 
   return (
@@ -36,7 +39,6 @@ export default function DashboardLayout () {
       <div className='flex flex-col flex-1 min-w-0 overflow-hidden'>
         <Topbar
           user={user}
-          onLogout={onLogout}
           notificationCount={notificationCount}
           onMobileMenuOpen={() => setMobileOpen(true)}
         />

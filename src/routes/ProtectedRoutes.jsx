@@ -1,11 +1,10 @@
-import { all } from "axios"
 import { useSelector } from "react-redux"
 import { Navigate, Outlet } from "react-router-dom"
 
 export const ProtectedRoutes = ({allowedRole}) => {
-    const {user} = useSelector((state)=> state.auth)
+    const user = useSelector((state)=> state.auth.user)
     if(!user){
-        return <Navigate to={"auth/login"} replace/>
+        return <Navigate to={"login"} replace/>
     }
 
     if(allowedRole && user.role !== allowedRole){

@@ -14,16 +14,15 @@ import { useSelector } from 'react-redux'
 import { useEffect } from 'react'
 import { Toaster } from 'react-hot-toast'
 import ResetPasswordPage from './pages/auth/ResetPasswordPage'
-import { useForm } from 'react-hook-form'
-import { passwordResetSchema } from './validation/authSchemas'
 import DashboardLayout from './layouts/DashboardLayout'
+import Profile from './components/common/Profile'
+import AdminDashboard from './pages/admin/AdminDashboard'
+import CandidateDashboard from './pages/candidate/CandidateDashboard'
+import PublicRoutes from './routes/PublicRoutes'
+import { Navigate } from 'react-router-dom'
 
 function App () {
   const mode = useSelector(state => state.theme.mode)
-
-  const { register } = useForm({
-    resolver: { zodResolver: passwordResetSchema }
-  })
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', mode === 'dark')
@@ -33,43 +32,58 @@ function App () {
     <>
       <Toaster position='top-right' />
       <Routes>
-        {/* Route to Common Landing Page */}
-        <Route element={<HomeLayout />}>
-          <Route path='/' element={<LandingPageBody />} />
-        </Route>
-        {/* Route To All Pages Related To Authentication */}
-        <Route path='auth' element={<AuthLayout />}>
-          <Route path='login' element={<LoginPage />} />
-          <Route path='register' element={<RegisterPage />} />
-          <Route path='verify-otp' element={<OtpVerificationPage />} />
-          <Route path='verify-email' element={<VerifyEmailPage />} />
-          <Route path='reset-password/:token' element={<ResetPasswordPage />} />
-          <Route path='admin-login' element={<AdminLoginPage />} />
-        </Route>
-        <Route path='dashboard' element={<DashboardLayout />}></Route>
-        {/* Candidate Home layout routes */}
-        <Route element={<ProtectedRoutes allowedRole={'candidate'} />}>
-          <Route path='candidate' element={<HomeLayout />}>
-            <Route path='home' element={<CandidateHome />} />
+        <Route element={<PublicRoutes />}>
+          {/* Route to Common Landing Page */}
+          <Route element={<HomeLayout />}>
+            <Route path='/' element={<LandingPageBody />} />
           </Route>
-          {/* candidate dashboard routes */}
-          <Route path='candidate' element={<DashboardLayout />}></Route>
+
+          {/* Route To All Pages Related To Authentication */}
+          <Route element={<AuthLayout />}>
+            <Route path='login' element={<LoginPage />} />
+            <Route path='register' element={<RegisterPage />} />
+            <Route path='verify-otp' element={<OtpVerificationPage />} />
+            <Route path='verify-email' element={<VerifyEmailPage />} />
+            <Route
+              path='reset-password/:token'
+              element={<ResetPasswordPage />}
+            />
+            <Route path='admin-login' element={<AdminLoginPage />} />
+          </Route>
+        </Route>
+
+        {/* Candidate routes */}
+        <Route element={<ProtectedRoutes allowedRole={'candidate'} />}>
+          <Route path='candidate'>
+            {/* Home layouts  */}
+            <Route element={<HomeLayout />}>
+              <Route path='home' element={<CandidateHome />} />
+            </Route>
+            {/* dashboard routes */}
+            <Route element={<DashboardLayout />}>
+              <Route path='overview' element={<CandidateDashboard />} />
+              <Route path='profile' element={<Profile />} />
+            </Route>
+          </Route>
         </Route>
 
         {/* Recruiter Dashbaord layout rotues */}
         <Route element={<ProtectedRoutes allowedRole={'recruiter'} />}>
-            {/* recruiter dashboard routes */}
-          <Route path='recruiter' element={<DashboardLayout />}>
-            
+          {/* recruiter dashboard routes */}
+          <Route path='recruiter'>
+            <Route element={<DashboardLayout />}>
+              <Route path='overview' element={<RecruiterDashboard />} />
+            </Route>
           </Route>
         </Route>
 
         {/* Admin Dashboard routes */}
-        <Route element={<ProtectedRoutes allowedRole={'recruiter'} />}>
-          <Route path='recruiter' element={<DashboardLayout />}>
-            
+        <Route element={<ProtectedRoutes allowedRole={'admin'} />}>
+          <Route path='admin' element={<DashboardLayout />}>
+            <Route path='dashboard' element={<AdminDashboard />} />
           </Route>
         </Route>
+        <Route path='*' element={<Navigate to="/" replace />}/>
       </Routes>
     </>
   )

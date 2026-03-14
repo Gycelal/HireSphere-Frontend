@@ -4,6 +4,8 @@ import ProfileDropdown from "./ProfileDropdown"
 
 
 export default function Topbar ({onMobileMenuOpen}) {
+
+  const notificationCount = null
     
   return (
     <header

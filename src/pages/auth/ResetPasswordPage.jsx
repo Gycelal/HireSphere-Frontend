@@ -34,7 +34,7 @@ export default function ResetPasswordPage () {
       })
       if (res.status === 200) {
         toast.success(res.data?.message)
-        navigate('/auth/login')
+        navigate('login')
       }
     } catch (error) {
       const err = error.response?.data
@@ -58,7 +58,7 @@ export default function ResetPasswordPage () {
     <div className='flex flex-col gap-6'>
       {/* Back */}
       <Link
-        to='/auth/login'
+        to='login'
         className='inline-flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 hover:text-violet-600 dark:hover:text-violet-400 transition-colors duration-200 w-fit'
       >
         <span className='material-symbols-outlined text-[1.1rem]'>

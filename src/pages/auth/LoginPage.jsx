@@ -30,9 +30,9 @@ export default function LoginPage() {
       dispatch(loginSuccess({user: response.data.user}))
 
       if (response.data.user.role === "candidate"){
-        navigate("/candidate/home")
+        navigate("/candidate/home", {replace: true})
       }else{
-        navigate("/recruiter/dashboard")
+        navigate("/recruiter/overview", {replace: true})
       }
 
     }catch(error){

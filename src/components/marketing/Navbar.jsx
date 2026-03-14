@@ -54,13 +54,11 @@ function NotificationBell () {
 // Profile Avatar
 function ProfileAvatar () {
   return (
-    <a
-      href='/dashboard/profile'
-      aria-label='Go to profile dashboard'
-      className='flex items-center justify-center w-8 h-8 rounded-full bg-violet-100 dark:bg-violet-900/60 text-violet-600 dark:text-violet-300 font-bold text-xs ring-2 ring-transparent hover:ring-violet-400 dark:hover:ring-violet-500 transition-all duration-200'
-    >
-      AK
-    </a>
+    <Link to={"profile"}  aria-label='Go to profile dashboard'
+      className='flex items-center justify-center w-8 h-8 rounded-full bg-violet-100 dark:bg-violet-900/60 text-violet-600 dark:text-violet-300 font-bold text-xs ring-2 ring-transparent hover:ring-violet-400 dark:hover:ring-violet-500 transition-all duration-200'>
+    AK
+    </Link>
+    
   )
 
 }
@@ -71,13 +69,13 @@ function PublicActions ({mobile = false }) {
     return (
       <div className='flex flex-col gap-2 mt-2 px-1'>
         <Link
-          to={"/auth/register"}
+          to={"register"}
           className='flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-semibold text-violet-600 dark:text-violet-400 border-2 border-violet-400 dark:border-violet-500 hover:bg-violet-50 dark:hover:bg-violet-950 transition-all duration-200'
         >
           Login
         </Link>
         <Link
-          to={"/auth/register"}
+          to={"register"}
           className='flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-violet-600 hover:bg-violet-700 active:bg-violet-800 transition-all duration-200 shadow-md shadow-violet-200 dark:shadow-violet-900/40'
         >
           Get Started
@@ -88,13 +86,13 @@ function PublicActions ({mobile = false }) {
   return (
     <div className='flex items-center gap-2'>
       <Link
-        to={"auth/login/"}
+        to={"login/"}
         className='px-4 py-2 rounded-lg text-sm font-semibold text-violet-600 dark:text-violet-400 border-2 border-violet-400 dark:border-violet-500 hover:bg-violet-50 dark:hover:bg-violet-950 transition-all duration-200'
       >
         Login
       </Link>
       <Link
-        to={"auth/register/"}
+        to={"register/"}
         className='px-4 py-2 rounded-lg text-sm font-semibold text-white bg-violet-600 hover:bg-violet-700 active:bg-violet-800 transition-all duration-200 shadow-md shadow-violet-200 dark:shadow-violet-900/40'
       >
         Get Started

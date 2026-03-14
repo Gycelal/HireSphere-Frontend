@@ -42,7 +42,7 @@ privateApi.interceptors.response.use(
                 return api(error.config)
             }catch(err){
                 localStorage.removeItem("access")
-                window.location.href = "auth/login"
+                window.location.href = "login"
             }
         }
         return Promise.reject(error)
