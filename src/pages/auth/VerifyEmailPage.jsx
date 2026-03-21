@@ -86,7 +86,7 @@ export default function VerifyEmailPage() {
 
         {/* Back to login */}
         <Link
-          to="login"
+          to="/login"
           className="inline-flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 hover:text-violet-600 dark:hover:text-violet-400 transition-colors duration-200 w-fit"
         >
           <span className="material-symbols-outlined text-[1.1rem]">arrow_back</span>
@@ -102,7 +102,7 @@ export default function VerifyEmailPage() {
 
       {/* Back to login */}
       <Link
-        to="login"
+        to="/login"
         className="inline-flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 hover:text-violet-600 dark:hover:text-violet-400 transition-colors duration-200 w-fit"
       >
         <span className="material-symbols-outlined text-[1.1rem]">arrow_back</span>

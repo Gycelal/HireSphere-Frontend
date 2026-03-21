@@ -11,21 +11,21 @@ import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
 
-  const { register, handleSubmit, setError, formState: {errors} } = useForm({
-    resolver: zodResolver(loginSchema)
+  const { register, handleSubmit, setError, formState: {errors, isSubmitting} } = useForm({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+    email: "",
+    password: ""
+  }
   })
 
   const onSubmit = async (data)=>{
     try{
-      setLoading(true)
-      console.log("Form data:", data);
       const response = await publicApi.post('accounts/login/', data)
-      console.log(response.data)
       localStorage.setItem("access", response.data.access)
       dispatch(loginSuccess({user: response.data.user}))
 
@@ -37,9 +37,6 @@ export default function LoginPage() {
 
     }catch(error){
       setError("root", {type: "server", message: error.response?.data?.detail || "Login failed. Please try again."})
-      console.log("Login failed:", error.response.data);
-    }finally{
-      setLoading(false)
     }
   }
 
@@ -127,7 +124,7 @@ export default function LoginPage() {
           {/* Forgot password */}
           <div className="flex justify-end">
             <Link
-              to="/auth/verify-email"
+              to="/verify-email"
               className="text-xs font-medium text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 transition-colors duration-200"
             >
               Forgot password?
@@ -144,10 +141,10 @@ export default function LoginPage() {
         {/* Submit */}
         <button
           type="submit"
-          disabled={loading}
+          disabled={isSubmitting}
           className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold text-white bg-violet-600 hover:bg-violet-700 active:bg-violet-800 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 shadow-md shadow-violet-200 dark:shadow-violet-900/30 mt-1"
         >
-          {loading ? (
+          {isSubmitting ? (
             <>
               <span className="material-symbols-outlined text-[1rem] animate-spin">
                 progress_activity
@@ -176,7 +173,7 @@ export default function LoginPage() {
       <p className="text-center text-sm text-gray-400 dark:text-gray-500">
         Don't have an account?{" "}
         <Link
-          to="/auth/register"
+          to="/register"
           className="font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 transition-colors duration-200"
         >
           Register

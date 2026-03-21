@@ -13,9 +13,7 @@ export default function DashboardLayout () {
   const [mobileOpen, setMobileOpen] = useState(false)
 
   const user = useSelector((state)=> state.auth.user)
-  console.log("user info:", user)
   const navItems = NAV[user.role]["main"]
-  console.log("nav items:", navItems)
   const bottomItems = NAV[user.role]["bottom"]
   const notificationCount = null
 

@@ -3,8 +3,11 @@ import { Navigate, Outlet } from "react-router-dom"
 
 export const ProtectedRoutes = ({allowedRole}) => {
     const user = useSelector((state)=> state.auth.user)
-    if(!user){
-        return <Navigate to={"login"} replace/>
+    if(!user){    
+        if(window.location.pathname.startsWith("/admin")){
+            return <Navigate to={"admin-login"} replace/>
+        }
+            return <Navigate to={"login"} replace/>
     }
 
     if(allowedRole && user.role !== allowedRole){

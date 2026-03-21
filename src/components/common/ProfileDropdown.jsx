@@ -1,19 +1,17 @@
-import { useDispatch, useSelector } from "react-redux"
-import { useRef, useState, useEffect } from "react"
-import { Link, replace, useNavigate } from "react-router-dom"
-import { privateApi } from "../../services/api"
-import { logout } from "../../store/slices/authSlice"
-import toast from "react-hot-toast"
-
-
+import { useDispatch, useSelector } from 'react-redux'
+import { useRef, useState, useEffect } from 'react'
+import { Link, replace, useNavigate } from 'react-router-dom'
+import { privateApi } from '../../services/api'
+import { logout } from '../../store/slices/authSlice'
+import toast from 'react-hot-toast'
 
 export default function ProfileDropdown () {
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
 
-  const {user} = useSelector((state)=> state.auth)
-  const navigate = useNavigate()
+  const { user } = useSelector(state => state.auth)
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   useEffect(() => {
     function handle (e) {
@@ -31,19 +29,30 @@ export default function ProfileDropdown () {
       .slice(0, 2)
       .toUpperCase() ?? 'U'
 
+  const onLogout = async () => {
+    const isAdmin = location.pathname.startsWith('/admin')
 
-    const onLogout = ()=>{
-      setOpen(false)
-      try{
-        privateApi.post('logout')
-      }catch(error){
-        // ignore error
-      }finally{
-        dispatch(logout())
-        navigate('login', {replace: true})
-        toast.success("Loged out successfully.")
-      }
+    setOpen(false)
+    dispatch(logout())
+    if (isAdmin) {
+      navigate('/admin-lgoin', { replace: true })
+    } else {
+      navigate('/login', { replace: true })
     }
+    try {
+      await privateApi.post('accounts/logout/')
+    } catch (error) {
+      // ignore error
+      console.log(
+        'log out api failed but user already loged out',
+        error.response?.data
+      )
+    } finally {
+      console.log(`user was ${role} before logout.`)
+      localStorage.removeItem('access')
+      toast.success('Loged out successfully.')
+    }
+  }
 
   return (
     <div ref={ref} className='relative'>
@@ -100,7 +109,7 @@ export default function ProfileDropdown () {
           </Link>
           <Link
             to='/dashboard/settings'
-            onClick={""}
+            onClick={''}
             className='flex items-center gap-2.5 px-4 py-2.5 text-sm
               text-gray-600 dark:text-gray-300
               hover:bg-gray-50 dark:hover:bg-gray-800

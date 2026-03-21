@@ -24,6 +24,7 @@ export const NAV = {
   admin: {
     main: [
       { label:"Dashboard",     icon:"dashboard",             href:"/dashboard" },
+      { label:"Recruiter Approvals", icon: "how_to_reg", href:"recruiter-approvals"},
       { label:"Users",        icon:"manage_accounts",       href:"/dashboard/users" },
       { label:"Job Listings", icon:"work_outline",          href:"/dashboard/listings" },
       { label:"Reports",      icon:"assessment",            href:"/dashboard/reports" },

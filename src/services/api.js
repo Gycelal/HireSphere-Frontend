@@ -1,5 +1,6 @@
 import axios from "axios";
-
+import { logout } from "../store/slices/authSlice";
+import appStore from "../store/store";
 
 export const publicApi = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL
@@ -9,8 +10,6 @@ export const privateApi = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
     withCredentials: true,
 })
-
-
 
 
 
@@ -33,7 +32,7 @@ privateApi.interceptors.response.use(
     async(error)=>{
         if(error.response?.status === 401){
             try{
-                const res = await publicApi.post("token/refresh/",
+                const res = await publicApi.post("accounts/token/refresh/",
                     {},
                     {withCredentials: true}
                 );
@@ -42,7 +41,7 @@ privateApi.interceptors.response.use(
                 return api(error.config)
             }catch(err){
                 localStorage.removeItem("access")
-                window.location.href = "login"
+                appStore.dispatch(logout())
             }
         }
         return Promise.reject(error)

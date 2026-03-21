@@ -42,7 +42,7 @@ export default function RegisterPage () {
       const response = await publicApi.post('accounts/register/', data)
       console.log(response.data)
       if (response.status === 201) {
-        navigate('verify-otp', {
+        navigate('/verify-otp', {
           state: { user_id: response.data?.user_id }
         })
         toast.success(response.data?.message)
@@ -250,7 +250,7 @@ export default function RegisterPage () {
       <p className='text-center text-sm text-gray-400 dark:text-gray-500'>
         Already have an account?{' '}
         <Link
-          to='login'
+          to='/login'
           className='font-semibold text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 transition-colors duration-200'
         >
           Log in
