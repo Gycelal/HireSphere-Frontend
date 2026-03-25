@@ -14,8 +14,7 @@ const GoogleButton = () => {
       const res = await publicApi.post('/accounts/google/', {
         id_token: credentialResponse.credential
       })
-      dispatch(loginSuccess({user: res.data.user}))
-      console.log("access:", res.data.access)
+      dispatch(loginSuccess(res.data))
       navigate('select-role')
     } catch (error) {
       console.error('Google login failed', error)

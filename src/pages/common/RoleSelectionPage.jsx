@@ -41,6 +41,10 @@ export default function RoleSelectionPage () {
     }
   ]
 
+  useEffect(()=>{
+    console.log("user after google auth:", user)
+  })
+
   useEffect(() => {
     if (user?.role) {
       // already has role → redirect away
@@ -67,9 +71,11 @@ export default function RoleSelectionPage () {
 
   const onContinue = async()=>{
     try{
-        const res = await privateApi("accounts/set-role")
-        dispatch(setUser(res.data))
+        const res = await privateApi.post("accounts/set-role/",{"role":selected})
+        console.log("user after set role:", res)
+        dispatch(setUser(res.data?.user))
     }catch(error){
+      console.log("backend error:", error)
         toast.error("Something went wrong.")
     }
   }
