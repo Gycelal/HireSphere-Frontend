@@ -6,7 +6,7 @@ Handles UI for Candidates, Recruiters, and Admins.
 ## Features
 
 - Role-based authentication (Candidate, Recruiter, Admin)
-- Separate login pages for each user type
+- Separate login pages for normal users and admin
 - Basic dashboards for all users
 - Theme toggle (light/dark) with Redux state
 - Responsive UI with Tailwind CSS
