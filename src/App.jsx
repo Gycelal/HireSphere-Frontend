@@ -23,11 +23,11 @@ import { Navigate } from 'react-router-dom'
 import { PersistGate } from 'redux-persist/integration/react'
 import { persistor } from './store/store'
 import AdminRecruiterApprovalsPage from './pages/admin/AdminRecruiterApprovals'
+import RoleSelectionPage from './pages/common/RoleSelectionPage'
 
 function App () {
-
   const mode = useSelector(state => state.theme.mode)
-  
+
   useEffect(() => {
     document.documentElement.classList.toggle('dark', mode === 'dark')
   }, [mode])
@@ -55,6 +55,11 @@ function App () {
               />
               <Route path='admin-login' element={<AdminLoginPage />} />
             </Route>
+          </Route>
+
+          {/* Role Selection */}
+          <Route element={<ProtectedRoutes />}>
+            <Route path='select-role' element={<RoleSelectionPage />} />
           </Route>
 
           {/* Candidate routes */}

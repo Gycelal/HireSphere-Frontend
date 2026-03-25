@@ -10,9 +10,28 @@ export const ProtectedRoutes = ({allowedRole}) => {
             return <Navigate to={"login"} replace/>
     }
 
-    if(allowedRole && user.role !== allowedRole){
-        return <Navigate to={"candidate/home"} replace/>
+    if (allowedRole && user.role !== allowedRole) {
+
+    // If role not assigned
+    if (!user.role) {
+        return <Navigate to="/select-role" replace />
     }
+
+    // Redirect based on role
+    if (user.role === "candidate") {
+        return <Navigate to="/candidate/home" replace />
+    }
+
+    if (user.role === "recruiter") {
+        return <Navigate to="/recruiter/overview" replace />
+    }
+
+    if (user.role === "admin") {
+        return <Navigate to="/admin/dashboard" replace />
+    }
+
+    return <Navigate to="/" replace />
+}
   return <Outlet/>
 }
 

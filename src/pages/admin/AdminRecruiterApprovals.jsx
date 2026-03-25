@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, act } from 'react'
 import PageHeader from '../../components/common/PageHeader'
 import TableToolbar from '../../components/table/TableToolBar'
 import DataTable from '../../components/table/DataTable'
@@ -6,6 +6,7 @@ import Pagination from '../../components/common/Pagination'
 import { SORT_OPTIONS } from '../../config/sortOptions'
 import { privateApi } from '../../services/api'
 import ConfirmModal from '../../components/common/ConfirmModal'
+import toast from 'react-hot-toast'
 
 function StatusBadge ({ status }) {
   const safeStatus = status || 'pending'
@@ -49,7 +50,7 @@ function RecruiterCell ({ row }) {
     </div>
   )
 }
-      // Call API
+// Call API
 // Action buttons
 function RowActions ({ row, onPreview, onApprove, onReject }) {
   return (
@@ -139,9 +140,8 @@ export default function AdminRecruiterApprovalsPage () {
   const [data, setData] = useState([])
   const [totalCount, setTotalCount] = useState(0)
   const [openModal, setOpenModal] = useState(false)
-  const [ action, setAction] = useState(null)
-  const [ selectedId, setSelectedId] = useState(null)
-
+  const [action, setAction] = useState(null)
+  const [selectedId, setSelectedId] = useState(null)
 
   const COLUMNS = useMemo(
     () => [
@@ -175,11 +175,9 @@ export default function AdminRecruiterApprovalsPage () {
     fetchRecruiters()
   }, [search, status, sort, page])
 
-
   const fetchRecruiters = async () => {
     try {
-
-      const paramsObj = { page, ordering: sort}
+      const paramsObj = { page, ordering: sort }
 
       if (search.trim()) paramsObj.search = search
       if (status) paramsObj.status = status
@@ -203,12 +201,14 @@ export default function AdminRecruiterApprovalsPage () {
 
   const handleApprove = row => {
     setOpenModal(true)
-    setAction("approve")
+    setAction('approve')
+    setSelectedId(row.id)
   }
 
   const handleReject = row => {
-    setOpenModal(true);
-    setAction("reject")
+    setOpenModal(true)
+    setAction('reject')
+    setSelectedId(row.id)
   }
 
   // Reset to page 1 when filters change
@@ -224,14 +224,23 @@ export default function AdminRecruiterApprovalsPage () {
     setSort(v)
     setPage(1)
   }
+  const handleConfirm = async () => {
+    try {
+      const res = await privateApi.patch(
+        `admin/recruiters/${selectedId}/approval/`,
+        { action: action }
+      )
+      toast.success(`Recruiter ${action} successfully!`)
+      setOpenModal(false)
 
-  const handleOpenModal = (id, type)=>{
-    setSelectedId(id)
-    setAction(type)
-    setModalOpen(true)
-  }
-  const handleConfirm = ()=>{
-
+      setSelectedId(null)
+      setAction(null)
+      // refetch recruiters
+      fetchRecruiters()
+    } catch (error) {
+      console.error("Approval error:", error)
+      toast.error(error?.response?.data?.message || "Failed to update recruiter status.")
+    }
   }
   return (
     <div className='flex flex-col gap-6'>
@@ -288,13 +297,15 @@ export default function AdminRecruiterApprovalsPage () {
 
       {/* Confirmation Modal */}
       <ConfirmModal
-      open={openModal}
-      title={action === "approve" ? "Approve Recruiter?" : "Reject Recruiter?"}
-      message={`Are you sure you want to ${action} this recruiter?`}
-      confirmText={action === "approve" ? "Approve" : "Reject"}
-      variant={action === "approve" ? "success" : "danger"}
-      onCancel={()=>setOpenModal(false) }
-      onConfirm={handleConfirm}
+        open={openModal}
+        title={
+          action === 'approve' ? 'Approve Recruiter?' : 'Reject Recruiter?'
+        }
+        message={`Are you sure you want to ${action} this recruiter?`}
+        confirmText={action === 'approve' ? 'Approve' : 'Reject'}
+        variant={action === 'approve' ? 'success' : 'danger'}
+        onCancel={() => setOpenModal(false)}
+        onConfirm={handleConfirm}
       />
     </div>
   )

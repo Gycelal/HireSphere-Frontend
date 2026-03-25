@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import ThemeToggle from "../components/common/ThemeToggle";
 import Logo from "../components/common/Logo";
+import MiniFooter from "../components/common/MiniFooter";
 
 export default function AuthLayout() {
   return (
@@ -18,14 +19,7 @@ export default function AuthLayout() {
           <Outlet />
         </div>
       </main>
-
-      
-      <footer className="py-5 flex items-center justify-center border-t border-gray-100 dark:border-gray-800">
-        <p className="text-xs text-gray-400 dark:text-gray-600 tracking-wide">
-          © {new Date().getFullYear()} HireSphere. All rights reserved.
-        </p>
-      </footer>
-
+      <MiniFooter/>
     </div>
   );
 }

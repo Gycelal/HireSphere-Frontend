@@ -33,12 +33,6 @@ export default function ProfileDropdown () {
     const isAdmin = location.pathname.startsWith('/admin')
 
     setOpen(false)
-    dispatch(logout())
-    if (isAdmin) {
-      navigate('/admin-lgoin', { replace: true })
-    } else {
-      navigate('/login', { replace: true })
-    }
     try {
       await privateApi.post('accounts/logout/')
     } catch (error) {
@@ -48,8 +42,12 @@ export default function ProfileDropdown () {
         error.response?.data
       )
     } finally {
-      console.log(`user was ${role} before logout.`)
-      localStorage.removeItem('access')
+       dispatch(logout())
+    if (isAdmin) {
+      navigate('/admin-lgoin', { replace: true })
+    } else {
+      navigate('/login', { replace: true })
+    }
       toast.success('Loged out successfully.')
     }
   }

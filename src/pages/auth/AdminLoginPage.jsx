@@ -31,6 +31,7 @@ export default function AdminLoginPage() {
   try {
 
     const res = await publicApi.post("accounts/login/", data)
+    console.log("the data:", res.data)
     const user = res.data.user
 
     if (user.role !== "admin") {
@@ -41,11 +42,12 @@ export default function AdminLoginPage() {
       return
     }
     localStorage.setItem("access", res.data.access)
-    dispatch(loginSuccess({user: res.data.user}))
+    dispatch(loginSuccess(res.data))
     navigate("/admin/dashboard", { replace: true })
     toast.success("Login Success!")
 
   } catch (err) {
+    console.error("err:",err)
     if (!err.response) {
       toast.error("Unable to connect to the server.")
       return
