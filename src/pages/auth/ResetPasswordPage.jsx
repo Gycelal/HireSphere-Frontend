@@ -34,7 +34,7 @@ export default function ResetPasswordPage () {
       })
       if (res.status === 200) {
         toast.success(res.data?.message)
-        navigate('login')
+        navigate('/login')
       }
     } catch (error) {
       const err = error.response?.data

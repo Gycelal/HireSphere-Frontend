@@ -9,7 +9,7 @@ import toast from 'react-hot-toast'
 import Field from '../../components/common/Field'
 import { inputClass } from '../../components/common/Field'
 
-//RegisterPage
+
 export default function RegisterPage () {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)

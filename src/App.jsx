@@ -38,12 +38,11 @@ function App () {
       <PersistGate loading={null} persistor={persistor}>
         <Routes>
           <Route element={<PublicRoutes />}>
-            {/* Route to Common Landing Page */}
+            {/* route to common page */}
             <Route element={<HomeLayout />}>
               <Route path='/' element={<LandingPageBody />} />
             </Route>
-
-            {/* Route To All Pages Related To Authentication */}
+            {/* Routes to all auth related pages */}
             <Route element={<AuthLayout />}>
               <Route path='login' element={<LoginPage />} />
               <Route path='register' element={<RegisterPage />} />
@@ -76,10 +75,8 @@ function App () {
               </Route>
             </Route>
           </Route>
-
-          {/* Recruiter Dashbaord layout rotues */}
+          {/* recruiter dashboard routes */}
           <Route element={<ProtectedRoutes allowedRole={'recruiter'} />}>
-            {/* recruiter dashboard routes */}
             <Route path='recruiter'>
               <Route element={<DashboardLayout />}>
                 <Route path='overview' element={<RecruiterDashboard />} />
