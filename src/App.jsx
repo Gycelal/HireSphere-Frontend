@@ -24,7 +24,7 @@ import { PersistGate } from 'redux-persist/integration/react'
 import { persistor } from './store/store'
 import AdminRecruiterApprovalsPage from './pages/admin/AdminRecruiterApprovals'
 import RoleSelectionPage from './pages/common/RoleSelectionPage'
-
+import RecruiterProfile from './pages/recruiter/RecruiterProfile'
 function App () {
   const mode = useSelector(state => state.theme.mode)
 
@@ -80,6 +80,7 @@ function App () {
             <Route path='recruiter'>
               <Route element={<DashboardLayout />}>
                 <Route path='overview' element={<RecruiterDashboard />} />
+                <Route path='profile' element={<RecruiterProfile />} />
               </Route>
             </Route>
           </Route>

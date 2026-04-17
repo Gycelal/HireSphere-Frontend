@@ -26,20 +26,24 @@ export default function LoginPage() {
   const onSubmit = async (data)=>{
     try{
       const response = await publicApi.post('accounts/login/', data)
-      const role = response?.data?.user?.role
-      console.log("role:", role)
-      if(role === "admin"){
+      const user = response?.data?.user
+     
+      if(user.role === "admin"){
         setError("root", {type: "server", message: "You are not allowed to use this page for login."})
         return;
       }
       dispatch(loginSuccess(response.data))
-      if (response.data.user.role === "candidate"){
+      if (user.role === "candidate"){
         navigate("/candidate/home", {replace: true})
       }else{
-        navigate("/recruiter/overview", {replace: true})
+        if(user.approval_status !== "approved"){
+          navigate("/recruiter/profile", {replace: true})
+        }else{
+          navigate("/recruiter/overview", {replace: true})
+        }
       }
-
     }catch(error){
+      console.error("Login error:", error)
       setError("root", {type: "server", message: error.response?.data?.detail || "Login failed. Please try again."})
     }
   }
