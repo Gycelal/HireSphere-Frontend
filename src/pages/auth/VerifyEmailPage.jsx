@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { emailVerificationSchema } from "../../validation/authSchemas";
 import { useForm } from "react-hook-form";
@@ -35,6 +35,7 @@ export default function VerifyEmailPage() {
       setError(error.response.data.email)
 
     } else {
+      console.error("Forgot password error:", error)
       toast.error("Something went wrong.")
     }
 
@@ -62,7 +63,7 @@ export default function VerifyEmailPage() {
           <p className="text-sm text-gray-400 dark:text-gray-500 leading-relaxed">
             We sent a password reset link to{" "}
             <span className="font-medium text-gray-600 dark:text-gray-300">{email}</span>.
-            The link expires in 30 minutes.
+            The link expires in 15 minutes.
           </p>
         </div>
 
