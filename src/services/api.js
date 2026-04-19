@@ -29,16 +29,23 @@ privateApi.interceptors.request.use(
 privateApi.interceptors.response.use(
   response => response,
   async error => {
+    if (!error.config) {
+      return Promise.reject(error)
+    }
     const originalRequest = error.config
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
         const res = await publicApi.post('accounts/token/refresh/')
         appStore.dispatch(setAccessToken(res.data.access))
-        originalRequest.headers.Authorization = `Bearer ${res.data.access}`
+        originalRequest.headers = {
+          ...originalRequest.headers,
+          Authorization: `Bearer ${res.data.access}`
+        }
         return privateApi(originalRequest);
       } catch (err) {
         appStore.dispatch(logout())
+        return Promise.reject(err)
       }
     }
     return Promise.reject(error)

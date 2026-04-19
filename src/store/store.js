@@ -23,6 +23,7 @@ const appStore = configureStore({
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
+    devTools: true
 })
 export const persistor = persistStore(appStore)
 export default appStore
