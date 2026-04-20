@@ -12,6 +12,7 @@ export default function ProfileDropdown () {
   const { user } = useSelector(state => state.auth)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  console.log('user in profile dropdown:', user)
 
   useEffect(() => {
     function handle (e) {
@@ -70,7 +71,7 @@ export default function ProfileDropdown () {
         </div>
         <div className='hidden sm:flex flex-col items-start leading-none gap-0.5'>
           <span className='text-sm font-semibold text-gray-800 dark:text-white leading-none'>
-            {user?.name ?? 'User'}
+            {user?.first_name ?? 'User'}
           </span>
           <span className='text-[0.7rem] text-gray-400 dark:text-gray-500 capitalize leading-none'>
             {user?.role ?? 'member'}

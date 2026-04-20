@@ -49,11 +49,12 @@ export default function RegisterPage () {
       }
     } catch (error) {
       const serverErrors = error.response?.data
+      console.log("registration error:", serverErrors)
       if (serverErrors) {
         Object.entries(serverErrors).forEach(([field, messages]) => {
           setError(field, {
             type: 'server',
-            message: messages[0]
+            message: messages
           })
         })
       }
