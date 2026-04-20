@@ -5,7 +5,6 @@ export const ProtectedRoutes = ({ allowedRole }) => {
   const user = useSelector((state) => state.auth.user);
   const location = useLocation();
 
-  // ✅ 1. ALWAYS check user first
   if (!user) {
     if (location.pathname.startsWith("/admin")) {
       return <Navigate to="/admin-login" replace />;
@@ -13,7 +12,6 @@ export const ProtectedRoutes = ({ allowedRole }) => {
     return <Navigate to="/login" replace />;
   }
 
-  // ✅ 2. Safe to use user now
   const isRecruiterPending =
     user.role === "recruiter" && user.approval_status !== "approved";
 
@@ -24,7 +22,6 @@ export const ProtectedRoutes = ({ allowedRole }) => {
     return <Navigate to="/recruiter/profile" replace />;
   }
 
-  // ✅ 3. Role check
   if (allowedRole && user.role !== allowedRole) {
     if (!user.role) {
       return <Navigate to="/select-role" replace />;
@@ -45,7 +42,7 @@ export const ProtectedRoutes = ({ allowedRole }) => {
     return <Navigate to="/" replace />;
   }
 
-  // ✅ 4. MUST return this
+  
   return <Outlet />;
 };
 
