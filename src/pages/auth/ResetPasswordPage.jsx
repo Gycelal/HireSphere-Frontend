@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, useNavigate } from 'react-router-dom'
 import { passwordResetSchema } from '../../validation/authSchemas'
@@ -6,11 +6,13 @@ import { publicApi } from '../../services/api'
 import { useParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { set } from 'zod'
 
 export default function ResetPasswordPage () {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isValidToken, setIsValidToken] = useState(true)
   const { token } = useParams()
   const navigate = useNavigate()
   const {
@@ -24,6 +26,22 @@ export default function ResetPasswordPage () {
     reValidationMode: 'onChange',
     shouldFocusError: true
   })
+
+  useEffect(() => {
+      verifyToken(token)
+    },[])
+  
+    const verifyToken = async (token) => {
+      if (token) {
+        try {
+          await publicApi.post('/accounts/verify-reset-token/', { "token": token });
+        } catch (error) {
+          console.error("Email verification error:", error)
+          setIsValidToken(false)
+        }
+      }
+    }
+
   const onSubmit = async data => {
     setIsSubmitting(true)
     try {
@@ -58,13 +76,13 @@ export default function ResetPasswordPage () {
     <div className='flex flex-col gap-6'>
       {/* Back */}
       <Link
-        to='/login'
+        to='/verify-email'
         className='inline-flex items-center gap-1.5 text-sm text-gray-400 dark:text-gray-500 hover:text-violet-600 dark:hover:text-violet-400 transition-colors duration-200 w-fit'
       >
         <span className='material-symbols-outlined text-[1.1rem]'>
           arrow_back
         </span>
-        Back to Login
+        Back to Verify Email
       </Link>
 
       {/* Heading */}
@@ -83,6 +101,16 @@ export default function ResetPasswordPage () {
         noValidate
         className='flex flex-col gap-4'
       >
+        {!isValidToken && (
+          
+            <p className='flex items-center gap-1.5 text-xs text-red-500 dark:text-red-400 mt-0.5'>
+              <span className='material-symbols-outlined text-[0.9rem] shrink-0'>
+                error
+              </span>
+              This password reset link is invalid or has expired. Please request a new one.
+            </p>
+        )}
+
         {/* New Password */}
         <div className='flex flex-col gap-1.5'>
           <label

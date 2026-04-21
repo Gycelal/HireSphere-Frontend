@@ -1,13 +1,17 @@
 import { Link } from "react-router-dom"
 import NavItem from "./NavItem"
+import { useSelector } from "react-redux";
 
 
 
 export default function DesktopSidebar ({ navItems, bottomItems, collapsed, onToggle }) {
+  const user = useSelector((state) => state.auth.user);
+  const isRecruiterPending =
+  user.role === "recruiter" && user.approval_status !== "approved";
   return (
     <aside
       style={{ width: collapsed ? 64 : 240 }}
-      className='hidden md:flex flex-col shrink-0 h-screen sticky top-0 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 transition-all duration-300 ease-in-out overflow-hidden'
+      className='hidden md:flex flex-col shrink-0 h-screen sticky top-0 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 transition-all duration-300 ease-in-out overflow-visible'
     >
       {/* Logo */}
       <div
@@ -59,6 +63,7 @@ export default function DesktopSidebar ({ navItems, bottomItems, collapsed, onTo
             item={item}
             collapsed={collapsed}
             onNavigate={null}
+            disabled={isRecruiterPending}
           />
         ))}
       </nav>

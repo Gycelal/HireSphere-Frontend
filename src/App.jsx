@@ -25,7 +25,6 @@ import { persistor } from './store/store'
 import AdminRecruiterApprovalsPage from './pages/admin/AdminRecruiterApprovals'
 import RoleSelectionPage from './pages/common/RoleSelectionPage'
 import RecruiterProfile from './pages/recruiter/RecruiterProfile'
-
 function App () {
   const mode = useSelector(state => state.theme.mode)
 
