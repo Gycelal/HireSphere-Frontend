@@ -12,7 +12,6 @@ export default function ProfileDropdown () {
   const { user } = useSelector(state => state.auth)
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  console.log('user in profile dropdown:', user)
 
   useEffect(() => {
     function handle (e) {

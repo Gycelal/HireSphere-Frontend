@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import ProfileCompletionBar from "../../components/common/ProfileCompletionBar";
+import { privateApi } from "../../services/api";
+import { set } from "zod";
 
 // ── Avatar lightbox ───────────────────────────────────────────────────────────
 function AvatarLightbox({ src, initials, onClose }) {
@@ -140,17 +142,6 @@ function SectionCard({ title, icon, children }) {
   );
 }
 
-// ── Mock initial data ─────────────────────────────────────────────────────────
-const INITIAL_STATE = {
-  firstName:     "Sarah",
-  lastName:      "Connor",
-  email:         "sarah.connor@acme.com",   // read-only
-  displayName:   "Sarah C.",
-  recruiterType: "corporate",
-  company:       "Acme Corp",
-  website:       "https://acme.com",
-  location:      "San Francisco, CA",
-};
 
 const RECRUITER_TYPES = [
   { value: "",           label: "Select type…" },
@@ -185,13 +176,28 @@ function ViewField({ label, value, icon }) {
 // ── RecruiterProfilePage ──────────────────────────────────────────────────────
 export default function RecruiterProfile() {
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData]           = useState(INITIAL_STATE);   // committed data
-  const [profileData, setProfileData]         = useState(INITIAL_STATE);   // working copy
+  const [formData, setFormData]           = useState(null);   // committed data
+  const [profileData, setProfileData]         = useState(null);   // working copy
   const [avatarSrc, setAvatarSrc] = useState(null);            // committed avatar
   const [draftAvatar, setDraftAvatar] = useState(null);        // working avatar (always editable)
   const [savedMsg, setSavedMsg]   = useState(false);
   const [viewAvatar, setViewAvatar] = useState(false);
-  const fileInputRef              = useRef(null);
+  const fileInputRef = useRef(null);
+
+  // function to get profile information from backend and set to form data
+  const getProfileData = async () =>{
+    try{
+      const response = await privateApi.get("/recruiter/profile/") 
+      console.log("Profile data fetched:", response.data)
+      setProfileData(response.data)
+    }catch(error){
+      console.log("Error fetching profile data:", error)
+    }
+  }
+
+  useEffect(()=>{
+    getProfileData();
+  }, [])
 
   // ── Handlers ──────────────────────────────────────────────────────────────
   function handleChange(e) {
@@ -236,20 +242,10 @@ export default function RecruiterProfile() {
 
   // Avatar: always show committed avatarSrc (independent of edit mode)
   const displayAvatar = avatarSrc;
-  const initials = `${form.firstName?.[0] ?? ""}${form.lastName?.[0] ?? ""}`.toUpperCase();
+  const initials = `${profileData.first_name?.[0] ?? ""}${profileData.last_name?.[0] ?? ""}`.toUpperCase();
 
-  // Completion uses committed form (view mode shows real completion)
 
-  const completionFields = [
-    { label: "First name",     filled: !!form.firstName.trim() },
-    { label: "Last name",      filled: !!form.lastName.trim() },
-    { label: "Display name",   filled: !!form.displayName.trim() },
-    { label: "Recruiter type", filled: !!form.recruiterType },
-    { label: "Company name",   filled: !!form.company.trim() },
-    { label: "Website",        filled: !!form.website.trim() },
-    { label: "Location",       filled: !!form.location.trim() },
-    { label: "Profile photo",  filled: !!avatarSrc },
-  ];
+  
 
   return (
     <div className="flex flex-col gap-6">
@@ -350,7 +346,7 @@ export default function RecruiterProfile() {
                     {displayAvatar ? "Change Photo" : "Upload Photo"}
                   </button>
 
-                  {/* Remove — always available when photo exists */}
+                  {/* Only if no photo */}
                   {displayAvatar && (
                     <button
                       type="button"
