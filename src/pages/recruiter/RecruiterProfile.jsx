@@ -2,6 +2,10 @@ import { useState, useRef, useEffect } from "react";
 import ProfileCompletionBar from "../../components/common/ProfileCompletionBar";
 import { privateApi } from "../../services/api";
 import { set } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { recruiterProfileValidationSchema } from "../../validation/ProfileValidationSchemas";
+import { RECRUITER_TYPES } from "../../constants/RecruiterProfileConstants";
 
 // ── Avatar lightbox ───────────────────────────────────────────────────────────
 function AvatarLightbox({ src, initials, onClose }) {
@@ -43,8 +47,7 @@ function AvatarLightbox({ src, initials, onClose }) {
   );
 }
 
-// ── Reusable field components ─────────────────────────────────────────────────
-
+//Reusable field components
 function FieldLabel({ htmlFor, children, required }) {
   return (
     <label
@@ -57,37 +60,14 @@ function FieldLabel({ htmlFor, children, required }) {
   );
 }
 
-function TextInput({ id, name, value, onChange, placeholder, disabled, type = "text" }) {
-  if (disabled) {
-    return (
-      <div className="relative">
-        <input
-          id={id}
-          type={type}
-          value={value}
-          disabled
-          readOnly
-          className="w-full px-4 py-2.5 rounded-xl text-sm
-            bg-gray-50 dark:bg-gray-800/60
-            border border-gray-200 dark:border-gray-700
-            text-gray-400 dark:text-gray-500
-            cursor-not-allowed select-none"
-        />
-        <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[1rem] text-gray-300 dark:text-gray-600 pointer-events-none">
-          lock
-        </span>
-      </div>
-    );
-  }
-
+function TextInput({ id, placeholder, type = "text", ...props }) {
   return (
     <input
       id={id}
       name={name}
       type={type}
-      value={value}
-      onChange={onChange}
       placeholder={placeholder}
+      {...props}
       className="w-full px-4 py-2.5 rounded-xl text-sm
         bg-white dark:bg-gray-900
         border border-gray-200 dark:border-gray-700
@@ -127,7 +107,7 @@ function SelectInput({ id, name, value, onChange, options }) {
   );
 }
 
-// ── Section card wrapper ──────────────────────────────────────────────────────
+// Section card wrapper
 function SectionCard({ title, icon, children }) {
   return (
     <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
@@ -141,16 +121,6 @@ function SectionCard({ title, icon, children }) {
     </div>
   );
 }
-
-
-const RECRUITER_TYPES = [
-  { value: "",           label: "Select type…" },
-  { value: "corporate",  label: "Corporate Recruiter" },
-  { value: "agency",     label: "Agency Recruiter" },
-  { value: "freelance",  label: "Freelance Recruiter" },
-  { value: "executive",  label: "Executive Search" },
-  { value: "hr",         label: "HR Generalist" },
-];
 
 // ── Read-only field display ───────────────────────────────────────────────────
 function ViewField({ label, value, icon }) {
@@ -176,22 +146,52 @@ function ViewField({ label, value, icon }) {
 // ── RecruiterProfilePage ──────────────────────────────────────────────────────
 export default function RecruiterProfile() {
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData]           = useState(null);   // committed data
-  const [profileData, setProfileData]         = useState(null);   // working copy
+  const [completionPercentage, setCompletionPercentage] = useState(0)
   const [avatarSrc, setAvatarSrc] = useState(null);            // committed avatar
   const [draftAvatar, setDraftAvatar] = useState(null);        // working avatar (always editable)
   const [savedMsg, setSavedMsg]   = useState(false);
   const [viewAvatar, setViewAvatar] = useState(false);
   const fileInputRef = useRef(null);
 
+  console.log("recruiter types:", RECRUITER_TYPES)
+
+  const profileForm = useForm({
+    resolver: zodResolver(recruiterProfileValidationSchema),
+    defaultValues:{
+      first_name: "",
+      last_name: "",
+      email: "",
+      profile:{
+        display_name: "",
+        profile_picture: "",
+        recruiter_type: "",
+        company_or_brand_name: "",
+        website_url: "",
+        location: ""
+      }
+    }
+  })
+
+
   // function to get profile information from backend and set to form data
   const getProfileData = async () =>{
     try{
       const response = await privateApi.get("/recruiter/profile/") 
       console.log("Profile data fetched:", response.data)
-      setProfileData(response.data)
+      profileForm.reset(response?.data)  // populate form with fetched data
+      setCompletionPercentage(response?.data?.completion_percentage || 0)  // set profile completion
+      
     }catch(error){
       console.log("Error fetching profile data:", error)
+    }
+  }
+  // function to save profile information to backend from form data
+  const saveProfile = async (data) =>{
+    try{
+       const response = await privateApi.put("/recruiter/profile/", profileForm.getValues())
+       console.log("Profile data saved:", response.data)
+    }catch(error){
+      console.log("Error saving profile data:", error)
     }
   }
 
@@ -200,11 +200,6 @@ export default function RecruiterProfile() {
   }, [])
 
   // ── Handlers ──────────────────────────────────────────────────────────────
-  function handleChange(e) {
-    const { name, value } = e.target;
-    setDraft((prev) => ({ ...prev, [name]: value }));
-  }
-
   function handleAvatarChange(e) {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -223,18 +218,15 @@ export default function RecruiterProfile() {
   }
 
   function handleEdit() {
-    setDraft(form);       // sync draft to current committed data
     setIsEditing(true);
   }
 
   function handleCancel() {
-    setDraft(form);       // revert all changes
     setIsEditing(false);
   }
 
   function handleSave(e) {
     e.preventDefault();
-    setForm(draft);       // commit draft → form
     setIsEditing(false);
     setSavedMsg(true);
     setTimeout(() => setSavedMsg(false), 3000);
@@ -242,9 +234,12 @@ export default function RecruiterProfile() {
 
   // Avatar: always show committed avatarSrc (independent of edit mode)
   const displayAvatar = avatarSrc;
-  const initials = `${profileData.first_name?.[0] ?? ""}${profileData.last_name?.[0] ?? ""}`.toUpperCase();
+  const initials = `${profileForm.watch("first_name")?.[0] ?? ""}${profileForm.watch("last_name")?.[0] ?? ""}`.toUpperCase();
 
-
+const locationSchema = z
+  .string()
+  .max(100, "Location too long")
+  .optional();
   
 
   return (
@@ -282,9 +277,24 @@ export default function RecruiterProfile() {
       </div>
 
       {/* ── Profile completion ── */}
-      <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 px-6 py-4">
-        <ProfileCompletionBar fields={completionFields} showItems />
+      {completionPercentage < 100 && (
+       <>
+        <div className="bg-yellow-50 dark:bg-yellow-950/30 rounded-2xl border border-yellow-200 dark:border-yellow-800 px-6 py-4">
+          <div className="flex items-center gap-3">
+            <span className="material-symbols-outlined text-[1.2rem] text-yellow-600">warning</span>
+            <p className="text-sm text-yellow-800 dark:text-yellow-300">
+              Your profile is {completionPercentage}% complete. Add more information to show your authentic self and get approved by the Admin team faster!
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 px-6 py-4">
+        <ProfileCompletionBar percent={completionPercentage} showItems />
       </div>
+       </>
+      )}
+
+      
 
       <form onSubmit={handleSave} noValidate>
         <div className="flex flex-col gap-5">
@@ -325,7 +335,7 @@ export default function RecruiterProfile() {
               {/* Info + upload */}
               <div className="flex flex-col gap-1.5 min-w-0">
                 <p className="text-base font-semibold text-gray-900 dark:text-white">
-                  {form.displayName || `${form.firstName} ${form.lastName}`}
+                  {profileForm.watch("display_name") || `${profileForm.watch("first_name")} ${profileForm.watch("last_name")}`}
                 </p>
                 <p className="text-xs text-gray-400 dark:text-gray-500">
                   Photo is always changeable · JPG, PNG or WEBP · Max 2 MB
@@ -394,32 +404,32 @@ export default function RecruiterProfile() {
               <div>
                 <FieldLabel htmlFor="firstName" required>First Name</FieldLabel>
                 {isEditing
-                  ? <TextInput id="firstName" name="firstName" value={draft.firstName} onChange={handleChange} placeholder="Enter first name" />
-                  : <ViewField value={form.firstName} />
+                  ? <TextInput id="firstName"  {...profileForm.register("first_name")}  placeholder="Enter first name" />
+                  : <ViewField value={profileForm.watch("first_name")} />
                 }
               </div>
 
               <div>
                 <FieldLabel htmlFor="lastName" required>Last Name</FieldLabel>
                 {isEditing
-                  ? <TextInput id="lastName" name="lastName" value={draft.lastName} onChange={handleChange} placeholder="Enter last name" />
-                  : <ViewField value={form.lastName} />
+                  ? <TextInput id="lastName" {...profileForm.register("last_name")}  placeholder="Enter last name" />
+                  : <ViewField value={profileForm.watch("last_name")} />
                 }
               </div>
 
               <div>
                 <FieldLabel htmlFor="email">Email Address</FieldLabel>
-                <TextInput id="email" name="email" type="email" value={form.email} disabled />
+                <ViewField value={profileForm.watch("email")} icon="email" />
                 <p className="mt-1.5 text-[0.7rem] text-gray-400 dark:text-gray-500">
-                  Contact support to change your email address.
+                  Change email from the settings.
                 </p>
               </div>
 
               <div>
                 <FieldLabel htmlFor="displayName">Display Name</FieldLabel>
                 {isEditing
-                  ? <TextInput id="displayName" name="displayName" value={draft.displayName} onChange={handleChange} placeholder="How others see you" />
-                  : <ViewField value={form.displayName} />
+                  ? <TextInput id="displayName" {...profileForm.register("profile.display_name")} placeholder="How others see you" />
+                  : <ViewField value={profileForm.watch("profile.display_name")} />
                 }
               </div>
 
@@ -433,32 +443,32 @@ export default function RecruiterProfile() {
               <div>
                 <FieldLabel htmlFor="recruiterType">Recruiter Type</FieldLabel>
                 {isEditing
-                  ? <SelectInput id="recruiterType" name="recruiterType" value={draft.recruiterType} onChange={handleChange} options={RECRUITER_TYPES} />
-                  : <ViewField value={RECRUITER_TYPES.find(t => t.value === form.recruiterType)?.label} icon="work_outline" />
+                  ? <SelectInput id="recruiterType" {...profileForm.register("profile.recruiter_type")} options={RECRUITER_TYPES} />
+                  : <ViewField value={RECRUITER_TYPES.find(t => t.value === profileForm.watch("profile.recruiter_type"))?.label} icon="work_outline" />
                 }
               </div>
 
               <div>
                 <FieldLabel htmlFor="company">Company / Branch Name</FieldLabel>
                 {isEditing
-                  ? <TextInput id="company" name="company" value={draft.company} onChange={handleChange} placeholder="e.g. Acme Corp" />
-                  : <ViewField value={form.company} icon="business" />
+                  ? <TextInput id="company" {...profileForm.register("profile.company_or_brand_name")} placeholder="e.g. Acme Corp" />
+                  : <ViewField value={profileForm.watch("profile.company_or_brand_name")} icon="business" />
                 }
               </div>
 
               <div>
                 <FieldLabel htmlFor="website">Website URL</FieldLabel>
                 {isEditing
-                  ? <TextInput id="website" name="website" type="url" value={draft.website} onChange={handleChange} placeholder="https://yourcompany.com" />
-                  : <ViewField value={form.website} icon="link" />
+                  ? <TextInput id="website"  type="url" {...profileForm.register("profile.website_url")} placeholder="https://yourcompany.com" />
+                  : <ViewField value={profileForm.watch("profile.website_url")} icon="link" />
                 }
               </div>
 
               <div>
                 <FieldLabel htmlFor="location">Location</FieldLabel>
                 {isEditing
-                  ? <TextInput id="location" name="location" value={draft.location} onChange={handleChange} placeholder="City, Country" />
-                  : <ViewField value={form.location} icon="location_on" />
+                  ? <TextInput id="location" {...profileForm.register("profile.location")} placeholder="City, Country" />
+                  : <ViewField value={profileForm.watch("profile.location")} icon="location_on" />
                 }
               </div>
 

@@ -17,11 +17,8 @@
  *   ];
  *   <ProfileCompletionBar fields={fields} showItems />
  */
-export default function ProfileCompletionBar({ fields = [], showItems = false, className = "" }) {
-  const total      = fields.length;
-  const filled     = fields.filter((f) => f.filled).length;
-  const percent    = total === 0 ? 0 : Math.round((filled / total) * 100);
-  const missing    = fields.filter((f) => !f.filled);
+export default function ProfileCompletionBar({ percent, className = "" }) {
+ 
 
   // Color tier based on completion
   const barColor =
@@ -62,9 +59,9 @@ export default function ProfileCompletionBar({ fields = [], showItems = false, c
       </div>
 
       {/* Optional: incomplete field pills */}
-      {showItems && missing.length > 0 && (
+      {/* {emptyFields.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mt-0.5">
-          {missing.map((f) => (
+          {emptyFields.map((f) => (
             <span
               key={f.label}
               className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md
@@ -77,7 +74,7 @@ export default function ProfileCompletionBar({ fields = [], showItems = false, c
             </span>
           ))}
         </div>
-      )}
+      )} */}
     </div>
   );
 }
