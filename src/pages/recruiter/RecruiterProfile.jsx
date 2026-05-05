@@ -145,8 +145,11 @@ function ViewField({ label, value, icon }) {
 
 // ── RecruiterProfilePage ──────────────────────────────────────────────────────
 export default function RecruiterProfile() {
+
+
   const [isEditing, setIsEditing] = useState(false);
   const [completionPercentage, setCompletionPercentage] = useState(0)
+  const [profileData, setProfileData] = useState(null);
   const [avatarSrc, setAvatarSrc] = useState(null);            // committed avatar
   const [draftAvatar, setDraftAvatar] = useState(null);        // working avatar (always editable)
   const [savedMsg, setSavedMsg]   = useState(false);
@@ -154,10 +157,10 @@ export default function RecruiterProfile() {
   const fileInputRef = useRef(null);
 
   console.log("recruiter types:", RECRUITER_TYPES)
-
+  
   const profileForm = useForm({
     resolver: zodResolver(recruiterProfileValidationSchema),
-    defaultValues:{
+    defaultValues: {
       first_name: "",
       last_name: "",
       email: "",
@@ -180,7 +183,8 @@ export default function RecruiterProfile() {
       console.log("Profile data fetched:", response.data)
       profileForm.reset(response?.data)  // populate form with fetched data
       setCompletionPercentage(response?.data?.completion_percentage || 0)  // set profile completion
-      
+      setProfileData(response?.data)  // store profile data
+
     }catch(error){
       console.log("Error fetching profile data:", error)
     }
@@ -234,13 +238,7 @@ export default function RecruiterProfile() {
 
   // Avatar: always show committed avatarSrc (independent of edit mode)
   const displayAvatar = avatarSrc;
-  const initials = `${profileForm.watch("first_name")?.[0] ?? ""}${profileForm.watch("last_name")?.[0] ?? ""}`.toUpperCase();
-
-const locationSchema = z
-  .string()
-  .max(100, "Location too long")
-  .optional();
-  
+  const initials = `${profileData?.first_name?.[0] ?? ""}${profileData?.last_name?.[0] ?? ""}`.toUpperCase();
 
   return (
     <div className="flex flex-col gap-6">
@@ -335,7 +333,7 @@ const locationSchema = z
               {/* Info + upload */}
               <div className="flex flex-col gap-1.5 min-w-0">
                 <p className="text-base font-semibold text-gray-900 dark:text-white">
-                  {profileForm.watch("display_name") || `${profileForm.watch("first_name")} ${profileForm.watch("last_name")}`}
+                  {profileData?.profile?.display_name || `${profileData?.first_name} ${profileData?.last_name}`}
                 </p>
                 <p className="text-xs text-gray-400 dark:text-gray-500">
                   Photo is always changeable · JPG, PNG or WEBP · Max 2 MB
@@ -405,7 +403,7 @@ const locationSchema = z
                 <FieldLabel htmlFor="firstName" required>First Name</FieldLabel>
                 {isEditing
                   ? <TextInput id="firstName"  {...profileForm.register("first_name")}  placeholder="Enter first name" />
-                  : <ViewField value={profileForm.watch("first_name")} />
+                  : <ViewField value={profileData?.first_name} />
                 }
               </div>
 
@@ -413,13 +411,13 @@ const locationSchema = z
                 <FieldLabel htmlFor="lastName" required>Last Name</FieldLabel>
                 {isEditing
                   ? <TextInput id="lastName" {...profileForm.register("last_name")}  placeholder="Enter last name" />
-                  : <ViewField value={profileForm.watch("last_name")} />
+                  : <ViewField value={profileData?.last_name} />
                 }
               </div>
 
               <div>
                 <FieldLabel htmlFor="email">Email Address</FieldLabel>
-                <ViewField value={profileForm.watch("email")} icon="email" />
+                <ViewField value={profileData?.email} icon="email" />
                 <p className="mt-1.5 text-[0.7rem] text-gray-400 dark:text-gray-500">
                   Change email from the settings.
                 </p>
@@ -429,7 +427,7 @@ const locationSchema = z
                 <FieldLabel htmlFor="displayName">Display Name</FieldLabel>
                 {isEditing
                   ? <TextInput id="displayName" {...profileForm.register("profile.display_name")} placeholder="How others see you" />
-                  : <ViewField value={profileForm.watch("profile.display_name")} />
+                  : <ViewField value={profileData?.profile?.display_name} />
                 }
               </div>
 
@@ -444,7 +442,7 @@ const locationSchema = z
                 <FieldLabel htmlFor="recruiterType">Recruiter Type</FieldLabel>
                 {isEditing
                   ? <SelectInput id="recruiterType" {...profileForm.register("profile.recruiter_type")} options={RECRUITER_TYPES} />
-                  : <ViewField value={RECRUITER_TYPES.find(t => t.value === profileForm.watch("profile.recruiter_type"))?.label} icon="work_outline" />
+                  : <ViewField value={RECRUITER_TYPES.find(t => t.value === profileData?.profile?.recruiter_type)?.label} icon="work_outline" />
                 }
               </div>
 
@@ -452,7 +450,7 @@ const locationSchema = z
                 <FieldLabel htmlFor="company">Company / Branch Name</FieldLabel>
                 {isEditing
                   ? <TextInput id="company" {...profileForm.register("profile.company_or_brand_name")} placeholder="e.g. Acme Corp" />
-                  : <ViewField value={profileForm.watch("profile.company_or_brand_name")} icon="business" />
+                  : <ViewField value={profileData?.profile?.company_or_brand_name} icon="business" />
                 }
               </div>
 
@@ -460,7 +458,7 @@ const locationSchema = z
                 <FieldLabel htmlFor="website">Website URL</FieldLabel>
                 {isEditing
                   ? <TextInput id="website"  type="url" {...profileForm.register("profile.website_url")} placeholder="https://yourcompany.com" />
-                  : <ViewField value={profileForm.watch("profile.website_url")} icon="link" />
+                  : <ViewField value={profileData?.profile?.website_url} icon="link" />
                 }
               </div>
 
@@ -468,7 +466,7 @@ const locationSchema = z
                 <FieldLabel htmlFor="location">Location</FieldLabel>
                 {isEditing
                   ? <TextInput id="location" {...profileForm.register("profile.location")} placeholder="City, Country" />
-                  : <ViewField value={profileForm.watch("profile.location")} icon="location_on" />
+                  : <ViewField value={profileData?.profile?.location} icon="location_on" />
                 }
               </div>
 

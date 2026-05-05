@@ -34,11 +34,13 @@ export const passwordSchema = z
 
 export const displayNameSchema = z
   .string()
-  .trim.max(50, 'Display name is too long')
+  .trim()
+  .max(50, 'Display name is too long')
   .optional()
 
 
-const locationSchema = z
+export const locationSchema = z
   .string()
+  .trim()
   .max(60, "Too long, make it into nearest city instead of full address")
   .optional();
