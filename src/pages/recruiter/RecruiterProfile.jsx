@@ -227,6 +227,7 @@ export default function RecruiterProfile() {
 
   function handleCancel() {
     setIsEditing(false);
+    profileForm.reset(profileData);  // revert form to last saved state
   }
 
   function handleSave(e) {
