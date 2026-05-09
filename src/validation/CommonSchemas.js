@@ -4,7 +4,7 @@ export const firstNameSchema = z
   .string()
   .trim()
   .nonempty('First name is required')
-  .min(2, 'First name must be at least 2 characters long')
+  .min(3, 'First name must be at least 3 characters long')
   .max(50, 'First name must be less than 50 characters long')
   .regex(/^[A-Za-z\s'-]+$/, 'First name contains invalid characters')
 
@@ -12,7 +12,7 @@ export const lastNameSchema = z
   .string()
   .trim()
   .nonempty('Last name is required')
-  .min(2, 'Last name must be at least 2 characters long')
+  .min(3, 'Last name must be at least 3 characters long')
   .max(50, 'Last name must be less than 50 characters long')
   .regex(/^[A-Za-z\s'-]+$/, 'Last name contains invalid characters')
 

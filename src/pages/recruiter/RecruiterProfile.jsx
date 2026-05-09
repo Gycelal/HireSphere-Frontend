@@ -160,6 +160,9 @@ export default function RecruiterProfile() {
   
   const profileForm = useForm({
     resolver: zodResolver(recruiterProfileValidationSchema),
+    mode: "onTouched",
+    reValidationMode: "onChange",
+    shouldFocusError: true,
     defaultValues: {
       first_name: "",
       last_name: "",
@@ -190,12 +193,14 @@ export default function RecruiterProfile() {
     }
   }
   // function to save profile information to backend from form data
-  const saveProfile = async (data) =>{
+  const handleSave = async (data) =>{
     try{
        const response = await privateApi.put("/recruiter/profile/", profileForm.getValues())
        console.log("Profile data saved:", response.data)
     }catch(error){
       console.log("Error saving profile data:", error)
+    }finally{
+      setIsEditing(false);
     }
   }
 
@@ -228,13 +233,6 @@ export default function RecruiterProfile() {
   function handleCancel() {
     setIsEditing(false);
     profileForm.reset(profileData);  // revert form to last saved state
-  }
-
-  function handleSave(e) {
-    e.preventDefault();
-    setIsEditing(false);
-    setSavedMsg(true);
-    setTimeout(() => setSavedMsg(false), 3000);
   }
 
   // Avatar: always show committed avatarSrc (independent of edit mode)
@@ -294,8 +292,7 @@ export default function RecruiterProfile() {
       )}
 
       
-
-      <form onSubmit={handleSave} noValidate>
+      <form onSubmit={profileForm.handleSubmit(handleSave)} noValidate>
         <div className="flex flex-col gap-5">
 
           {/* ── Profile picture card ── */}
@@ -406,6 +403,11 @@ export default function RecruiterProfile() {
                   ? <TextInput id="firstName"  {...profileForm.register("first_name")}  placeholder="Enter first name" />
                   : <ViewField value={profileData?.first_name} />
                 }
+                {profileForm.formState.errors.first_name && (
+                  <p className="mt-1.5 text-[0.7rem] text-red-600 dark:text-red-400 font-medium">
+                    {profileForm.formState.errors.first_name.message}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -414,6 +416,11 @@ export default function RecruiterProfile() {
                   ? <TextInput id="lastName" {...profileForm.register("last_name")}  placeholder="Enter last name" />
                   : <ViewField value={profileData?.last_name} />
                 }
+                {profileForm.formState.errors.last_name && (
+                  <p className="mt-1.5 text-[0.7rem] text-red-600 dark:text-red-400 font-medium">
+                    {profileForm.formState.errors.last_name.message}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -430,6 +437,11 @@ export default function RecruiterProfile() {
                   ? <TextInput id="displayName" {...profileForm.register("profile.display_name")} placeholder="How others see you" />
                   : <ViewField value={profileData?.profile?.display_name} />
                 }
+                {profileForm.formState.errors.profile?.display_name && (
+                  <p className="mt-1.5 text-[0.7rem] text-red-600 dark:text-red-400 font-medium">
+                    {profileForm.formState.errors.profile?.display_name.message}
+                  </p>
+                )}
               </div>
 
             </div>
@@ -445,6 +457,11 @@ export default function RecruiterProfile() {
                   ? <SelectInput id="recruiterType" {...profileForm.register("profile.recruiter_type")} options={RECRUITER_TYPES} />
                   : <ViewField value={RECRUITER_TYPES.find(t => t.value === profileData?.profile?.recruiter_type)?.label} icon="work_outline" />
                 }
+                {profileForm.formState.errors.profile?.recruiter_type && (
+                  <p className="mt-1.5 text-[0.7rem] text-red-600 dark:text-red-400 font-medium">
+                    {profileForm.formState.errors.profile?.recruiter_type.message}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -453,6 +470,11 @@ export default function RecruiterProfile() {
                   ? <TextInput id="company" {...profileForm.register("profile.company_or_brand_name")} placeholder="e.g. Acme Corp" />
                   : <ViewField value={profileData?.profile?.company_or_brand_name} icon="business" />
                 }
+                {profileForm.formState.errors.profile?.company_or_brand_name && (
+                  <p className="mt-1.5 text-[0.7rem] text-red-600 dark:text-red-400 font-medium">
+                    {profileForm.formState.errors.profile?.company_or_brand_name.message}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -461,6 +483,11 @@ export default function RecruiterProfile() {
                   ? <TextInput id="website"  type="url" {...profileForm.register("profile.website_url")} placeholder="https://yourcompany.com" />
                   : <ViewField value={profileData?.profile?.website_url} icon="link" />
                 }
+                {profileForm.formState.errors.profile?.website_url && (
+                  <p className="mt-1.5 text-[0.7rem] text-red-600 dark:text-red-400 font-medium">
+                    {profileForm.formState.errors.profile?.website_url.message}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -469,6 +496,11 @@ export default function RecruiterProfile() {
                   ? <TextInput id="location" {...profileForm.register("profile.location")} placeholder="City, Country" />
                   : <ViewField value={profileData?.profile?.location} icon="location_on" />
                 }
+                {profileForm.formState.errors.profile?.location && (
+                  <p className="mt-1.5 text-[0.7rem] text-red-600 dark:text-red-400 font-medium">
+                    {profileForm.formState.errors.profile?.location.message}
+                  </p>
+                )}
               </div>
 
             </div>

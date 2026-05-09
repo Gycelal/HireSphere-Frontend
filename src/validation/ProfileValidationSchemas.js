@@ -14,7 +14,9 @@ const recruiterTypeValues = RECRUITER_TYPES.map(type => type.value).filter(
 export const recruiterProfileValidationSchema = z.object({
   first_name: firstNameSchema,
   last_name: lastNameSchema,
-  display_name: displayNameSchema,
+  profile: z .object(
+    {
+    display_name: displayNameSchema,
   recruiter_type: z.enum(recruiterTypeValues, {
     message: 'Invalid recruiter type'
   }),
@@ -23,6 +25,8 @@ export const recruiterProfileValidationSchema = z.object({
     .union([z.string().trim().url('Invalid URL'), z.literal('')])
     .optional(),
   location: locationSchema
+  }
+  )
 })
 
 export const candidateProfileValidationSchema = z.object({
