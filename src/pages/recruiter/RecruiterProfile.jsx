@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import ProfileCompletionBar from "../../components/common/ProfileCompletionBar";
 import { privateApi } from "../../services/api";
-import { set } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { recruiterProfileValidationSchema } from "../../validation/ProfileValidationSchemas";
 import { RECRUITER_TYPES } from "../../constants/RecruiterProfileConstants";
+import CropModal from "../../utils/cropImage";
+
 
 // ── Avatar lightbox ───────────────────────────────────────────────────────────
 function AvatarLightbox({ src, initials, onClose }) {
@@ -150,9 +151,8 @@ export default function RecruiterProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [completionPercentage, setCompletionPercentage] = useState(0)
   const [profileData, setProfileData] = useState(null);
-  const [avatarSrc, setAvatarSrc] = useState(null);            // committed avatar
-  const [draftAvatar, setDraftAvatar] = useState(null);        // working avatar (always editable)
-  const [savedMsg, setSavedMsg]   = useState(false);
+  const [avatarSrc, setAvatarSrc] = useState(null);   // committed/saved avatar
+  const [cropSrc, setCropSrc] = useState(null);        // raw image waiting for crop
   const [viewAvatar, setViewAvatar] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -208,20 +208,29 @@ export default function RecruiterProfile() {
     getProfileData();
   }, [])
 
-  // ── Handlers ──────────────────────────────────────────────────────────────
+  // Handlers
   function handleAvatarChange(e) {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Reset input so re-selecting the same file triggers onChange again
+    e.target.value = "";
     const reader = new FileReader();
     reader.onload = (ev) => {
-      setDraftAvatar(ev.target.result);
-      setAvatarSrc(ev.target.result);   // avatar saves immediately, independent of edit mode
+      setCropSrc(ev.target.result);  // open crop modal with selected image
     };
     reader.readAsDataURL(file);
   }
 
+  function handleCropApply(croppedDataUrl) {
+    setAvatarSrc(croppedDataUrl);   // commit cropped result as the avatar
+    setCropSrc(null);               // close crop modal
+  }
+
+  function handleCropCancel() {
+    setCropSrc(null);               // discard, keep existing avatar
+  }
+
   function handleRemoveAvatar() {
-    setDraftAvatar(null);
     setAvatarSrc(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   }
@@ -235,7 +244,7 @@ export default function RecruiterProfile() {
     profileForm.reset(profileData);  // revert form to last saved state
   }
 
-  // Avatar: always show committed avatarSrc (independent of edit mode)
+  // Avatar: always show committed avatarSrc
   const displayAvatar = avatarSrc;
   const initials = `${profileData?.first_name?.[0] ?? ""}${profileData?.last_name?.[0] ?? ""}`.toUpperCase();
 
@@ -337,7 +346,7 @@ export default function RecruiterProfile() {
                   Photo is always changeable · JPG, PNG or WEBP · Max 2 MB
                 </p>
                 <div className="flex flex-wrap items-center gap-2 mt-1">
-                  {/* Change photo — always available */}
+                  {/* Upload — always available, always labelled "Upload Photo" */}
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
@@ -349,36 +358,23 @@ export default function RecruiterProfile() {
                       transition-colors duration-200"
                   >
                     <span className="material-symbols-outlined text-[0.9rem]">upload</span>
-                    {displayAvatar ? "Change Photo" : "Upload Photo"}
+                    Upload Photo
                   </button>
 
-                  {/* Only if no photo */}
+                  {/* Remove — only when a photo exists */}
                   {displayAvatar && (
                     <button
                       type="button"
                       onClick={handleRemoveAvatar}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
-                        text-gray-500 dark:text-gray-400
-                        hover:bg-gray-100 dark:hover:bg-gray-800
+                        text-red-500 dark:text-red-400
+                        hover:bg-red-50 dark:hover:bg-red-950/40
                         transition-colors duration-200"
                     >
                       <span className="material-symbols-outlined text-[0.9rem]">delete</span>
-                      Remove
+                      Remove Photo
                     </button>
                   )}
-
-                  {/* View photo — always visible */}
-                  <button
-                    type="button"
-                    onClick={() => setViewAvatar(true)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
-                      text-gray-500 dark:text-gray-400
-                      hover:bg-gray-100 dark:hover:bg-gray-800
-                      transition-colors duration-200"
-                  >
-                    <span className="material-symbols-outlined text-[0.9rem]">zoom_in</span>
-                    View Photo
-                  </button>
                 </div>
 
                 {/* Hidden file input */}
@@ -510,17 +506,6 @@ export default function RecruiterProfile() {
           {isEditing && (
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3
               bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 px-6 py-4">
-
-              {/* Saved confirmation */}
-              <div className="flex items-center gap-2 text-sm">
-                {savedMsg && (
-                  <span className="flex items-center gap-1.5 text-green-600 dark:text-green-400 font-medium">
-                    <span className="material-symbols-outlined text-[1rem]">check_circle</span>
-                    Changes saved
-                  </span>
-                )}
-              </div>
-
               {/* Buttons */}
               <div className="flex items-center gap-2.5">
                 <button
@@ -551,7 +536,16 @@ export default function RecruiterProfile() {
 
         </div>
       </form>
-      {/* ── Avatar lightbox ── */}
+      {/* ── Crop modal — shown immediately after file selection ── */}
+      {cropSrc && (
+        <CropModal
+          imageSrc={cropSrc}
+          onApply={handleCropApply}
+          onCancel={handleCropCancel}
+        />
+      )}
+
+      {/* ── Avatar lightbox (view-only) — triggered by clicking the avatar ── */}
       {viewAvatar && (
         <AvatarLightbox
           src={displayAvatar}
