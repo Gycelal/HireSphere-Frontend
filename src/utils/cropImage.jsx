@@ -67,27 +67,27 @@ export default function CropModal({ imageSrc, onApply, onCancel }) {
       onClick={(e) => { if (e.target === e.currentTarget) onCancel(); }}
     >
       {/* ── Modal card ── */}
-      <div className="relative w-full max-w-md sm:max-w-lg bg-gray-900 rounded-2xl shadow-2xl shadow-black/60 border border-gray-700/60 flex flex-col overflow-hidden">
+      <div className="relative w-full max-w-md sm:max-w-lg bg-white dark:bg-gray-900 rounded-2xl shadow-2xl shadow-black/10 dark:shadow-black/60 border border-gray-200 dark:border-gray-700/60 flex flex-col overflow-hidden">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-700/60 shrink-0">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-200 dark:border-gray-700/60 shrink-0">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[1rem] text-violet-400">crop</span>
-            <h2 className="text-sm font-semibold text-white">Adjust Photo</h2>
+            <span className="material-symbols-outlined text-[1rem] text-violet-500 dark:text-violet-400">crop</span>
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Adjust Photo</h2>
           </div>
           <button
             type="button"
             onClick={onCancel}
             aria-label="Close"
             className="w-7 h-7 flex items-center justify-center rounded-lg
-              text-gray-400 hover:text-white hover:bg-gray-700 transition-colors duration-200"
+              text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
           >
             <span className="material-symbols-outlined text-[1rem]">close</span>
           </button>
         </div>
 
         {/* Cropper area — fixed height so the card stays compact */}
-        <div className="relative h-64 sm:h-80 bg-black">
+        <div className="relative h-64 sm:h-80 bg-gray-100 dark:bg-black">
           <Cropper
             image={imageSrc}
             crop={crop}
@@ -106,7 +106,7 @@ export default function CropModal({ imageSrc, onApply, onCancel }) {
 
           {/* Zoom slider */}
           <div className="flex items-center gap-3">
-            <span className="material-symbols-outlined text-[1rem] text-gray-400">zoom_out</span>
+            <span className="material-symbols-outlined text-[1rem] text-gray-500 dark:text-gray-400">zoom_out</span>
             <input
               type="range"
               min={1}
@@ -114,10 +114,10 @@ export default function CropModal({ imageSrc, onApply, onCancel }) {
               step={0.01}
               value={zoom}
               onChange={(e) => setZoom(Number(e.target.value))}
-              className="flex-1 h-1.5 rounded-full appearance-none cursor-pointer accent-violet-500 bg-gray-700"
+              className="flex-1 h-1.5 rounded-full appearance-none cursor-pointer accent-violet-500 bg-gray-200 dark:bg-gray-700"
             />
-            <span className="material-symbols-outlined text-[1rem] text-gray-400">zoom_in</span>
-            <span className="text-xs text-gray-400 w-10 text-right tabular-nums">
+            <span className="material-symbols-outlined text-[1rem] text-gray-500 dark:text-gray-400">zoom_in</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 w-10 text-right tabular-nums">
               {Math.round(zoom * 100)}%
             </span>
           </div>
@@ -133,8 +133,9 @@ export default function CropModal({ imageSrc, onApply, onCancel }) {
               type="button"
               onClick={onCancel}
               className="px-4 py-2 rounded-xl text-sm font-semibold
-                text-gray-300 bg-gray-800 hover:bg-gray-700
-                border border-gray-700 transition-colors duration-200"
+                text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 
+                hover:bg-gray-200 dark:hover:bg-gray-700
+                border border-gray-200 dark:border-gray-700 transition-colors duration-200"
             >
               Cancel
             </button>
@@ -145,7 +146,7 @@ export default function CropModal({ imageSrc, onApply, onCancel }) {
               className="inline-flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white
                 bg-violet-600 hover:bg-violet-700 active:bg-violet-800
                 disabled:opacity-60 disabled:cursor-not-allowed
-                shadow-md shadow-violet-900/40 transition-all duration-200"
+                shadow-md shadow-violet-200 dark:shadow-violet-900/40 transition-all duration-200"
             >
               <span className="material-symbols-outlined text-[1rem]">
                 {applying ? "autorenew" : "check"}
