@@ -53,14 +53,15 @@ export default function NavItem({ item, collapsed, onNavigate, disabled }) {
       {/* Tooltip */}
       {(collapsed || disabled) && (
         <span
-          className="
-            fixed left-60 z-50
+          className={`
+            fixed z-50
             whitespace-nowrap rounded-lg bg-gray-900 dark:bg-gray-700
             px-2.5 py-1.5 text-xs font-medium text-white shadow-lg
-            opacity-0 group-hover:opacity-100 transition-opacity duration-150
-          "
+            opacity-0 group-hover:opacity-100 transition-all duration-150 pointer-events-none
+            ${collapsed ? "left-[74px]" : "left-[250px]"}
+          `}
         >
-          {disabled ? "Can access only after approval" : item.label}
+          {disabled ? "Can access only after Admin Approval" : item.label}
         </span>
       )}
     </Link>
