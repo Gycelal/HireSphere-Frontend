@@ -7,6 +7,7 @@ import { recruiterProfileValidationSchema } from "../../validation/ProfileValida
 import { RECRUITER_TYPES } from "../../constants/RecruiterProfileConstants";
 import CropModal from "../../utils/cropImage";
 import ConfirmModal from "../../components/common/ConfirmModal";
+import toast from "react-hot-toast";
 
 // ── Avatar lightbox ───────────────────────────────────────────────────────────
 function AvatarLightbox({ src, initials, onClose }) {
@@ -229,6 +230,19 @@ export default function RecruiterProfile() {
   function handleAvatarChange(e) {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      toast.error("Only JPG, PNG and WEBP images are allowed.");
+      e.target.value = "";
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("File size exceeds 2MB limit.");
+      e.target.value = "";
+      return;
+    }
+
     // Reset input so re-selecting the same file triggers onChange again
     e.target.value = "";
     const reader = new FileReader();
@@ -256,21 +270,21 @@ export default function RecruiterProfile() {
     if (!draftAvatar) return;
     setIsSavingAvatar(true);
     try {
-      const currentValues = profileForm.getValues();
-      const payload = {
-        ...currentValues,
-        profile: {
-          ...currentValues.profile,
-          profile_picture: draftAvatar,
-        },
-      };
-      const response = await privateApi.put("/recruiter/profile/", payload);
+      const responseBlob = await fetch(draftAvatar);
+      const blob = await responseBlob.blob();
+
+      const formData = new FormData();
+      formData.append("profile_picture", blob, "avatar.jpg");
+
+      const response = await privateApi.put("/recruiter/profile/", formData);
       setProfileData(response.data);
       profileForm.reset(response.data);
       setDraftAvatar(null);
+      toast.success("Profile picture saved successfully!");
       console.log("Profile picture saved:", response.data);
     } catch (error) {
       console.error("Error saving profile picture:", error);
+      toast.error("Failed to save profile picture.");
     } finally {
       setIsSavingAvatar(false);
     }
@@ -280,11 +294,8 @@ export default function RecruiterProfile() {
     setShowRemoveModal(false);
     setIsSavingAvatar(true);
     try {
-      const currentValues = profileForm.getValues();
       const payload = {
-        ...currentValues,
         profile: {
-          ...currentValues.profile,
           profile_picture: null,
         },
       };
