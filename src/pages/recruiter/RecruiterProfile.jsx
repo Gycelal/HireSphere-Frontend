@@ -48,7 +48,7 @@ function AvatarLightbox({ src, initials, onClose }) {
             <span className="text-7xl font-bold text-violet-600 dark:text-violet-400 select-none">
               {initials}
             </span>
-          )}
+          )}h
         </div>
 
         <p className="text-xs text-white/60">
@@ -210,15 +210,61 @@ export default function RecruiterProfile() {
   // function to save profile information to backend from form data
   const handleSave = async (data) => {
     try {
-      const response = await privateApi.put(
+      const response = await privateApi.patch(
         "/recruiter/profile/",
-        profileForm.getValues(),
+        data,
       );
       console.log("Profile data saved:", response.data);
-    } catch (error) {
-      console.log("Error saving profile data:", error);
-    } finally {
+      toast.success("Profile updated successfully!");
+      setProfileData(response.data);
       setIsEditing(false);
+    } catch (error) {
+      console.error("Error saving profile data:", error);
+      
+      if (error.response && error.response.status === 400) {
+        const errors = error.response.data;
+        let hasFieldErrors = false;
+
+        // Handle flat errors and non_field_errors
+        Object.keys(errors).forEach((key) => {
+          if (key === "non_field_errors") {
+            toast.error(Array.isArray(errors[key]) ? errors[key][0] : errors[key]);
+          } else if (key !== "profile") {
+            profileForm.setError(key, {
+              type: "server",
+              message: Array.isArray(errors[key]) ? errors[key][0] : errors[key],
+            });
+            hasFieldErrors = true;
+          }
+        });
+
+        // Handle nested profile errors
+        if (errors.profile && typeof errors.profile === "object") {
+          Object.keys(errors.profile).forEach((nestedKey) => {
+            if (nestedKey === "non_field_errors") {
+              toast.error(
+                Array.isArray(errors.profile[nestedKey])
+                  ? errors.profile[nestedKey][0]
+                  : errors.profile[nestedKey]
+              );
+            } else {
+              profileForm.setError(`profile.${nestedKey}`, {
+                type: "server",
+                message: Array.isArray(errors.profile[nestedKey])
+                  ? errors.profile[nestedKey][0]
+                  : errors.profile[nestedKey],
+              });
+              hasFieldErrors = true;
+            }
+          });
+        }
+
+        if (hasFieldErrors) {
+          toast.error("Please fix the errors in the form.");
+        }
+      } else {
+        toast.error("Failed to update profile. Please try again.");
+      }
     }
   };
 
@@ -276,7 +322,7 @@ export default function RecruiterProfile() {
       const formData = new FormData();
       formData.append("profile_picture", blob, "avatar.jpg");
 
-      const response = await privateApi.put("/recruiter/profile/", formData);
+      const response = await privateApi.patch("/recruiter/profile/photo/", formData);
       setProfileData(response.data);
       profileForm.reset(response.data);
       setDraftAvatar(null);
@@ -299,7 +345,7 @@ export default function RecruiterProfile() {
           profile_picture: null,
         },
       };
-      const response = await privateApi.put("/recruiter/profile/", payload);
+      const response = await privateApi.patch("/recruiter/profile/photo/", payload);
       setProfileData(response.data);
       profileForm.reset(response.data);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -640,7 +686,7 @@ export default function RecruiterProfile() {
               </div>
 
               <div>
-                <FieldLabel htmlFor="company">Company / Branch Name</FieldLabel>
+                <FieldLabel htmlFor="company">Company / Brand Name</FieldLabel>
                 {isEditing ? (
                   <TextInput
                     id="company"
