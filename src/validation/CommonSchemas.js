@@ -12,7 +12,6 @@ export const lastNameSchema = z
   .string()
   .trim()
   .nonempty('Last name is required')
-  .min(3, 'Last name must be at least 3 characters long')
   .max(50, 'Last name must be less than 50 characters long')
   .regex(/^[A-Za-z\s'-]+$/, 'Last name contains invalid characters')
 

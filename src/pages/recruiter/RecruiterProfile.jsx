@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, forwardRef } from "react";
 import ProfileCompletionBar from "../../components/common/ProfileCompletionBar";
 import { privateApi } from "../../services/api";
 import { useForm } from "react-hook-form";
@@ -48,7 +48,7 @@ function AvatarLightbox({ src, initials, onClose }) {
             <span className="text-7xl font-bold text-violet-600 dark:text-violet-400 select-none">
               {initials}
             </span>
-          )}h
+          )}
         </div>
 
         <p className="text-xs text-white/60">
@@ -72,11 +72,11 @@ function FieldLabel({ htmlFor, children, required }) {
   );
 }
 
-function TextInput({ id, placeholder, type = "text", ...props }) {
+const TextInput = forwardRef(({ id, placeholder, type = "text", ...props }, ref) => {
   return (
     <input
+      ref={ref}
       id={id}
-      name={name}
       type={type}
       placeholder={placeholder}
       {...props}
@@ -89,16 +89,15 @@ function TextInput({ id, placeholder, type = "text", ...props }) {
         transition-all duration-200"
     />
   );
-}
+});
 
-function SelectInput({ id, name, value, onChange, options }) {
+const SelectInput = forwardRef(({ id, options, ...props }, ref) => {
   return (
     <div className="relative">
       <select
+        ref={ref}
         id={id}
-        name={name}
-        value={value}
-        onChange={onChange}
+        {...props}
         className="w-full px-4 py-2.5 pr-10 rounded-xl text-sm appearance-none cursor-pointer
           bg-white dark:bg-gray-900
           border border-gray-200 dark:border-gray-700
@@ -117,7 +116,7 @@ function SelectInput({ id, name, value, onChange, options }) {
       </span>
     </div>
   );
-}
+});
 
 // Section card wrapper
 function SectionCard({ title, icon, children }) {
@@ -163,7 +162,7 @@ function ViewField({ label, value, icon }) {
   );
 }
 
-// ── RecruiterProfilePage ──────────────────────────────────────────────────────
+// ── RecruiterProfilePage
 export default function RecruiterProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [completionPercentage, setCompletionPercentage] = useState(0);
@@ -173,6 +172,7 @@ export default function RecruiterProfile() {
   const [cropSrc, setCropSrc] = useState(null); // raw image waiting for crop
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [viewAvatar, setViewAvatar] = useState(false);
+  const [avatarError, setAvatarError] = useState("");
   const fileInputRef = useRef(null);
 
   const profileForm = useForm({
@@ -217,6 +217,7 @@ export default function RecruiterProfile() {
       console.log("Profile data saved:", response.data);
       toast.success("Profile updated successfully!");
       setProfileData(response.data);
+      setCompletionPercentage(response.data.completion_percentage || 0);
       setIsEditing(false);
     } catch (error) {
       console.error("Error saving profile data:", error);
@@ -274,17 +275,20 @@ export default function RecruiterProfile() {
 
   // Handlers
   function handleAvatarChange(e) {
+    setAvatarError(""); // Clear previous errors
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
-      toast.error("Only JPG, PNG and WEBP images are allowed.");
+    if (!["image/jpeg", "image/png", "image/webp", "image/jpg"].includes(file.type)) {
+      setAvatarError("Only JPG, JPEG, PNG and WEBP image formats are allowed.");
+      toast.error("Invalid format.");
       e.target.value = "";
       return;
     }
 
     if (file.size > 2 * 1024 * 1024) {
-      toast.error("File size exceeds 2MB limit.");
+      setAvatarError("File size exceeds 2MB limit.");
+      toast.error("Upload Failed.");
       e.target.value = "";
       return;
     }
@@ -323,14 +327,18 @@ export default function RecruiterProfile() {
       formData.append("profile_picture", blob, "avatar.jpg");
 
       const response = await privateApi.patch("/recruiter/profile/photo/", formData);
-      setProfileData(response.data);
-      profileForm.reset(response.data);
+      await getProfileData();
       setDraftAvatar(null);
       toast.success("Profile picture saved successfully!");
       console.log("Profile picture saved:", response.data);
     } catch (error) {
       console.error("Error saving profile picture:", error);
-      toast.error("Failed to save profile picture.");
+      if (error.response?.status === 400 && error.response?.data?.profile_picture) {
+        setAvatarError(error.response.data.profile_picture[0]);
+        toast.error("Failed to save: Invalid image.");
+      } else {
+        toast.error("Upload Failed.");
+      }
     } finally {
       setIsSavingAvatar(false);
     }
@@ -345,9 +353,8 @@ export default function RecruiterProfile() {
           profile_picture: null,
         },
       };
-      const response = await privateApi.patch("/recruiter/profile/photo/", payload);
-      setProfileData(response.data);
-      profileForm.reset(response.data);
+      const response = await privateApi.delete("/recruiter/profile/photo/", payload);
+      await getProfileData();
       if (fileInputRef.current) fileInputRef.current.value = "";
       console.log("Profile picture removed:", response.data);
     } catch (error) {
@@ -438,7 +445,7 @@ export default function RecruiterProfile() {
                   type="button"
                   onClick={() => setViewAvatar(true)}
                   aria-label="View profile picture"
-                  className="group relative w-20 h-20 rounded-2xl overflow-hidden
+                  className="group relative w-24 sm:w-28 h-24 sm:h-28 rounded-2xl overflow-hidden
                     bg-violet-100 dark:bg-violet-950
                     border-2 border-violet-200 dark:border-violet-800
                     flex items-center justify-center
@@ -451,7 +458,7 @@ export default function RecruiterProfile() {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <span className="text-2xl font-bold text-violet-600 dark:text-violet-400 select-none">
+                    <span className="text-3xl sm:text-4xl font-bold text-violet-600 dark:text-violet-400 select-none">
                       {initials}
                     </span>
                   )}
@@ -478,6 +485,11 @@ export default function RecruiterProfile() {
                 <p className="text-xs text-gray-400 dark:text-gray-500">
                   Photo is always changeable · JPG, PNG or WEBP · Max 2 MB
                 </p>
+                {avatarError && (
+                  <p className="mt-1 text-xs text-red-500 font-medium">
+                    {avatarError}
+                  </p>
+                )}
                 <div className="flex flex-wrap items-center gap-2 mt-1">
                   {draftAvatar ? (
                     <>
@@ -561,7 +573,7 @@ export default function RecruiterProfile() {
                           <span className="material-symbols-outlined text-[0.9rem]">
                             {isSavingAvatar ? "autorenew" : "delete"}
                           </span>
-                          Remove Photo
+                          {isSavingAvatar ? " Removing..." : "Remove Photo"}
                         </button>
                       )}
                     </>
