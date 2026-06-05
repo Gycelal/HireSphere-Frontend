@@ -5,175 +5,21 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { recruiterProfileValidationSchema } from "../../validation/ProfileValidationSchemas";
 import { RECRUITER_TYPES } from "../../constants/RecruiterProfileConstants";
-import CropModal from "../../utils/cropImage";
-import ConfirmModal from "../../components/common/ConfirmModal";
 import toast from "react-hot-toast";
 
-// ── Avatar lightbox ───────────────────────────────────────────────────────────
-function AvatarLightbox({ src, initials, onClose }) {
-  useEffect(() => {
-    function onKey(e) {
-      if (e.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <div className="relative flex flex-col items-center gap-4">
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          aria-label="Close"
-          className="absolute -top-3 -right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white shadow-lg transition-colors duration-150"
-        >
-          <span className="material-symbols-outlined text-[1.1rem]">close</span>
-        </button>
-
-        {/* Full-size image or initials */}
-        <div className="w-64 h-64 rounded-3xl overflow-hidden bg-violet-100 dark:bg-violet-950 border-4 border-white dark:border-gray-800 shadow-2xl shadow-black/40 flex items-center justify-center">
-          {src ? (
-            <img
-              src={src}
-              alt="Profile"
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <span className="text-7xl font-bold text-violet-600 dark:text-violet-400 select-none">
-              {initials}
-            </span>
-          )}
-        </div>
-
-        <p className="text-xs text-white/60">
-          Press Esc or click outside to close
-        </p>
-      </div>
-    </div>
-  );
-}
-
-//Reusable field components
-function FieldLabel({ htmlFor, children, required }) {
-  return (
-    <label
-      htmlFor={htmlFor}
-      className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wide mb-1.5"
-    >
-      {children}
-      {required && <span className="text-red-400 ml-0.5">*</span>}
-    </label>
-  );
-}
-
-const TextInput = forwardRef(({ id, placeholder, type = "text", ...props }, ref) => {
-  return (
-    <input
-      ref={ref}
-      id={id}
-      type={type}
-      placeholder={placeholder}
-      {...props}
-      className="w-full px-4 py-2.5 rounded-xl text-sm
-        bg-white dark:bg-gray-900
-        border border-gray-200 dark:border-gray-700
-        text-gray-900 dark:text-white
-        placeholder-gray-400 dark:placeholder-gray-600
-        focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent
-        transition-all duration-200"
-    />
-  );
-});
-
-const SelectInput = forwardRef(({ id, options, ...props }, ref) => {
-  return (
-    <div className="relative">
-      <select
-        ref={ref}
-        id={id}
-        {...props}
-        className="w-full px-4 py-2.5 pr-10 rounded-xl text-sm appearance-none cursor-pointer
-          bg-white dark:bg-gray-900
-          border border-gray-200 dark:border-gray-700
-          text-gray-900 dark:text-white
-          focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent
-          transition-all duration-200"
-      >
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
-      <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[1rem] text-gray-400 dark:text-gray-500 pointer-events-none">
-        expand_more
-      </span>
-    </div>
-  );
-});
-
-// Section card wrapper
-function SectionCard({ title, icon, children }) {
-  return (
-    <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden">
-      {/* Section header */}
-      <div className="flex items-center gap-2.5 px-6 py-4 border-b border-gray-100 dark:border-gray-800">
-        <span className="material-symbols-outlined text-[1.1rem] text-violet-500">
-          {icon}
-        </span>
-        <h2 className="text-sm font-semibold text-gray-800 dark:text-white">
-          {title}
-        </h2>
-      </div>
-      {/* Section body */}
-      <div className="px-6 py-5">{children}</div>
-    </div>
-  );
-}
-
-// ── Read-only field display ───────────────────────────────────────────────────
-function ViewField({ label, value, icon }) {
-  return (
-    <div className="flex flex-col gap-1">
-      <span className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide">
-        {label}
-      </span>
-      <div className="flex items-center gap-2 py-2">
-        {icon && (
-          <span className="material-symbols-outlined text-[1rem] text-gray-400 dark:text-gray-500 shrink-0">
-            {icon}
-          </span>
-        )}
-        <span className="text-sm text-gray-800 dark:text-gray-200 break-all">
-          {value || (
-            <span className="text-gray-400 dark:text-gray-600 italic">
-              Not set
-            </span>
-          )}
-        </span>
-      </div>
-    </div>
-  );
-}
+import AvatarManager from "../../components/common/profile/AvatarManager";
+import ViewField from "../../components/common/data-display/ViewField";
+import SectionCard from "../../components/common/ui/SectionCard";
+import FieldLabel from "../../components/common/form/FieldLabel";
+import TextInput from "../../components/common/form/TextInput";
+import SelectInput from "../../components/common/form/SelectInput";
 
 // ── RecruiterProfilePage
 export default function RecruiterProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [completionPercentage, setCompletionPercentage] = useState(0);
   const [profileData, setProfileData] = useState(null);
-  const [draftAvatar, setDraftAvatar] = useState(null); // cropped but unsaved image
-  const [isSavingAvatar, setIsSavingAvatar] = useState(false);
-  const [cropSrc, setCropSrc] = useState(null); // raw image waiting for crop
-  const [showRemoveModal, setShowRemoveModal] = useState(false);
-  const [viewAvatar, setViewAvatar] = useState(false);
-  const [avatarError, setAvatarError] = useState("");
-  const fileInputRef = useRef(null);
+
 
   const profileForm = useForm({
     resolver: zodResolver(recruiterProfileValidationSchema),
@@ -273,97 +119,6 @@ export default function RecruiterProfile() {
     getProfileData();
   }, []);
 
-  // Handlers
-  function handleAvatarChange(e) {
-    setAvatarError(""); // Clear previous errors
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!["image/jpeg", "image/png", "image/webp", "image/jpg"].includes(file.type)) {
-      setAvatarError("Only JPG, JPEG, PNG and WEBP image formats are allowed.");
-      toast.error("Invalid format.");
-      e.target.value = "";
-      return;
-    }
-
-    if (file.size > 2 * 1024 * 1024) {
-      setAvatarError("File size exceeds 2MB limit.");
-      toast.error("Upload Failed.");
-      e.target.value = "";
-      return;
-    }
-
-    // Reset input so re-selecting the same file triggers onChange again
-    e.target.value = "";
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setCropSrc(ev.target.result); // open crop modal with selected image
-    };
-    reader.readAsDataURL(file);
-  }
-
-  function handleCropApply(croppedDataUrl) {
-    setDraftAvatar(croppedDataUrl); // set cropped result as draft
-    setCropSrc(null); // close crop modal
-  }
-
-  function handleCropCancel() {
-    setCropSrc(null); // discard, keep existing avatar
-  }
-
-  function handleCancelDraft() {
-    setDraftAvatar(null);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  }
-
-  async function handleSaveAvatar() {
-    if (!draftAvatar) return;
-    setIsSavingAvatar(true);
-    try {
-      const responseBlob = await fetch(draftAvatar);
-      const blob = await responseBlob.blob();
-
-      const formData = new FormData();
-      formData.append("profile_picture", blob, "avatar.jpg");
-
-      const response = await privateApi.patch("/recruiter/profile/photo/", formData);
-      await getProfileData();
-      setDraftAvatar(null);
-      toast.success("Profile picture saved successfully!");
-      console.log("Profile picture saved:", response.data);
-    } catch (error) {
-      console.error("Error saving profile picture:", error);
-      if (error.response?.status === 400 && error.response?.data?.profile_picture) {
-        setAvatarError(error.response.data.profile_picture[0]);
-        toast.error("Failed to save: Invalid image.");
-      } else {
-        toast.error("Upload Failed.");
-      }
-    } finally {
-      setIsSavingAvatar(false);
-    }
-  }
-
-  async function handleRemoveAvatar() {
-    setShowRemoveModal(false);
-    setIsSavingAvatar(true);
-    try {
-      const payload = {
-        profile: {
-          profile_picture: null,
-        },
-      };
-      const response = await privateApi.delete("/recruiter/profile/photo/", payload);
-      await getProfileData();
-      if (fileInputRef.current) fileInputRef.current.value = "";
-      console.log("Profile picture removed:", response.data);
-    } catch (error) {
-      console.error("Error removing profile picture:", error);
-    } finally {
-      setIsSavingAvatar(false);
-    }
-  }
-
   function handleEdit() {
     setIsEditing(true);
   }
@@ -375,7 +130,6 @@ export default function RecruiterProfile() {
 
   // Avatar logic
   const savedAvatar = profileData?.profile?.profile_picture;
-  const displayAvatar = draftAvatar || savedAvatar;
   const initials =
     `${profileData?.first_name?.[0] ?? ""}${profileData?.last_name?.[0] ?? ""}`.toUpperCase();
 
@@ -437,160 +191,13 @@ export default function RecruiterProfile() {
       <form onSubmit={profileForm.handleSubmit(handleSave)} noValidate>
         <div className="flex flex-col gap-5">
           {/* ── Profile picture card ── */}
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
-              {/* Avatar — click to view full size */}
-              <div className="relative shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setViewAvatar(true)}
-                  aria-label="View profile picture"
-                  className="group relative w-24 sm:w-28 h-24 sm:h-28 rounded-2xl overflow-hidden
-                    bg-violet-100 dark:bg-violet-950
-                    border-2 border-violet-200 dark:border-violet-800
-                    flex items-center justify-center
-                    focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
-                >
-                  {displayAvatar ? (
-                    <img
-                      src={displayAvatar}
-                      alt="Profile"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-3xl sm:text-4xl font-bold text-violet-600 dark:text-violet-400 select-none">
-                      {initials}
-                    </span>
-                  )}
-                  {/* Hover overlay */}
-                  <span
-                    className="absolute inset-0 bg-black/40 flex items-center justify-center
-                    opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-2xl"
-                  >
-                    <span className="material-symbols-outlined text-white text-[1.2rem]">
-                      zoom_in
-                    </span>
-                  </span>
-                </button>
-                {/* Online dot */}
-                <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-green-500 border-2 border-white dark:border-gray-900" />
-              </div>
-
-              {/* Info + upload */}
-              <div className="flex flex-col gap-1.5 min-w-0">
-                <p className="text-base font-semibold text-gray-900 dark:text-white">
-                  {profileData?.profile?.display_name ||
-                    `${profileData?.first_name} ${profileData?.last_name}`}
-                </p>
-                <p className="text-xs text-gray-400 dark:text-gray-500">
-                  Photo is always changeable · JPG, PNG or WEBP · Max 2 MB
-                </p>
-                {avatarError && (
-                  <p className="mt-1 text-xs text-red-500 font-medium">
-                    {avatarError}
-                  </p>
-                )}
-                <div className="flex flex-wrap items-center gap-2 mt-1">
-                  {draftAvatar ? (
-                    <>
-                      {/* Draft State Buttons */}
-                      <button
-                        type="button"
-                        onClick={handleSaveAvatar}
-                        disabled={isSavingAvatar}
-                        className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold
-                          text-white bg-violet-600 hover:bg-violet-700 active:bg-violet-800
-                          disabled:opacity-60 disabled:cursor-not-allowed
-                          shadow-md shadow-violet-200 dark:shadow-violet-900/30 transition-all duration-200"
-                      >
-                        <span className="material-symbols-outlined text-[0.9rem]">
-                          {isSavingAvatar ? "autorenew" : "save"}
-                        </span>
-                        {isSavingAvatar ? "Saving..." : "Save Photo"}
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={isSavingAvatar}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
-                          bg-violet-50 dark:bg-violet-950/60
-                          text-violet-700 dark:text-violet-300
-                          border border-violet-200 dark:border-violet-800
-                          hover:bg-violet-100 dark:hover:bg-violet-900/40
-                          transition-colors duration-200"
-                      >
-                        <span className="material-symbols-outlined text-[0.9rem]">
-                          change_circle
-                        </span>
-                        Change Photo
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={handleCancelDraft}
-                        disabled={isSavingAvatar}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
-                          text-red-500 dark:text-red-400
-                          hover:bg-red-50 dark:hover:bg-red-950/40
-                          transition-colors duration-200"
-                      >
-                        <span className="material-symbols-outlined text-[0.9rem]">
-                          cancel
-                        </span>
-                        Cancel
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      {/* Viewing Saved State Buttons */}
-                      <button
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
-                          bg-violet-50 dark:bg-violet-950/60
-                          text-violet-700 dark:text-violet-300
-                          border border-violet-200 dark:border-violet-800
-                          hover:bg-violet-100 dark:hover:bg-violet-900/40
-                          transition-colors duration-200"
-                      >
-                        <span className="material-symbols-outlined text-[0.9rem]">
-                          {savedAvatar ? "change_circle" : "upload"}
-                        </span>
-                        {savedAvatar ? "Change Photo" : "Upload Photo"}
-                      </button>
-
-                      {savedAvatar && (
-                        <button
-                          type="button"
-                          onClick={() => setShowRemoveModal(true)}
-                          disabled={isSavingAvatar}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
-                            text-red-500 dark:text-red-400
-                            hover:bg-red-50 dark:hover:bg-red-950/40
-                            transition-colors duration-200"
-                        >
-                          <span className="material-symbols-outlined text-[0.9rem]">
-                            {isSavingAvatar ? "autorenew" : "delete"}
-                          </span>
-                          {isSavingAvatar ? " Removing..." : "Remove Photo"}
-                        </button>
-                      )}
-                    </>
-                  )}
-                </div>
-
-                {/* Hidden file input */}
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  className="hidden"
-                  onChange={handleAvatarChange}
-                />
-              </div>
-            </div>
-          </div>
+          <AvatarManager
+            savedAvatar={profileData?.profile?.profile_picture}
+            initials={initials}
+            displayName={profileData?.profile?.display_name || `${profileData?.first_name} ${profileData?.last_name}`}
+            uploadEndpoint="/recruiter/profile/photo/"
+            onSuccess={getProfileData}
+          />
 
           {/* ── Personal information ── */}
           <SectionCard title="Personal Information" icon="person">
@@ -804,36 +411,6 @@ export default function RecruiterProfile() {
           )}
         </div>
       </form>
-      {/* ── Crop modal — shown immediately after file selection ── */}
-      {cropSrc && (
-        <CropModal
-          imageSrc={cropSrc}
-          onApply={handleCropApply}
-          onCancel={handleCropCancel}
-        />
-      )}
-
-      {/* ── Avatar lightbox (view-only) — triggered by clicking the avatar ── */}
-      {viewAvatar && (
-        <AvatarLightbox
-          src={displayAvatar}
-          initials={initials}
-          onClose={() => setViewAvatar(false)}
-        />
-      )}
-
-      {/* Remove Avatar Confirmation Modal */}
-      {showRemoveModal && (
-        <ConfirmModal
-          open={showRemoveModal}
-          title="Remove Profile Picture"
-          message="Are you sure you want to remove your profile picture? This action cannot be undone."
-          confirmText="Remove Photo"
-          variant="danger"
-          onConfirm={handleRemoveAvatar}
-          onCancel={() => setShowRemoveModal(false)}
-        />
-      )}
     </div>
   );
 }
