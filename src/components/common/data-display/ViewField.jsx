@@ -10,7 +10,7 @@ const ViewField = ({ label, value, icon }) => {
             {icon}
           </span>
         )}
-        <span className="text-sm text-gray-800 dark:text-gray-200 break-all">
+        <span className="text-sm text-gray-800 dark:text-gray-200 break-all whitespace-pre-wrap">
           {value || (
             <span className="text-gray-400 dark:text-gray-600 italic">
               Not set

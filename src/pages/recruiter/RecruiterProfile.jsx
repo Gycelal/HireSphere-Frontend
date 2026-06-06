@@ -19,6 +19,7 @@ export default function RecruiterProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [completionPercentage, setCompletionPercentage] = useState(0);
   const [profileData, setProfileData] = useState(null);
+  const firstFieldRef = useRef(null);
 
 
   const profileForm = useForm({
@@ -119,6 +120,13 @@ export default function RecruiterProfile() {
     getProfileData();
   }, []);
 
+  // Scroll to Personal Info section when edit mode activates
+  useEffect(() => {
+    if (isEditing) {
+      firstFieldRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [isEditing]);
+
   function handleEdit() {
     setIsEditing(true);
   }
@@ -198,6 +206,9 @@ export default function RecruiterProfile() {
             uploadEndpoint="/recruiter/profile/photo/"
             onSuccess={getProfileData}
           />
+
+          {/* Scroll anchor — edit mode scrolls here ── */}
+          <div ref={firstFieldRef} />
 
           {/* ── Personal information ── */}
           <SectionCard title="Personal Information" icon="person">
