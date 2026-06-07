@@ -106,6 +106,8 @@ const ResumeManager = ({ savedResume, onSuccess }) => {
   const [isRemoving, setIsRemoving] = useState(false);
   const fileInputRef = useRef(null);
 
+  const LS_KEY = "candidate_resume_uploaded_at";
+
   const validateAndUpload = async (file) => {
     if (!file) return;
     const allowed = ["application/pdf", "application/msword",
@@ -123,6 +125,7 @@ const ResumeManager = ({ savedResume, onSuccess }) => {
       const formData = new FormData();
       formData.append("resume", file);
       await privateApi.patch("/candidate/profile/resume/", formData);
+      localStorage.setItem(LS_KEY, new Date().toISOString());
       toast.success("Resume uploaded successfully!");
       if (onSuccess) await onSuccess();
     } catch (err) {
@@ -138,6 +141,7 @@ const ResumeManager = ({ savedResume, onSuccess }) => {
     setIsRemoving(true);
     try {
       await privateApi.delete("/candidate/profile/resume/");
+      localStorage.removeItem(LS_KEY);
       toast.success("Resume removed.");
       if (onSuccess) await onSuccess();
     } catch (err) {
@@ -156,8 +160,15 @@ const ResumeManager = ({ savedResume, onSuccess }) => {
   };
 
   const resumeFileName = savedResume
-    ? savedResume.split("/").pop().split("?")[0]
+    ? decodeURIComponent(savedResume.split("/").pop().split("?")[0])
     : null;
+
+  const uploadedAt = (() => {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return null;
+    const d = new Date(raw);
+    return d.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+  })();
 
   return (
     <div
@@ -172,58 +183,91 @@ const ResumeManager = ({ savedResume, onSuccess }) => {
     >
       {savedResume ? (
         /* ── Saved state ── */
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-          <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-950/60 flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-violet-600 dark:text-violet-400 text-[1.2rem]">
+        <div className="flex flex-col gap-3">
+          {/* Section label */}
+          <p className="text-[0.65rem] font-bold uppercase tracking-widest text-violet-500 dark:text-violet-400">
+            Current Resume
+          </p>
+
+          <div className="flex items-center gap-3">
+            {/* File icon */}
+            <div className="w-11 h-11 rounded-xl bg-violet-100 dark:bg-violet-950/60 flex items-center justify-center shrink-0">
+              <span className="material-symbols-outlined text-violet-600 dark:text-violet-400 text-[1.3rem]">
                 description
               </span>
             </div>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-gray-800 dark:text-white truncate">
+
+            {/* File info */}
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-gray-800 dark:text-white truncate" title={resumeFileName}>
                 {resumeFileName}
               </p>
-              <p className="text-xs text-gray-400 dark:text-gray-500">Resume on file</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                {uploadedAt ? `Uploaded on ${uploadedAt}` : "PDF / Word document"}
+              </p>
             </div>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <a
-              href={savedResume}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
-                bg-violet-50 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300
-                border border-violet-200 dark:border-violet-800
-                hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors duration-200"
-            >
-              <span className="material-symbols-outlined text-[0.9rem]">open_in_new</span>
-              View
-            </a>
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isUploading}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
-                bg-violet-50 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300
-                border border-violet-200 dark:border-violet-800
-                hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors duration-200"
-            >
-              <span className="material-symbols-outlined text-[0.9rem]">change_circle</span>
-              Replace
-            </button>
-            <button
-              type="button"
-              onClick={handleRemove}
-              disabled={isRemoving}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
-                text-red-500 dark:text-red-400
-                hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors duration-200"
-            >
-              <span className="material-symbols-outlined text-[0.9rem]">
-                {isRemoving ? "autorenew" : "delete"}
-              </span>
-              {isRemoving ? "Removing…" : "Remove"}
-            </button>
+
+            {/* Action icon buttons */}
+            <div className="flex items-center gap-0.5 shrink-0">
+              {/* View */}
+              <a
+                href={savedResume}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="View"
+                className="w-8 h-8 rounded-lg flex items-center justify-center
+                  text-violet-600 dark:text-violet-400
+                  hover:bg-violet-100 dark:hover:bg-violet-900/40
+                  transition-colors duration-200"
+              >
+                <span className="material-symbols-outlined text-[1.15rem]">open_in_new</span>
+              </a>
+
+              {/* Download */}
+              <a
+                href={savedResume}
+                download={resumeFileName}
+                title="Download"
+                className="w-8 h-8 rounded-lg flex items-center justify-center
+                  text-violet-600 dark:text-violet-400
+                  hover:bg-violet-100 dark:hover:bg-violet-900/40
+                  transition-colors duration-200"
+              >
+                <span className="material-symbols-outlined text-[1.15rem]">download</span>
+              </a>
+
+              {/* Change */}
+              <button
+                type="button"
+                title="Change"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+                className="w-8 h-8 rounded-lg flex items-center justify-center
+                  text-violet-600 dark:text-violet-400
+                  hover:bg-violet-100 dark:hover:bg-violet-900/40
+                  disabled:opacity-50 disabled:cursor-not-allowed
+                  transition-colors duration-200"
+              >
+                <span className="material-symbols-outlined text-[1.15rem]">drive_file_rename_outline</span>
+              </button>
+
+              {/* Delete */}
+              <button
+                type="button"
+                title="Delete"
+                onClick={handleRemove}
+                disabled={isRemoving}
+                className="w-8 h-8 rounded-lg flex items-center justify-center
+                  text-red-500 dark:text-red-400
+                  hover:bg-red-50 dark:hover:bg-red-950/40
+                  disabled:opacity-50 disabled:cursor-not-allowed
+                  transition-colors duration-200"
+              >
+                <span className="material-symbols-outlined text-[1.15rem]">
+                  {isRemoving ? "autorenew" : "delete"}
+                </span>
+              </button>
+            </div>
           </div>
         </div>
       ) : (
@@ -351,9 +395,9 @@ const CandidateProfile = () => {
             hasFieldErrors = true;
           });
         }
-        if (hasFieldErrors) toast.error("Please fix the errors in the form.");
+        if (hasFieldErrors) toast.error("Fix the errors on the fields.");
       } else {
-        toast.error("Failed to update profile. Please try again.");
+        toast.error("Updation Failed. Please try again.");
       }
     }
   };

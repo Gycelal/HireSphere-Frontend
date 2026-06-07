@@ -101,7 +101,6 @@ const AvatarManager = ({
           profile_picture: null,
         },
       };
-      // For axios delete with body, standard is passing { data: payload }
       const response = await privateApi.delete(uploadEndpoint, { data: payload });
       if (onSuccess) await onSuccess();
       if (fileInputRef.current) fileInputRef.current.value = "";

@@ -73,7 +73,7 @@ export default function RecruiterProfile() {
         const errors = error.response.data;
         let hasFieldErrors = false;
 
-        // Handle flat errors and non_field_errors
+        //for handling flat errors and non_field_errors
         Object.keys(errors).forEach((key) => {
           if (key === "non_field_errors") {
             toast.error(Array.isArray(errors[key]) ? errors[key][0] : errors[key]);
