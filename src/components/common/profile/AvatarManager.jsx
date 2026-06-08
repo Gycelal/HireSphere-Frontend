@@ -101,12 +101,13 @@ const AvatarManager = ({
           profile_picture: null,
         },
       };
-      const response = await privateApi.delete(uploadEndpoint, { data: payload });
+      await privateApi.delete(uploadEndpoint, { data: payload });
       if (onSuccess) await onSuccess();
       if (fileInputRef.current) fileInputRef.current.value = "";
-      console.log("Profile picture removed:", response.data);
+      toast.success("Profile picture removed.");
     } catch (error) {
       console.error("Error removing profile picture:", error);
+      toast.error("Failed to remove photo. Please try again.");
     } finally {
       setIsSavingAvatar(false);
     }

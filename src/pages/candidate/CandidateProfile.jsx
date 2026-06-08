@@ -122,9 +122,28 @@ const ResumeManager = ({ savedResume, onSuccess }) => {
     }
     setIsUploading(true);
     try {
-      const formData = new FormData();
-      formData.append("resume", file);
-      await privateApi.patch("/candidate/profile/resume/", formData);
+      // 1. Upload to Cloudinary
+      const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/auto/upload`;
+      const cloudData = new FormData();
+      cloudData.append("file", file);
+      cloudData.append("upload_preset", import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
+
+      const cloudRes = await fetch(cloudinaryUrl, {
+        method: "POST",
+        body: cloudData,
+      });
+      console.log("cloud upload result:",cloudRes);
+      
+      if (!cloudRes.ok) throw new Error("Failed to upload to Cloudinary");
+      const cloudJson = await cloudRes.json();
+
+      // 2. Send public_id (or secure_url) to backend
+      // Adjust the key ("resume") if your backend expects something else (e.g., "public_id")
+      await privateApi.patch("/candidate/profile/resume/", {
+        resume: cloudJson.public_id, 
+        resume_url: cloudJson.secure_url
+      });
+
       localStorage.setItem(LS_KEY, new Date().toISOString());
       toast.success("Resume uploaded successfully!");
       if (onSuccess) await onSuccess();
