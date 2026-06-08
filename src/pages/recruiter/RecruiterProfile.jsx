@@ -175,7 +175,7 @@ export default function RecruiterProfile() {
       </div>
 
       {/* ── Profile completion ── */}
-      {completionPercentage < 100 && (
+      {profileData && completionPercentage < 100 && (
         <>
           <div className="bg-yellow-50 dark:bg-yellow-950/30 rounded-2xl border border-yellow-200 dark:border-yellow-800 px-6 py-4">
             <div className="flex items-center gap-3">

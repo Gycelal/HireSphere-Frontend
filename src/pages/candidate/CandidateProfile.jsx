@@ -106,8 +106,6 @@ const ResumeManager = ({ savedResume, onSuccess }) => {
   const [isRemoving, setIsRemoving] = useState(false);
   const fileInputRef = useRef(null);
 
-  const LS_KEY = "candidate_resume_uploaded_at";
-
   const validateAndUpload = async (file) => {
     if (!file) return;
     const allowed = ["application/pdf", "application/msword",
@@ -140,11 +138,10 @@ const ResumeManager = ({ savedResume, onSuccess }) => {
       // 2. Send public_id (or secure_url) to backend
       // Adjust the key ("resume") if your backend expects something else (e.g., "public_id")
       await privateApi.patch("/candidate/profile/resume/", {
-        resume: cloudJson.public_id, 
+        resume_public_id: cloudJson.public_id,
         resume_url: cloudJson.secure_url
       });
 
-      localStorage.setItem(LS_KEY, new Date().toISOString());
       toast.success("Resume uploaded successfully!");
       if (onSuccess) await onSuccess();
     } catch (err) {
@@ -160,7 +157,6 @@ const ResumeManager = ({ savedResume, onSuccess }) => {
     setIsRemoving(true);
     try {
       await privateApi.delete("/candidate/profile/resume/");
-      localStorage.removeItem(LS_KEY);
       toast.success("Resume removed.");
       if (onSuccess) await onSuccess();
     } catch (err) {
@@ -178,16 +174,8 @@ const ResumeManager = ({ savedResume, onSuccess }) => {
     if (file) validateAndUpload(file);
   };
 
-  const resumeFileName = savedResume
-    ? decodeURIComponent(savedResume.split("/").pop().split("?")[0])
-    : null;
-
-  const uploadedAt = (() => {
-    const raw = localStorage.getItem(LS_KEY);
-    if (!raw) return null;
-    const d = new Date(raw);
-    return d.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
-  })();
+  const resumeUrl = savedResume || null;
+  const resumeFileName = savedResume ? "Candidate Resume" : null;
 
   return (
     <div
@@ -222,7 +210,7 @@ const ResumeManager = ({ savedResume, onSuccess }) => {
                 {resumeFileName}
               </p>
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                {uploadedAt ? `Uploaded on ${uploadedAt}` : "PDF / Word document"}
+                PDF / Word document
               </p>
             </div>
 
@@ -230,7 +218,7 @@ const ResumeManager = ({ savedResume, onSuccess }) => {
             <div className="flex items-center gap-0.5 shrink-0">
               {/* View */}
               <a
-                href={savedResume}
+                href={resumeUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 title="View"
@@ -240,19 +228,6 @@ const ResumeManager = ({ savedResume, onSuccess }) => {
                   transition-colors duration-200"
               >
                 <span className="material-symbols-outlined text-[1.15rem]">open_in_new</span>
-              </a>
-
-              {/* Download */}
-              <a
-                href={savedResume}
-                download={resumeFileName}
-                title="Download"
-                className="w-8 h-8 rounded-lg flex items-center justify-center
-                  text-violet-600 dark:text-violet-400
-                  hover:bg-violet-100 dark:hover:bg-violet-900/40
-                  transition-colors duration-200"
-              >
-                <span className="material-symbols-outlined text-[1.15rem]">download</span>
               </a>
 
               {/* Change */}
@@ -341,7 +316,7 @@ const CandidateProfile = () => {
   const [profileData, setProfileData] = useState(null);
   const [skills, setSkills] = useState([]);
   const firstFieldRef = useRef(null);
-
+  console.log("profile form data:",profileData)
   const profileForm = useForm({
     resolver: zodResolver(candidateProfileValidationSchema),
     mode: "onTouched",
@@ -482,7 +457,7 @@ const CandidateProfile = () => {
       </div>
 
       {/* ── Profile completion ── */}
-      {completionPercentage < 100 && (
+      {profileData && completionPercentage < 100 && (
         <>
           <div className="bg-yellow-50 dark:bg-yellow-950/30 rounded-2xl border border-yellow-200 dark:border-yellow-800 px-6 py-4">
             <div className="flex items-center gap-3">
@@ -513,7 +488,7 @@ const CandidateProfile = () => {
 
             <SectionCard title="Resume" icon="description">
               <ResumeManager
-                savedResume={profileData?.profile?.resume}
+                savedResume={profileData?.profile?.resume_url || profileData?.profile?.resume}
                 onSuccess={getProfileData}
               />
             </SectionCard>
