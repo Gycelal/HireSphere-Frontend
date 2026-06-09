@@ -6,308 +6,15 @@ import toast from "react-hot-toast";
 import { privateApi } from "../../services/api";
 import ProfileCompletionBar from "../../components/common/ProfileCompletionBar";
 import AvatarManager from "../../components/common/profile/AvatarManager";
+import ResumeManager from "../../components/common/profile/ResumeManager";
 import SectionCard from "../../components/common/ui/SectionCard";
 import FieldLabel from "../../components/common/form/FieldLabel";
 import TextInput from "../../components/common/form/TextInput";
 import TextArea from "../../components/common/form/TextArea";
+import TagInput from "../../components/common/form/TagInput";
 import ViewField from "../../components/common/data-display/ViewField";
 
 
-
-// ── Skills Tag Input ─────────────────────────────────────────────────────────
-const SkillsTagInput = ({ skills, onChange, isEditing }) => {
-  const [inputVal, setInputVal] = useState("");
-  const inputRef = useRef(null);
-
-  const addSkill = (val) => {
-    const trimmed = val.trim();
-    if (!trimmed || skills.includes(trimmed)) return;
-    onChange([...skills, trimmed]);
-    setInputVal("");
-  };
-
-  const removeSkill = (skill) => onChange(skills.filter((s) => s !== skill));
-
-  const handleKeyDown = (e) => {
-    if (["Enter", ",", "Tab"].includes(e.key)) {
-      e.preventDefault();
-      addSkill(inputVal);
-    } else if (e.key === "Backspace" && !inputVal && skills.length > 0) {
-      removeSkill(skills[skills.length - 1]);
-    }
-  };
-
-  if (!isEditing) {
-    return (
-      <div className="flex flex-wrap gap-2 py-2">
-        {skills.length > 0 ? (
-          skills.map((s) => (
-            <span
-              key={s}
-              className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
-                bg-violet-100 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300
-                border border-violet-200 dark:border-violet-800"
-            >
-              {s}
-            </span>
-          ))
-        ) : (
-          <span className="text-sm text-gray-400 dark:text-gray-600 italic">Not set</span>
-        )}
-      </div>
-    );
-  }
-
-  return (
-    <div
-      className="flex flex-wrap gap-2 w-full min-h-[44px] px-3 py-2 rounded-xl
-        bg-white dark:bg-gray-900
-        border border-gray-200 dark:border-gray-700
-        focus-within:ring-2 focus-within:ring-violet-500 focus-within:border-transparent
-        transition-all duration-200 cursor-text"
-      onClick={() => inputRef.current?.focus()}
-    >
-      {skills.map((s) => (
-        <span
-          key={s}
-          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold
-            bg-violet-100 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300
-            border border-violet-200 dark:border-violet-800"
-        >
-          {s}
-          <button
-            type="button"
-            onClick={(e) => { e.stopPropagation(); removeSkill(s); }}
-            className="ml-0.5 text-violet-400 hover:text-red-500 transition-colors"
-            aria-label={`Remove ${s}`}
-          >
-            <span className="material-symbols-outlined text-[0.85rem]">close</span>
-          </button>
-        </span>
-      ))}
-      <input
-        ref={inputRef}
-        value={inputVal}
-        onChange={(e) => setInputVal(e.target.value)}
-        onKeyDown={handleKeyDown}
-        onBlur={() => inputVal.trim() && addSkill(inputVal)}
-        placeholder={skills.length === 0 ? "Type a skill and press Enter or comma…" : "Add more…"}
-        className="flex-1 min-w-[140px] bg-transparent text-sm text-gray-900 dark:text-white
-          placeholder-gray-400 dark:placeholder-gray-600 outline-none"
-      />
-    </div>
-  );
-};
-
-// ── Resume Manager ───────────────────────────────────────────────────────────
-const ResumeManager = ({ savedResume, onSuccess }) => {
-  const [isDragging, setIsDragging] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [isRemoving, setIsRemoving] = useState(false);
-  const fileInputRef = useRef(null);
-
-  const validateAndUpload = async (file) => {
-    if (!file) return;
-    const allowed = ["application/pdf", "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
-    if (!allowed.includes(file.type)) {
-      toast.error("Only PDF or Word documents are allowed.");
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("File must be under 5 MB.");
-      return;
-    }
-    setIsUploading(true);
-    try {
-      // 1. Upload to Cloudinary
-      const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/auto/upload`;
-      const cloudData = new FormData();
-      cloudData.append("file", file);
-      cloudData.append("upload_preset", import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
-
-      const cloudRes = await fetch(cloudinaryUrl, {
-        method: "POST",
-        body: cloudData,
-      });
-      console.log("cloud upload result:",cloudRes);
-      
-      if (!cloudRes.ok) throw new Error("Failed to upload to Cloudinary");
-      const cloudJson = await cloudRes.json();
-
-      // 2. Send public_id (or secure_url) to backend
-      // Adjust the key ("resume") if your backend expects something else (e.g., "public_id")
-      await privateApi.patch("/candidate/profile/resume/", {
-        resume_public_id: cloudJson.public_id,
-        resume_url: cloudJson.secure_url
-      });
-
-      toast.success("Resume uploaded successfully!");
-      if (onSuccess) await onSuccess();
-    } catch (err) {
-      console.error(err);
-      toast.error("Resume upload failed. Please try again.");
-    } finally {
-      setIsUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
-  };
-
-  const handleRemove = async () => {
-    setIsRemoving(true);
-    try {
-      await privateApi.delete("/candidate/profile/resume/");
-      toast.success("Resume removed.");
-      if (onSuccess) await onSuccess();
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to remove resume.");
-    } finally {
-      setIsRemoving(false);
-    }
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) validateAndUpload(file);
-  };
-
-  const resumeUrl = savedResume || null;
-  const resumeFileName = savedResume ? "Candidate Resume" : null;
-
-  return (
-    <div
-      onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-      onDragLeave={() => setIsDragging(false)}
-      onDrop={handleDrop}
-      className={`relative rounded-2xl border-2 border-dashed p-6 transition-all duration-200
-        ${isDragging
-          ? "border-violet-400 bg-violet-50 dark:bg-violet-950/30"
-          : "border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50"
-        }`}
-    >
-      {savedResume ? (
-        /* ── Saved state ── */
-        <div className="flex flex-col gap-3">
-          {/* Section label */}
-          <p className="text-[0.65rem] font-bold uppercase tracking-widest text-violet-500 dark:text-violet-400">
-            Current Resume
-          </p>
-
-          <div className="flex items-center gap-3">
-            {/* File icon */}
-            <div className="w-11 h-11 rounded-xl bg-violet-100 dark:bg-violet-950/60 flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-violet-600 dark:text-violet-400 text-[1.3rem]">
-                description
-              </span>
-            </div>
-
-            {/* File info */}
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-gray-800 dark:text-white truncate" title={resumeFileName}>
-                {resumeFileName}
-              </p>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                PDF / Word document
-              </p>
-            </div>
-
-            {/* Action icon buttons */}
-            <div className="flex items-center gap-0.5 shrink-0">
-              {/* View */}
-              <a
-                href={resumeUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                title="View"
-                className="w-8 h-8 rounded-lg flex items-center justify-center
-                  text-violet-600 dark:text-violet-400
-                  hover:bg-violet-100 dark:hover:bg-violet-900/40
-                  transition-colors duration-200"
-              >
-                <span className="material-symbols-outlined text-[1.15rem]">open_in_new</span>
-              </a>
-
-              {/* Change */}
-              <button
-                type="button"
-                title="Change"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isUploading}
-                className="w-8 h-8 rounded-lg flex items-center justify-center
-                  text-violet-600 dark:text-violet-400
-                  hover:bg-violet-100 dark:hover:bg-violet-900/40
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                  transition-colors duration-200"
-              >
-                <span className="material-symbols-outlined text-[1.15rem]">drive_file_rename_outline</span>
-              </button>
-
-              {/* Delete */}
-              <button
-                type="button"
-                title="Delete"
-                onClick={handleRemove}
-                disabled={isRemoving}
-                className="w-8 h-8 rounded-lg flex items-center justify-center
-                  text-red-500 dark:text-red-400
-                  hover:bg-red-50 dark:hover:bg-red-950/40
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                  transition-colors duration-200"
-              >
-                <span className="material-symbols-outlined text-[1.15rem]">
-                  {isRemoving ? "autorenew" : "delete"}
-                </span>
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : (
-        /* ── Empty state ── */
-        <div className="flex flex-col items-center gap-3 text-center py-2">
-          <div className="w-12 h-12 rounded-2xl bg-violet-100 dark:bg-violet-950/60 flex items-center justify-center">
-            <span className="material-symbols-outlined text-violet-500 text-[1.5rem]">
-              {isUploading ? "autorenew" : "upload_file"}
-            </span>
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-gray-800 dark:text-white">
-              {isUploading ? "Uploading…" : "Upload your resume"}
-            </p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-              PDF or Word · Max 5 MB · Drag & drop or click to browse
-            </p>
-          </div>
-          {!isUploading && (
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold
-                text-violet-700 dark:text-violet-300
-                bg-violet-50 dark:bg-violet-950/60
-                border border-violet-200 dark:border-violet-800
-                hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-all duration-200"
-            >
-              <span className="material-symbols-outlined text-[1rem]">folder_open</span>
-              Browse File
-            </button>
-          )}
-        </div>
-      )}
-
-      {/* Hidden file input */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        className="hidden"
-        onChange={(e) => validateAndUpload(e.target.files?.[0])}
-      />
-    </div>
-  );
-};
 
 // ── CandidateProfile Page ────────────────────────────────────────────────────
 const CandidateProfile = () => {
@@ -489,6 +196,7 @@ const CandidateProfile = () => {
             <SectionCard title="Resume" icon="description">
               <ResumeManager
                 savedResume={profileData?.profile?.resume_url || profileData?.profile?.resume}
+                savedResumeFilename={profileData?.profile?.resume_filename}
                 onSuccess={getProfileData}
               />
             </SectionCard>
@@ -630,13 +338,14 @@ const CandidateProfile = () => {
               {/* Professional Skills — full width tag input */}
               <div className="sm:col-span-2">
                 <FieldLabel htmlFor="skills">Professional Skills</FieldLabel>
-                <SkillsTagInput
-                  skills={skills}
+                <TagInput
+                  tags={skills}
                   onChange={(newSkills) => {
                     setSkills(newSkills);
                     profileForm.setValue("profile.professional_skills", newSkills, { shouldValidate: true });
                   }}
                   isEditing={isEditing}
+                  placeholder="Type a skill and press Enter or comma…"
                 />
                 {getSkillsErrorMessage() && (
                   <p className="mt-1.5 text-[0.7rem] text-red-600 dark:text-red-400 font-medium">
