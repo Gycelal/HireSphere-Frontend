@@ -26,6 +26,7 @@ import AdminRecruiterApprovalsPage from './pages/admin/AdminRecruiterApprovals'
 import RoleSelectionPage from './pages/common/RoleSelectionPage'
 import RecruiterProfile from './pages/recruiter/RecruiterProfile'
 import CandidateProfile from './pages/candidate/CandidateProfile'
+import UserManagementPage from './pages/admin/UserManagementPage'
 function App () {
   const mode = useSelector(state => state.theme.mode)
 
@@ -94,6 +95,7 @@ function App () {
                 path='recruiter-approvals'
                 element={<AdminRecruiterApprovalsPage />}
               />
+              <Route path='users' element={<UserManagementPage />} />
             </Route>
           </Route>
           <Route path='*' element={<Navigate to='/' replace />} />

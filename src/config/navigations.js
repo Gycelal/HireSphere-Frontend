@@ -25,7 +25,7 @@ export const NAV = {
     main: [
       { label:"Dashboard",     icon:"dashboard",             href:"/dashboard" },
       { label:"Recruiter Approvals", icon: "how_to_reg", href:"recruiter-approvals"},
-      { label:"Users",        icon:"manage_accounts",       href:"/dashboard/users" },
+      { label:"User Management",        icon:"manage_accounts",       href:"users" },
       { label:"Job Listings", icon:"work_outline",          href:"/dashboard/listings" },
       { label:"Reports",      icon:"assessment",            href:"/dashboard/reports" },
       { label:"Audit Logs",   icon:"history",               href:"/dashboard/logs" },

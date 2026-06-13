@@ -1,12 +1,12 @@
-import { useState, useEffect, useMemo, act } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import toast from 'react-hot-toast'
+import ConfirmModal from '../../components/common/ConfirmModal'
 import PageHeader from '../../components/common/PageHeader'
-import TableToolbar from '../../components/table/TableToolBar'
-import DataTable from '../../components/table/DataTable'
 import Pagination from '../../components/common/Pagination'
+import DataTable from '../../components/table/DataTable'
+import TableToolbar from '../../components/table/TableToolBar'
 import { SORT_OPTIONS } from '../../config/sortOptions'
 import { privateApi } from '../../services/api'
-import ConfirmModal from '../../components/common/ConfirmModal'
-import toast from 'react-hot-toast'
 
 function StatusBadge ({ status }) {
   const safeStatus = status || 'pending'
@@ -41,9 +41,6 @@ function StatusBadge ({ status }) {
 function RecruiterCell ({ row }) {
   return (
     <div className='flex items-center gap-3'>
-      {/* <div className="w-8 h-8 rounded-full bg-violet-100 dark:bg-violet-950 border border-violet-200 dark:border-violet-800 flex items-center justify-center flex-shrink-0">
-        <span className="text-[0.65rem] font-bold text-violet-700 dark:text-violet-300">{row.avatar}</span>
-      </div> */}
       <span className='font-medium text-gray-900 dark:text-white'>
         {row.first_name + ' ' + row.last_name}
       </span>
@@ -135,7 +132,7 @@ const STATUS_FILTERS = [
 export default function AdminRecruiterApprovalsPage () {
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState('pending')
-  const [sort, setSort] = useState('newest')
+  const [sort, setSort] = useState(SORT_OPTIONS[0]?.value || '')
   const [page, setPage] = useState(1)
   const [data, setData] = useState([])
   const [totalCount, setTotalCount] = useState(0)
@@ -289,9 +286,9 @@ export default function AdminRecruiterApprovalsPage () {
       {/* Pagination */}
       <Pagination
         page={page}
-        totalPages={Math.ceil(totalCount / 10)}
+        totalPages={Math.ceil(totalCount / 8)}
         onPageChange={setPage}
-        pageSize={10}
+        pageSize={8}
         totalItems={totalCount}
       />
 
