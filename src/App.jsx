@@ -27,6 +27,9 @@ import RoleSelectionPage from './pages/common/RoleSelectionPage'
 import RecruiterProfile from './pages/recruiter/RecruiterProfile'
 import CandidateProfile from './pages/candidate/CandidateProfile'
 import UserManagementPage from './pages/admin/UserManagementPage'
+import FindJob from './pages/candidate/FindJob'
+import MyJobPosts from './pages/recruiter/MyJobPosts'
+
 function App () {
   const mode = useSelector(state => state.theme.mode)
 
@@ -74,6 +77,7 @@ function App () {
               <Route element={<DashboardLayout />}>
                 <Route path='overview' element={<CandidateDashboard />} />
                 <Route path='profile' element={<CandidateProfile />} />
+                <Route path='jobs' element={<FindJob/>  }/>
               </Route>
             </Route>
           </Route>
@@ -83,8 +87,9 @@ function App () {
               <Route element={<DashboardLayout />}>
                 <Route path='overview' element={<RecruiterDashboard />} />
                 <Route path='profile' element={<RecruiterProfile />} />
+                <Route path='my-job-posts' element={<MyJobPosts/>}/>
               </Route>
-            </Route>
+            </Route>  
           </Route>
 
           {/* Admin Dashboard routes */}

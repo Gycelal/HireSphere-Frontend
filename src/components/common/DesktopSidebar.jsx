@@ -8,6 +8,15 @@ export default function DesktopSidebar ({ navItems, bottomItems, collapsed, onTo
   const user = useSelector((state) => state.auth.user);
   const isRecruiterPending =
   user.role === "recruiter" && user.approval_status !== "approved";
+  const logoLink =
+    user?.role === "candidate"
+      ? "/candidate/home"
+      : user?.role === "recruiter"
+      ? "/recruiter/overview"
+      : user?.role === "admin"
+      ? "/admin/dashboard"
+      : "/";
+
   return (
     <aside
       style={{ width: collapsed ? 64 : 240 }}
@@ -20,7 +29,7 @@ export default function DesktopSidebar ({ navItems, bottomItems, collapsed, onTo
         }`}
       >
         <Link
-          to='/dashboard'
+          to={logoLink}
           className='flex items-center gap-2.5 hover:opacity-80 transition-opacity select-none min-w-0'
         >
           <span className='relative flex items-center justify-center w-8 h-8'>
@@ -66,7 +75,31 @@ export default function DesktopSidebar ({ navItems, bottomItems, collapsed, onTo
             disabled={isRecruiterPending}
           />
         ))}
+
+        {/* Post a Job CTA — recruiters only */}
+        {user?.role === 'recruiter' && (
+          <div className={`mt-2 pt-2 border-t border-gray-100 dark:border-gray-800 ${collapsed ? 'mx-1' : 'mx-2'}`}>
+            <Link
+              to='/recruiter/post-job'
+              title='Post a Job'
+              className={[
+                'group flex items-center gap-2.5 rounded-xl text-sm font-medium',
+                'border border-dashed border-violet-300 dark:border-violet-700',
+                'text-violet-600 dark:text-violet-400',
+                'hover:border-violet-400 dark:hover:border-violet-500',
+                'hover:bg-violet-50 dark:hover:bg-violet-950/30',
+                'transition-all duration-200',
+                collapsed ? 'justify-center p-2.5' : 'px-3 py-2.5',
+              ].join(' ')}
+            >
+              <span className='material-symbols-outlined text-[1.2rem] shrink-0'>add</span>
+              {!collapsed && <span className='truncate'>Post a Job</span>}
+            </Link>
+          </div>
+        )}
       </nav>
+
+
 
       {/* Bottom nav */}
       {bottomItems?.length > 0 && (

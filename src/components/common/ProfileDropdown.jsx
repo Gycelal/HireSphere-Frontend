@@ -93,7 +93,7 @@ export default function ProfileDropdown () {
           py-1.5 z-50'
         >
           <Link
-            to='/dashboard/profile'
+            to={user?.role === 'admin' ? '/admin/dashboard' : `/${user?.role}/profile`}
             onClick={() => setOpen(false)}
             className='flex items-center gap-2.5 px-4 py-2.5 text-sm
               text-gray-600 dark:text-gray-300
@@ -106,8 +106,8 @@ export default function ProfileDropdown () {
             Profile
           </Link>
           <Link
-            to='/dashboard/settings'
-            onClick={''}
+            to={user?.role === 'admin' ? '/admin/settings' : `/${user?.role}/settings`}
+            onClick={() => setOpen(false)}
             className='flex items-center gap-2.5 px-4 py-2.5 text-sm
               text-gray-600 dark:text-gray-300
               hover:bg-gray-50 dark:hover:bg-gray-800

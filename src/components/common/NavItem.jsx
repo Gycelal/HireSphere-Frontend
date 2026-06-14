@@ -21,7 +21,7 @@ export default function NavItem({ item, collapsed, onNavigate, disabled }) {
         "transition-all duration-200 overflow-visible",
         collapsed ? "justify-center p-2.5 mx-1" : "gap-3 px-3 py-2.5 mx-2",
         isActive
-          ? "bg-violet-50 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300"
+          ? "bg-violet-50 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300 ring-1 ring-violet-400 dark:ring-violet-500"
           : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white",
         disabled ? "opacity-50 cursor-not-allowed" : ""
       ].join(" ")}
