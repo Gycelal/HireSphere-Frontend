@@ -42,8 +42,7 @@ const UserManagementPage = () => {
 
       if (search.trim()) paramsObj.search = search;
       if(role) paramsObj.role = role;
-      if (status === "active") paramsObj.is_active = "true";
-      if (status === "suspended") paramsObj.is_active = "false";
+      if (status !== "all") paramsObj.status = status;
       const params = new URLSearchParams(paramsObj);
       const res = await privateApi.get(`admin/users/?${params.toString()}`);
       console.log("data:", res.data)
