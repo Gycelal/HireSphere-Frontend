@@ -19,9 +19,8 @@ const TagInput = ({
   const inputRef = useRef(null);
 
   const addTag = (val) => {
-    const trimmed = val.trim();
-    if (!trimmed || tags.includes(trimmed)) return;
-    onChange([...tags, trimmed]);
+    if (!val || tags.includes(val)) return;
+    onChange([...tags, val]);
     setInputVal("");
   };
 
@@ -91,7 +90,7 @@ const TagInput = ({
         value={inputVal}
         onChange={(e) => setInputVal(e.target.value)}
         onKeyDown={handleKeyDown}
-        onBlur={() => inputVal.trim() && addTag(inputVal)}
+        onBlur={() => inputVal && addTag(inputVal)}
         placeholder={tags.length === 0 ? placeholder : "Add more…"}
         className="flex-1 min-w-[140px] bg-transparent text-sm text-gray-900 dark:text-white
           placeholder-gray-400 dark:placeholder-gray-600 outline-none"

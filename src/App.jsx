@@ -29,6 +29,8 @@ import CandidateProfile from './pages/candidate/CandidateProfile'
 import UserManagementPage from './pages/admin/UserManagementPage'
 import FindJob from './pages/candidate/FindJob'
 import MyJobPosts from './pages/recruiter/MyJobPosts'
+import PostJobPage from './pages/recruiter/PostJobPage'
+import EditJobPage from './pages/recruiter/EditJobPage'
 
 function App () {
   const mode = useSelector(state => state.theme.mode)
@@ -88,6 +90,8 @@ function App () {
                 <Route path='overview' element={<RecruiterDashboard />} />
                 <Route path='profile' element={<RecruiterProfile />} />
                 <Route path='my-job-posts' element={<MyJobPosts/>}/>
+                <Route path='post-job' element={<PostJobPage />} />
+                <Route path='edit-job/:id' element={<EditJobPage />} />
               </Route>
             </Route>  
           </Route>
