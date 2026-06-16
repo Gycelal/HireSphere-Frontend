@@ -19,8 +19,9 @@ const TagInput = ({
   const inputRef = useRef(null);
 
   const addTag = (val) => {
-    if (!val || tags.includes(val)) return;
-    onChange([...tags, val]);
+    const trimmedVal = val.trim();
+    if (!trimmedVal || tags.includes(trimmedVal)) return;
+    onChange([...tags, trimmedVal]);
     setInputVal("");
   };
 

@@ -15,6 +15,9 @@ export default function PostJobPage() {
       navigate("/recruiter/my-job-posts");
     } catch (err) {
       console.error("Backend Error:", err.response?.data || err.message);
+      if (err.response?.status === 400 && err.response?.data) {
+        throw err.response.data;
+      }
       
       let errorMsg = "Failed to post job. Please try again.";
       if (err.response?.data) {

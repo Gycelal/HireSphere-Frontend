@@ -43,6 +43,9 @@ export default function EditJobPage() {
       navigate("/recruiter/my-job-posts");
     } catch (err) {
       console.error(err);
+      if (err.response?.status === 400 && err.response?.data) {
+        throw err.response.data;
+      }
       toast.error("Failed to save changes. Please try again.");
     }
   };

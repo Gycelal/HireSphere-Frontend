@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import {
   JOB_POST_STEPS,
   JOB_POST_STEP_META
@@ -37,9 +37,11 @@ const JobPostWizard = ({
     handleSubmit,
     trigger,
     getValues,
+    setError,
     formState: { errors, isSubmitting }
   } = useForm({
     resolver: zodResolver(jobPostSchema),
+    mode: "onTouched",
     defaultValues: {
       title: initialData?.title ?? "",
       location: initialData?.location ?? "",
@@ -70,7 +72,29 @@ const JobPostWizard = ({
   const handleBack = () => { setStep((s) => s - 1); };
 
   const onFormSubmit = async (data) => {
-    await onSubmit?.(data);
+    try {
+      await onSubmit?.(data);
+    } catch (backendErrors) {
+      if (typeof backendErrors === 'object' && backendErrors !== null) {
+        const step1Fields = ['title', 'location', 'employment_type', 'work_mode', 'vacancies'];
+        const step2Fields = ['description', 'experience_required', 'application_deadline', 'skills_required', 'responsibilities'];
+        
+        let targetStep = step; // default to current step
+        
+        Object.keys(backendErrors).forEach((field) => {
+          const errorMsgs = backendErrors[field];
+          const message = Array.isArray(errorMsgs) ? errorMsgs[0] : errorMsgs;
+          setError(field, { type: 'server', message });
+          
+          if (step1Fields.includes(field)) targetStep = Math.min(targetStep, 1);
+          else if (step2Fields.includes(field)) targetStep = Math.min(targetStep, 2);
+        });
+        
+        if (targetStep !== step) {
+          setStep(targetStep);
+        }
+      }
+    }
   };
 
   const stepMeta = JOB_POST_STEP_META[isEditing ? 'edit' : 'create'][step - 1];
