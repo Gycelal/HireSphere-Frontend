@@ -66,6 +66,17 @@ export const JOB_POST_STEP_META = {
   ]
 };
 
+export const JOB_POST_STATUS_FILTERS = [
+  { label: 'All Jobs',   value: 'all'   },
+  { label: 'Active',     value: 'true'  },
+  { label: 'Closed',     value: 'false' },
+]
 
+export const JOB_SORT_OPTIONS = [
+  { label: 'Newest',  value: '-created_at' },
+  { label: 'Oldest',  value: 'created_at'  },
+  { label: 'A-Z',     value: 'title'       },
+  { label: 'Z-A',     value: '-title'      },
+]
 
 

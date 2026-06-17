@@ -68,7 +68,7 @@ export default function DataTable({
                       key={col.key}
                       className="px-4 py-3.5 text-gray-700 dark:text-gray-300 whitespace-nowrap"
                     >
-                      {col.render ? col.render(row) : (row[col.key] ?? "—")}
+                      {col.render ? col.render(row, rowIndex) : (row[col.key] ?? "—")}
                     </td>
                   ))}
                   {renderActions && (

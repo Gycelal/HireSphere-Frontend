@@ -5,7 +5,7 @@ import PageHeader from '../../components/common/PageHeader'
 import Pagination from '../../components/common/Pagination'
 import DataTable from '../../components/table/DataTable'
 import TableToolbar from '../../components/table/TableToolBar'
-import { SORT_OPTIONS } from '../../config/sortOptions'
+import { SORT_OPTIONS, PAGE_SIZE } from '../../config/sortOptions'
 import { privateApi } from '../../services/api'
 
 function StatusBadge ({ status }) {
@@ -286,9 +286,9 @@ export default function AdminRecruiterApprovalsPage () {
       {/* Pagination */}
       <Pagination
         page={page}
-        totalPages={Math.ceil(totalCount / 8)}
+        totalPages={Math.ceil(totalCount / PAGE_SIZE)}
         onPageChange={setPage}
-        pageSize={8}
+        pageSize={PAGE_SIZE}
         totalItems={totalCount}
       />
 

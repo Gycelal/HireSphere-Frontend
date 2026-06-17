@@ -4,3 +4,5 @@ export const SORT_OPTIONS = [
   { label: "A-Z", value: "first_name" },
   { label: "Z-A", value: "-first_name" }
 ]
+
+export const PAGE_SIZE = 8

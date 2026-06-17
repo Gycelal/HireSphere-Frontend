@@ -143,7 +143,7 @@ const JobPostWizard = ({
                 border border-red-100 dark:border-red-800
                 transition-colors duration-200"
             >
-              Discard
+              Cancel
             </button>
           ) : (
             <button
