@@ -52,10 +52,10 @@ const MyJobPosts = () => {
     try {
       const params = { page, ordering: sort }
       if (search.trim())    params.search    = search
-      if (status !== 'all') params.is_active = status
+      if (status !== 'all') params.status = status
       const query = new URLSearchParams(params)
       const res = await privateApi.get(`jobs/?${query.toString()}`)
-      console.log(res.data.results)
+      console.log(res.data)
       setData(res.data.results || [])
       setTotalCount(res.data.count || 0)
     } catch (err) {

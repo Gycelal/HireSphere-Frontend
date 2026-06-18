@@ -38,6 +38,7 @@ const JobPostWizard = ({
     trigger,
     getValues,
     setError,
+    setValue,
     formState: { errors, isSubmitting }
   } = useForm({
     resolver: zodResolver(jobPostSchema),
@@ -48,6 +49,8 @@ const JobPostWizard = ({
       employment_type: initialData?.employment_type ?? "",
       work_mode: initialData?.work_mode ?? "",
       vacancies: initialData?.vacancies ?? "",
+      salary_min: initialData?.salary_min ?? "",
+      salary_max: initialData?.salary_max ?? "",
       description: initialData?.description ?? "",
       experience_required: initialData?.experience_required ?? "",
       application_deadline: initialData?.application_deadline ?? "",
@@ -59,7 +62,7 @@ const JobPostWizard = ({
   const handleNext = async () => {
     let fieldsToValidate = [];
     if (step === 1) {
-      fieldsToValidate = ['title', 'location', 'employment_type', 'work_mode', 'vacancies'];
+      fieldsToValidate = ['title', 'location', 'employment_type', 'work_mode', 'vacancies', 'salary_min', 'salary_max'];
     } else if (step === 2) {
       fieldsToValidate = ['description', 'experience_required', 'application_deadline', 'skills_required', 'responsibilities'];
     }
@@ -76,20 +79,29 @@ const JobPostWizard = ({
       await onSubmit?.(data);
     } catch (backendErrors) {
       if (typeof backendErrors === 'object' && backendErrors !== null) {
-        const step1Fields = ['title', 'location', 'employment_type', 'work_mode', 'vacancies'];
+        const step1Fields = ['title', 'location', 'employment_type', 'work_mode', 'vacancies', 'salary_min', 'salary_max'];
         const step2Fields = ['description', 'experience_required', 'application_deadline', 'skills_required', 'responsibilities'];
-        
+
         let targetStep = step; // default to current step
-        
+
         Object.keys(backendErrors).forEach((field) => {
           const errorMsgs = backendErrors[field];
+
+          // Object-level (non-field) errors → show in the banner on Step 1
+          if (field === 'non_field_errors') {
+            const message = Array.isArray(errorMsgs) ? errorMsgs.join(' ') : String(errorMsgs);
+            setError('root', { type: 'server', message });
+            targetStep = Math.min(targetStep, 1);
+            return;
+          }
+
           const message = Array.isArray(errorMsgs) ? errorMsgs[0] : errorMsgs;
           setError(field, { type: 'server', message });
-          
+
           if (step1Fields.includes(field)) targetStep = Math.min(targetStep, 1);
           else if (step2Fields.includes(field)) targetStep = Math.min(targetStep, 2);
         });
-        
+
         if (targetStep !== step) {
           setStep(targetStep);
         }
@@ -125,7 +137,7 @@ const JobPostWizard = ({
 
         {/* Step content */}
         <div>
-          {step === 1 && <Step1 register={register} errors={errors} />}
+          {step === 1 && <Step1 register={register} errors={errors} control={control} setValue={setValue} />}
           {step === 2 && <Step2 register={register} control={control} errors={errors} />}
           {step === 3 && <Step3 form={getValues()} />}
         </div>

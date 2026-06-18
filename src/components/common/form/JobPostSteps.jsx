@@ -1,3 +1,5 @@
+import { useWatch } from "react-hook-form";
+import { Controller } from "react-hook-form";
 import FieldLabel from "./FieldLabel";
 import TextInput from "./TextInput";
 import TextArea from "./TextArea";
@@ -7,7 +9,7 @@ import ErrorMsg from "./ErrorMsg";
 import FieldHint from "./FieldHint";
 import InfoPill from "../data-display/InfoPill";
 import TagList from "../data-display/TagList";
-import { Controller } from "react-hook-form";
+
 import {
   EMPLOYMENT_TYPES,
   WORK_MODES,
@@ -15,12 +17,23 @@ import {
   WORK_MODE_LABELS,
 } from "../../../constants/JobPostConstants";
 
+// Helper used in Step3 review pill
+const fmtSalary = (val) => {
+  if (!val && val !== 0) return "—";
+  if (val >= 10_000_000) return `₹${(val / 10_000_000).toFixed(1).replace(/\.0$/, "")}Cr`;
+  if (val >= 100_000)    return `₹${(val / 100_000).toFixed(1).replace(/\.0$/, "")}L`;
+  if (val >= 1_000)      return `₹${(val / 1_000).toFixed(0)}K`;
+  return `₹${val}`;
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Step 1 — Basic Information
 // ─────────────────────────────────────────────────────────────────────────────
-export const Step1 = ({ register, errors }) => {
+export const Step1 = ({ register, errors, control, setValue }) => {
+
   return (
     <div className="flex flex-col gap-6">
+
       {/* Row 1: Title + Location */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>
@@ -43,8 +56,8 @@ export const Step1 = ({ register, errors }) => {
         </div>
       </div>
 
-      {/* Row 2: Employment Type + Work Mode + Vacancies */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+      {/* Row 2: Employment Type + Work Mode */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>
           <FieldLabel htmlFor="employment-type" required>Employment Type</FieldLabel>
           <SelectInput
@@ -63,6 +76,12 @@ export const Step1 = ({ register, errors }) => {
           />
           <ErrorMsg message={errors.work_mode?.message} />
         </div>
+      </div>
+
+      {/* Row 3: Vacancies | Min Salary | Max Salary — all horizontally aligned */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+
+        {/* Vacancies */}
         <div>
           <FieldLabel htmlFor="vacancies" required>Vacancies</FieldLabel>
           <TextInput
@@ -74,7 +93,56 @@ export const Step1 = ({ register, errors }) => {
           />
           <ErrorMsg message={errors.vacancies?.message} />
         </div>
+
+        {/* Min + Max salary stacked in 2 cols */}
+        <div className="sm:col-span-2 flex flex-col gap-3">
+          <div className="grid grid-cols-2 gap-5">
+            <div>
+              <FieldLabel htmlFor="salary-min">
+                Min Salary
+                <span className="ml-1 text-[0.65rem] font-normal text-gray-400">(₹, optional)</span>
+              </FieldLabel>
+              <TextInput
+                id="salary-min"
+                type="number"
+                min="1"
+                step={"5000"}
+                placeholder="e.g. 500000"
+                {...register("salary_min")}
+              />
+              <ErrorMsg message={errors.salary_min?.message} />
+            </div>
+            <div>
+              <FieldLabel htmlFor="salary-max">
+                Max Salary
+                <span className="ml-1 text-[0.65rem] font-normal text-gray-400">(₹, optional)</span>
+              </FieldLabel>
+              <TextInput
+                id="salary-max"
+                type="number"
+                min="1"
+                step={"5000"}
+                placeholder="e.g. 1500000"
+                {...register("salary_max")}
+              />
+              <ErrorMsg message={errors.salary_max?.message} />
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* For showing Non Field errors */}
+      {errors.root?.message && (
+        <div className="flex items-start gap-2 rounded-xl border border-red-200 dark:border-red-800
+          bg-red-50 dark:bg-red-900/20 px-4 py-3">
+          <span className="material-symbols-outlined text-red-500 dark:text-red-400 text-[1rem] mt-0.5 shrink-0">
+            error
+          </span>
+          <p className="text-[0.78rem] text-red-600 dark:text-red-400 font-medium leading-snug">
+            {errors.root.message}
+          </p>
+        </div>
+      )}
     </div>
   );
 };
@@ -167,6 +235,8 @@ export const Step2 = ({ register, control, errors }) => {
 // Step 3 — Review (clean job-post preview, no edit buttons)
 // ─────────────────────────────────────────────────────────────────────────────
 export const Step3 = ({ form }) => {
+  const hasSalary = form.salary_min || form.salary_max;
+
   return (
     <div className="flex flex-col gap-7">
 
@@ -181,6 +251,18 @@ export const Step3 = ({ form }) => {
           <InfoPill icon="home_work"    text={WORK_MODE_LABELS[form.work_mode]} />
           <InfoPill icon="group"        text={form.vacancies ? `${form.vacancies} ${Number(form.vacancies) === 1 ? "vacancy" : "vacancies"}` : null} />
           <InfoPill icon="event"        text={form.application_deadline ? new Date(form.application_deadline).toLocaleDateString() : null} />
+          {hasSalary && (
+            <InfoPill
+              icon="payments"
+              text={
+                form.salary_min && form.salary_max
+                  ? `${fmtSalary(form.salary_min)} – ${fmtSalary(form.salary_max)}`
+                  : form.salary_min
+                  ? `From ${fmtSalary(form.salary_min)}`
+                  : `Up to ${fmtSalary(form.salary_max)}`
+              }
+            />
+          )}
         </div>
       </div>
 
@@ -224,4 +306,3 @@ export const Step3 = ({ form }) => {
     </div>
   );
 };
-
