@@ -2,8 +2,6 @@ export const NAV = {
     candidate: {
     main: [
       { label:"Overview",        icon:"dashboard",           href:"/candidate/overview" },
-      { label:"Find Jobs",       icon:"work_outline",        href:"/candidate/jobs" },
-      { label:"Find Recruiters", icon:"group_search",        href:"/candidate/recruiters" },
       { label:"Applications",    icon:"description",         href:"/candidate/applications" },
       { label:"Interviews",      icon:"video_call",          href:"/candidate/interviews" },
       { label:"Messages",        icon:"chat_bubble_outline", href:"/candidate/messages" },
@@ -33,3 +31,23 @@ export const NAV = {
     bottom: [{ label:"System Settings", icon:"admin_panel_settings", href:"/admin/settings" }],
   },
 }
+
+
+export const HOME_TOP_NAV = [
+    {
+      "label": 'Find jobs',
+      "path": '/find-jobs'
+    },
+    {
+      "label": 'Find Recruiters',
+      "path": '/find-recruiters'
+    },
+    {
+      "label": 'About',
+      "path": '/about'
+    },
+    {
+      "label": 'Features',
+      "path": '/#features'
+    }
+]

@@ -1,4 +1,4 @@
-import { Routes, Route, useNavigate, replace } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import AuthLayout from './layouts/AuthLayout'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
@@ -27,7 +27,7 @@ import RoleSelectionPage from './pages/common/RoleSelectionPage'
 import RecruiterProfile from './pages/recruiter/RecruiterProfile'
 import CandidateProfile from './pages/candidate/CandidateProfile'
 import UserManagementPage from './pages/admin/UserManagementPage'
-import FindJob from './pages/candidate/FindJob'
+import FindJobs from './pages/candidate/FindJobs'
 import MyJobPosts from './pages/recruiter/MyJobPosts'
 import PostJobPage from './pages/recruiter/PostJobPage'
 import EditJobPage from './pages/recruiter/EditJobPage'
@@ -61,6 +61,7 @@ function App () {
                 path='reset-password/:token'
                 element={<ResetPasswordPage />}
               />
+              <Route path='find-jobs' element={<FindJobs />} />
               <Route path='admin-login' element={<AdminLoginPage />} />
             </Route>
           </Route>
@@ -81,7 +82,6 @@ function App () {
               <Route element={<DashboardLayout />}>
                 <Route path='overview' element={<CandidateDashboard />} />
                 <Route path='profile' element={<CandidateProfile />} />
-                <Route path='jobs' element={<FindJob/>  }/>
                 <Route path='jobs/:id' element={<CandidateJobDetailsPage />} />
               </Route>
             </Route>

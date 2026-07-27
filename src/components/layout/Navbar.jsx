@@ -1,34 +1,65 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import ThemeToggle from '../common/ThemeToggle'
 import { useSelector } from 'react-redux'
 import Logo from '../common/Logo'
-
-
-
-const NAV_CONFIG = {
-  public: {
-    links: ['About', 'Features']
-  },
-  candidate: {
-    links: ['Find Jobs', 'Find Recruiters', 'About']
-  }
-}
+import { HOME_TOP_NAV } from '../../config/navigations'
 
 
 // Nav Link
-function NavLink ({ label, mobile = false }) {
-  const base = mobile
-    ? 'block w-full px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 text-gray-700 dark:text-gray-300 hover:bg-violet-50 dark:hover:bg-violet-950 hover:text-violet-600 dark:hover:text-violet-400'
-    : 'text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-violet-600 dark:hover:text-violet-400 transition-colors duration-200 relative group'
+function MarketingNavLink ({ label, path }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const baseClasses = 'text-sm font-medium transition-all duration-200 relative group block w-full px-4 py-3 rounded-lg md:inline-block md:w-auto md:px-0 md:py-0 md:rounded-none'
+
+  const handleClick = (e) => {
+    if (path.includes('#')) {
+      const id = path.split('#')[1];
+      const element = document.getElementById(id);
+      if (element) {
+        if (location.pathname === '/') {
+          e.preventDefault();
+          // Update URL hash via React Router so location updates and triggers re-render
+          navigate(path, { replace: true });
+        }
+        element.scrollIntoView({
+          behavior: 'smooth'
+        });
+      }
+    }
+  };
+
+  const getIsActive = (defaultIsActive) => {
+    const isHashLink = path.includes('#');
+    if (isHashLink) {
+      return location.pathname === '/' && location.hash === path.substring(path.indexOf('#'));
+    }
+    return defaultIsActive;
+  };
 
   return (
-    <a href={`#${label.toLowerCase().replace(' ', '-')}`} className={base}>
-      {label}
-      {!mobile && (
-        <span className='absolute -bottom-1 left-0 w-0 h-0.5 bg-violet-500 rounded-full transition-all duration-300 group-hover:w-full' />
-      )}
-    </a>
+    <NavLink 
+      to={path}
+      onClick={handleClick}
+      className={({ isActive }) => {
+        const active = getIsActive(isActive);
+        return `${baseClasses} ${
+          active
+            ? 'text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/50 md:bg-transparent md:dark:bg-transparent'
+            : 'text-gray-700 dark:text-gray-300 md:text-gray-600 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950 md:hover:bg-transparent md:dark:hover:bg-transparent'
+        }`;
+      }}
+    >
+      {({ isActive }) => {
+        const active = getIsActive(isActive);
+        return (
+          <>
+            {label}
+            <span className={`hidden md:block absolute -bottom-1 left-0 h-0.5 bg-violet-500 rounded-full transition-all duration-300 ${active ? 'w-full' : 'w-0 group-hover:w-full'}`} />
+          </>
+        );
+      }}
+    </NavLink>
   )
 }
 
@@ -132,9 +163,7 @@ function Hamburger ({ open, onToggle }) {
 }
 
 // Mobile Menu
-function MobileMenu ({ open, userRole, dark, onToggle }) {
-  const links = NAV_CONFIG[userRole]?.links ?? []
-
+function MobileMenu ({ open, userRole, dark, links, onToggle }) {
   return (
     <div
       className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
@@ -143,7 +172,7 @@ function MobileMenu ({ open, userRole, dark, onToggle }) {
     >
       <div className='pb-4 pt-1 space-y-0.5 border-t border-gray-100 dark:border-gray-800'>
         {links.map(link => (
-          <NavLink key={link} label={link} mobile />
+          <MarketingNavLink key={link.label} label={link.label} path={link.path} />
         ))}
 
         {userRole === 'candidate' && (
@@ -166,11 +195,7 @@ export default function HireSphereNavbar () {
   const [menuOpen, setMenuOpen] = useState(false)
   
   const {user} = useSelector((state)=>state.auth)
-  const role = user?.role
-
-  
-  const links = NAV_CONFIG[role]?.links ?? []
-
+  const role = user?.role || 'public'
 
   return (
     <nav className='sticky top-0 z-50 w-full bg-white/90 dark:bg-gray-950/90 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 shadow-sm shadow-gray-100/60 dark:shadow-black/30 transition-colors duration-300'>
@@ -182,8 +207,8 @@ export default function HireSphereNavbar () {
 
           {/* Center: Desktop Nav Links */}
           <div className='hidden md:flex items-center gap-8'>
-            {links.map(link => (
-              <NavLink key={link} label={link} />
+            {HOME_TOP_NAV.map(link => (
+              <MarketingNavLink key={link.label} label={link.label} path={link.path} />
             ))}
           </div>
 
@@ -206,6 +231,7 @@ export default function HireSphereNavbar () {
         <MobileMenu
           open={menuOpen}
           userRole={role}
+          links={HOME_TOP_NAV}
         />
       </div>
     </nav>

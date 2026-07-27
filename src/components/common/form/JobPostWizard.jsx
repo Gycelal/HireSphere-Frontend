@@ -11,17 +11,6 @@ import StepBar from "../ui/StepBar";
 import { Step1, Step2, Step3 } from "./JobPostSteps";
 
 
-
-// ─────────────────────────────────────────────────────────────────────────────
-// JobPostWizard — full-page, self-contained
-// ─────────────────────────────────────────────────────────────────────────────
-/**
- * Props:
- *   initialData  – object   pre-fill form for edit mode
- *   isEditing    – boolean  true → "Save Changes", false → "Post Job"
- *   onSubmit     – async (formData) => void
- *   backHref     – string   where the back button navigates (default: -1)
- */
 const JobPostWizard = ({
   initialData = null,
   isEditing   = false,

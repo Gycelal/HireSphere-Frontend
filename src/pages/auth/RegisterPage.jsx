@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import GoogleButton from '../../components/common/GoogleButton'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -11,6 +11,9 @@ import { inputClass } from '../../components/common/Field'
 
 
 export default function RegisterPage () {
+  const [searchParams] = useSearchParams()
+  const initialRole = searchParams.get('role') === 'recruiter' ? 'recruiter' : 'candidate'
+
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -28,11 +31,12 @@ export default function RegisterPage () {
     reValidateMode: 'onChange',
     shouldFocusError: true,
     defaultValues: {
-      role: 'candidate'
+      role: initialRole
     }
   })
 
   const role = watch('role')
+  
   const navigate = useNavigate()
 
   const onSubmit = async data => {

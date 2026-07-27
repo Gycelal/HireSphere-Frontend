@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import JobPostWizard from "../../components/common/form/JobPostWizard";
 import PageHeader from "../../components/common/PageHeader";
+import { privateApi } from "../../services/api";
 
 export default function EditJobPage() {
   const { id } = useParams();
@@ -13,17 +14,11 @@ export default function EditJobPage() {
   useEffect(() => {
     const fetchJob = async () => {
       try {
-        // TODO: replace with real API call
-        // const res = await privateApi.get(`/recruiter/jobs/${id}/`);
-        // setJobData(res.data);
-        console.log("Fetching job:", id);
+        const res = await privateApi.get(`/jobs/${id}/`);
+        console.log('res:', res)
+        setJobData(res.data)
+        console.log("jobData:", jobData)
 
-        // Placeholder until API is wired
-        setJobData({
-          title: "", location: "", employment_type: "", work_mode: "",
-          vacancies: "", description: "", experience_required: "",
-          skills_required: [], responsibilities: [],
-        });
       } catch (err) {
         console.error(err);
         toast.error("Could not load job details.");
@@ -37,7 +32,7 @@ export default function EditJobPage() {
 
   const handleSubmit = async (data) => {
     try {
-      // TODO: await privateApi.patch(`/recruiter/jobs/${id}/`, data);
+      const res = await privateApi.post()
       console.log("Saving edits:", data);
       toast.success("Job updated successfully!");
       navigate("/recruiter/my-job-posts");
