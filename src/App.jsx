@@ -6,7 +6,6 @@ import OtpVerificationPage from './pages/auth/OtpVerificationPage'
 import VerifyEmailPage from './pages/auth/VerifyEmailPage'
 import AdminLoginPage from './pages/auth/AdminLoginPage'
 import HomeLayout from './layouts/HomeLayout'
-import CandidateHome from './pages/candidate/CandidateHome'
 import LandingPageBody from './pages/LandingPage'
 import ProtectedRoutes from './routes/ProtectedRoutes'
 import RecruiterDashboard from './pages/recruiter/RecruiterDashboard'
@@ -15,7 +14,6 @@ import { useEffect } from 'react'
 import { Toaster } from 'react-hot-toast'
 import ResetPasswordPage from './pages/auth/ResetPasswordPage'
 import DashboardLayout from './layouts/DashboardLayout'
-import Profile from './components/common/Profile'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import CandidateDashboard from './pages/candidate/CandidateDashboard'
 import PublicRoutes from './routes/PublicRoutes'
@@ -50,6 +48,7 @@ function App () {
             {/* route to common page */}
             <Route element={<HomeLayout />}>
               <Route path='/' element={<LandingPageBody />} />
+              <Route path='find-jobs' element={<FindJobs />} />
             </Route>
             {/* Routes to all auth related pages */}
             <Route element={<AuthLayout />}>
@@ -61,7 +60,6 @@ function App () {
                 path='reset-password/:token'
                 element={<ResetPasswordPage />}
               />
-              <Route path='find-jobs' element={<FindJobs />} />
               <Route path='admin-login' element={<AdminLoginPage />} />
             </Route>
           </Route>
@@ -76,7 +74,7 @@ function App () {
             <Route path='candidate'>
               {/* Home layouts  */}
               <Route element={<HomeLayout />}>
-                <Route path='home' element={<CandidateHome />} />
+                <Route path='find-jobs' element={<FindJobs />} />
               </Route>
               {/* dashboard routes */}
               <Route element={<DashboardLayout />}>

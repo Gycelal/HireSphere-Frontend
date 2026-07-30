@@ -14,8 +14,24 @@ const GoogleButton = () => {
       const res = await publicApi.post('/accounts/google/', {
         id_token: credentialResponse.credential
       })
+      const user = res.data.user
       dispatch(loginSuccess(res.data))
-      navigate('select-role')
+
+      // Check if user already has a role
+      if (!user.role) {
+        navigate('/select-role', { replace: true })
+      } else if (user.role === "candidate") {
+        navigate("/candidate/find-jobs", { replace: true })
+      } else if (user.role === "recruiter") {
+        if (user.approval_status !== "approved") {
+          navigate("/recruiter/profile", { replace: true })
+        } else {
+          navigate("/recruiter/overview", { replace: true })
+        }
+      } else {
+        // Fallback for admin or unknown roles
+        navigate('/', { replace: true })
+      }
     } catch (error) {
       console.error('Google login failed', error)
       toast.error("Google failed.")

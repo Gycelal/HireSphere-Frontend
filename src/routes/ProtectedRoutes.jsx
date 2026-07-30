@@ -39,7 +39,7 @@ export const ProtectedRoutes = ({ allowedRole }) => {
       return <Navigate to="/admin/dashboard" replace />;
     }
 
-    return <Navigate to="/" replace />;
+    return <Navigate to="/home" replace />;
   }
 
   

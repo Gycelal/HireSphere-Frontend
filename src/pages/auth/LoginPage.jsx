@@ -34,7 +34,7 @@ export default function LoginPage() {
       }
       dispatch(loginSuccess(response.data))
       if (user.role === "candidate"){
-        navigate("/candidate/home", {replace: true})
+        navigate("/candidate/find-jobs", {replace: true})
       }else{
         if(user.approval_status !== "approved"){
           navigate("/recruiter/profile", {replace: true})
@@ -177,7 +177,6 @@ export default function LoginPage() {
 
       {/* Google OAuth Button */}
       <GoogleButton />
-      {/* Register Link */}
       <p className="text-center text-sm text-gray-400 dark:text-gray-500">
         Don't have an account?{" "}
         <Link

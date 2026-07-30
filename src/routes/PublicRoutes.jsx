@@ -6,10 +6,14 @@ import { Navigate, Outlet } from 'react-router-dom'
 
   if (auth.isAuthenticated && auth.user) {
     if (auth.user.role === 'candidate')
-      return <Navigate to="/candidate/home" replace />
+      return <Navigate to="/candidate/find-jobs" replace />
 
-    if (auth.user.role === 'recruiter')
+    if (auth.user.role === 'recruiter') {
+      if (auth.user.approval_status !== 'approved') {
+        return <Navigate to="/recruiter/profile" replace />
+      }
       return <Navigate to="/recruiter/overview" replace />
+    }
 
     return <Navigate to="/admin/dashboard" replace />
   }

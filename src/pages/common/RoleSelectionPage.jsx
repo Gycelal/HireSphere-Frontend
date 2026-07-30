@@ -10,11 +10,7 @@ import toast from 'react-hot-toast'
 import { navigateBasedOnRole } from '../../utils/navigations'
 /**
  * RoleSelectionPage
- *
- * A complete self-contained page that reuses your existing Logo,
- * ThemeToggle, and Footer components. Adds a Logout button next
- * to ThemeToggle in the header.
- *
+
  * Props:
  *   onRoleSelect  (role: "candidate" | "recruiter") => void
  *   onLogout      () => void
@@ -48,8 +44,14 @@ export default function RoleSelectionPage () {
   useEffect(() => {
     if (user?.role) {
       // already has role → redirect away
-      if (user.role === 'candidate') navigate('/candidate/home')
-      else if (user.role === 'recruiter') navigate('/recruiter/overview')
+      if (user.role === 'candidate') navigate('/candidate/find-jobs')
+      else if (user.role === 'recruiter') {
+        if (user.approval_status !== 'approved') {
+          navigate('/recruiter/profile')
+        } else {
+          navigate('/recruiter/overview')
+        }
+      }
       else if (user.role === 'admin') navigate('/admin/dashboard')
     }
   }, [user])

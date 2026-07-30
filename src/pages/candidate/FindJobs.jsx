@@ -3,7 +3,7 @@ import { privateApi } from '../../services/api'
 import toast from 'react-hot-toast'
 
 
-const FindJob = () => {
+const FindJobs = () => {
   const [jobs, setJobs] = useState([])
 
   useEffect(()=>{
@@ -12,8 +12,9 @@ const FindJob = () => {
 
   const fetchJobs = async () =>{
     try{
-      const result = await privateApi.get('/jobs/all')
-      setJobs(result.data)
+      const result = await privateApi.get('/jobs')
+      setJobs(result?.data?.results)
+      console.log("result.data", result.data)
     }catch(err){
       toast.error(err.message)
     }
@@ -22,7 +23,7 @@ const FindJob = () => {
   }
   return (
     <div className='p-6 text-3xl font-bold text-gray-600 dark:text-white'>
-      <div className=''>
+      <div className='flex justify-center'>
         <input placeholder='Job title'/>
         <input placeholder='Location'/>
       </div>
@@ -35,4 +36,4 @@ const FindJob = () => {
   )
 }
 
-export default FindJob
+export default FindJobs
