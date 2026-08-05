@@ -15,6 +15,13 @@ export const WORK_MODES = [
   { value: 'hybrid', label: 'Hybrid' },
 ]
 
+export const EXPERIENCE_REQUIRED = [
+  { value: [0, 1], label: '0–1 years' },
+  { value: [2, 4], label: '2–4 years' },
+  { value: [5, 7], label: '5–7 years' },
+  { value: [8,0], label: '8+ years' },
+]
+
 export const EMPLOYMENT_TYPE_LABELS = {
   full_time: 'Full-Time',
   part_time: 'Part-Time',
@@ -77,6 +84,8 @@ export const JOB_SORT_OPTIONS = [
   { label: 'Oldest',  value: 'created_at'  },
   { label: 'A-Z',     value: 'title'       },
   { label: 'Z-A',     value: '-title'      },
+  { label: 'Earliest Deadline', value: 'application_deadline'},
+  { label: 'Latest Deadline', value: '-application_deadline'}
 ]
 
 

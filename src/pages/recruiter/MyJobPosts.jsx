@@ -27,9 +27,9 @@ const MyJobPosts = () => {
   // Confirm modal for close/open toggle
   const [openModal, setOpenModal]       = useState(false)
   const [selectedJob, setSelectedJob]   = useState(null)
-  const [action, setAction]             = useState(null) // 'close' | 'open'
+  const [action, setAction]             = useState(null)
 
-  // Fetch jobs whenever filters change
+  
   useEffect(() => {
     fetchJobs()
   }, [search, status, sort, page])
@@ -113,7 +113,6 @@ const MyJobPosts = () => {
   return (
     <div className='flex flex-col gap-6'>
 
-      {/* Header */}
       <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4'>
         <PageHeader
           title='My Job Posts'
@@ -133,8 +132,7 @@ const MyJobPosts = () => {
           Post a Job
         </Link>
       </div>
-
-      {/* Toolbar */}
+      
       <TableToolbar
         searchValue={search}
         onSearchChange={handleSearch}
@@ -147,7 +145,6 @@ const MyJobPosts = () => {
         onSortChange={handleSort}
       />
 
-      {/* Table */}
       <DataTable
         columns={columns}
         data={data}
@@ -198,8 +195,6 @@ const MyJobPosts = () => {
           </div>
         )}
       />
-
-      {/* Pagination */}
       <Pagination
         page={page}
         totalPages={Math.ceil(totalCount / PAGE_SIZE)}
@@ -208,7 +203,6 @@ const MyJobPosts = () => {
         totalItems={totalCount}
       />
 
-      {/* Confirm toggle modal */}
       <ConfirmModal
         open={openModal}
         title={action === 'close' ? 'Close Job?' : 'Reopen Job?'}
