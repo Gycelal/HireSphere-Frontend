@@ -19,6 +19,7 @@ export const NAV = {
       },
     ],
     bottom: [
+      { label: "Back to Home", icon: "home", href: "/candidate/find-jobs" },
       { label: "Settings", icon: "settings", href: "/candidate/settings" },
     ],
   },

@@ -30,8 +30,8 @@ import MyJobPosts from './pages/recruiter/MyJobPosts'
 import PostJobPage from './pages/recruiter/PostJobPage'
 import EditJobPage from './pages/recruiter/EditJobPage'
 import RecruiterJobDetailsPage from './pages/recruiter/RecruiterJobDetailsPage'
-import CandidateJobDetailsPage from './pages/candidate/CandidateJobDetailsPage'
-import JobDetailsPage from './components/job-details/JobDetailsPage'
+import ApplicationsJobDetailsPage from './pages/candidate/ApplicationsJobDetailsPage'
+import HomeJobDetailsPage from './pages/candidate/HomeJobDetailsPage'
 
 function App () {
   const mode = useSelector(state => state.theme.mode)
@@ -76,13 +76,13 @@ function App () {
               {/* Home layouts  */}
               <Route element={<HomeLayout />}>
                 <Route path='find-jobs' element={<FindJobs />} />
-                <Route path='jobs/:id' element={<JobDetailsPage/>} />
+                <Route path='jobs/:id' element={<HomeJobDetailsPage />} />
               </Route>
               {/* dashboard routes */}
               <Route element={<DashboardLayout />}>
                 <Route path='overview' element={<CandidateDashboard />} />
                 <Route path='profile' element={<CandidateProfile />} />
-                <Route path='jobs/:id' element={<CandidateJobDetailsPage />} />
+                <Route path='jobs/:id' element={<ApplicationsJobDetailsPage />} />
               </Route>
             </Route>
           </Route>

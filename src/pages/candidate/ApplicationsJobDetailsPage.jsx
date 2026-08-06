@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom'
 import JobDetailsPage from '../../components/job-details/JobDetailsPage'
+import { useSelector } from 'react-redux'
 
 /**
  * CandidateJobDetailsPage
@@ -7,7 +8,7 @@ import JobDetailsPage from '../../components/job-details/JobDetailsPage'
  * Route: /candidate/jobs/:id
  * Renders JobDetailsPage in "candidate" view mode with apply support.
  */
-export default function CandidateJobDetailsPage() {
+export default function ApplicationJobDetailsWrapper() {
   const { id } = useParams()
 
   return (

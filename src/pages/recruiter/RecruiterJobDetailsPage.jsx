@@ -1,14 +1,10 @@
 import { useParams } from 'react-router-dom'
 import JobDetailsPage from '../../components/job-details/JobDetailsPage'
 
-/**
- * RecruiterJobDetailsPage
- *
- * Route: /recruiter/jobs/:id
- * Renders JobDetailsPage in "recruiter" (owner) view mode.
- */
+
 export default function RecruiterJobDetailsPage() {
   const { id } = useParams()
+  console.log("recently created recruiter job details page")
 
   return (
     <JobDetailsPage

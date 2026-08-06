@@ -2,13 +2,11 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { privateApi } from '../../services/api'
-import PageHeader from '../common/PageHeader'
 import JobStatusBadge from './JobStatusBadge'
 import JobInformationSection from './JobInformationSection'
 import RecruiterSummaryCard from './RecruiterSummaryCard'
 import JobActionSection from './JobActionSection'
 
-// ── Loading skeleton ──────────────────────────────────────────────────────────
 function LoadingSkeleton() {
   return (
     <div className='flex flex-col gap-4 animate-pulse'>
@@ -26,8 +24,6 @@ function LoadingSkeleton() {
     </div>
   )
 }
-
-// ── Error state ───────────────────────────────────────────────────────────────
 function ErrorState({ onBack }) {
   return (
     <div className='flex flex-col items-center justify-center gap-4 py-24 text-center'>
@@ -54,19 +50,6 @@ function ErrorState({ onBack }) {
     </div>
   )
 }
-
-// ── Main component ────────────────────────────────────────────────────────────
-/**
- * JobDetailsPage
- *
- * Props:
- *   jobId        – string | number     ID of the job to fetch
- *   viewMode     – 'candidate' | 'recruiter'
- *   backHref     – string              where PageHeader's back button navigates
- *   jobDetailUrl – string              API endpoint to fetch the job (e.g. 'jobs/{id}/')
- *   toggleUrl    – string              API endpoint to PATCH is_active
- *   applyUrl     – string              API endpoint to POST an application (candidate only)
- */
 export default function JobDetailsPage({
   jobId,
   viewMode = 'candidate',
@@ -84,7 +67,6 @@ export default function JobDetailsPage({
   const [applying,  setApplying]  = useState(false)
   const [applied,   setApplied]   = useState(false)
 
-  // ── Fetch job ──────────────────────────────────────────────────────────────
   const fetchJob = async () => {
     setLoading(true)
     setError(false)
@@ -107,7 +89,7 @@ export default function JobDetailsPage({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jobId])
 
-  // ── Toggle job status (recruiter only) ─────────────────────────────────────
+  // Toggle Job Status for recruiter
   const handleToggle = async () => {
     try {
       await privateApi.patch(toggleUrl || `jobs/${jobId}/`, { is_active: !job.is_active })
@@ -119,7 +101,7 @@ export default function JobDetailsPage({
     }
   }
 
-  // ── Apply (candidate only) ─────────────────────────────────────────────────
+  // Apply for candidate
   const handleApply = async () => {
     if (applied) return
     setApplying(true)
