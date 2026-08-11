@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { candidateProfileValidationSchema } from "../../validation/ProfileValidationSchemas";
 import toast from "react-hot-toast";
 import { privateApi } from "../../services/api";
-import ProfileCompletionBar from "../../components/common/ProfileCompletionBar";
 import AvatarManager from "../../components/common/profile/AvatarManager";
 import ResumeManager from "../../components/common/profile/ResumeManager";
 import SectionCard from "../../components/common/ui/SectionCard";
@@ -13,17 +12,15 @@ import TextInput from "../../components/common/form/TextInput";
 import TextArea from "../../components/common/form/TextArea";
 import TagInput from "../../components/common/form/TagInput";
 import ViewField from "../../components/common/data-display/ViewField";
+import CandidateProfileView from "../../components/common/profile/CandidateProfileView";
 
-
-
-// ── CandidateProfile Page ────────────────────────────────────────────────────
 const CandidateProfile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [completionPercentage, setCompletionPercentage] = useState(0);
   const [profileData, setProfileData] = useState(null);
   const [skills, setSkills] = useState([]);
   const firstFieldRef = useRef(null);
-  console.log("profile form data:",profileData)
+  console.log("profile form data:", profileData);
   const profileForm = useForm({
     resolver: zodResolver(candidateProfileValidationSchema),
     mode: "onTouched",
@@ -60,7 +57,10 @@ const CandidateProfile = () => {
         profile: {
           ...data.profile,
           professional_skills: skills,
-          experience_years: data.profile.experience_years === "" ? null : Number(data.profile.experience_years),
+          experience_years:
+            data.profile.experience_years === ""
+              ? null
+              : Number(data.profile.experience_years),
         },
       };
       const response = await privateApi.patch("/candidate/profile/", payload);
@@ -76,11 +76,15 @@ const CandidateProfile = () => {
         let hasFieldErrors = false;
         Object.keys(errors).forEach((key) => {
           if (key === "non_field_errors") {
-            toast.error(Array.isArray(errors[key]) ? errors[key][0] : errors[key]);
+            toast.error(
+              Array.isArray(errors[key]) ? errors[key][0] : errors[key],
+            );
           } else if (key !== "profile") {
             profileForm.setError(key, {
               type: "server",
-              message: Array.isArray(errors[key]) ? errors[key][0] : errors[key],
+              message: Array.isArray(errors[key])
+                ? errors[key][0]
+                : errors[key],
             });
             hasFieldErrors = true;
           }
@@ -103,12 +107,17 @@ const CandidateProfile = () => {
     }
   };
 
-  useEffect(() => { getProfileData(); }, []);
+  useEffect(() => {
+    getProfileData();
+  }, []);
 
   // Scroll to Personal Info section when edit mode activates
   useEffect(() => {
     if (isEditing) {
-      firstFieldRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      firstFieldRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }
   }, [isEditing]);
 
@@ -120,14 +129,14 @@ const CandidateProfile = () => {
   };
 
   const savedAvatar = profileData?.profile?.profile_picture;
-  const initials = `${profileData?.first_name?.[0] ?? ""}${profileData?.last_name?.[0] ?? ""}`.toUpperCase();
+  const initials =
+    `${profileData?.first_name?.[0] ?? ""}${profileData?.last_name?.[0] ?? ""}`.toUpperCase();
   const errors = profileForm.formState.errors;
 
   const getSkillsErrorMessage = () => {
     const err = errors.profile?.professional_skills;
     if (!err) return null;
     if (err.message) return err.message;
-    // In case it's an object of nested element error messages (e.g. index level errors)
     const firstElError = Object.values(err).find((e) => e?.message);
     return firstElError?.message || "Invalid skill(s) provided";
   };
@@ -163,103 +172,96 @@ const CandidateProfile = () => {
         )}
       </div>
 
-      {/* ── Profile completion ── */}
-      {profileData && completionPercentage < 100 && (
-        <>
-          <div className="bg-yellow-50 dark:bg-yellow-950/30 rounded-2xl border border-yellow-200 dark:border-yellow-800 px-6 py-4">
-            <div className="flex items-center gap-3">
-              <span className="material-symbols-outlined text-[1.2rem] text-yellow-600">warning</span>
-              <p className="text-sm text-yellow-800 dark:text-yellow-300">
-                Your profile is {completionPercentage}% complete. Complete your profile to get discovered by top recruiters!
-              </p>
-            </div>
-          </div>
-          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 px-6 py-4">
-            <ProfileCompletionBar percent={completionPercentage} showItems />
-          </div>
-        </>
-      )}
-
-      <form onSubmit={profileForm.handleSubmit(handleSave)} noValidate>
-        <div className="flex flex-col gap-5">
-
-          {/* ── Profile picture + Resume — side by side on md+ screens ── */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <AvatarManager
-              savedAvatar={savedAvatar}
-              initials={initials}
-              displayName={`${profileData?.first_name ?? ""} ${profileData?.last_name ?? ""}`.trim()}
-              uploadEndpoint="/candidate/profile/photo/"
-              onSuccess={getProfileData}
-            />
-
-            <SectionCard title="Resume" icon="description">
-              <ResumeManager
-                savedResume={profileData?.profile?.resume_url || profileData?.profile?.resume}
-                savedResumeFilename={profileData?.profile?.resume_filename}
+      {/* Profile View or Profile Edit render */}
+      {!isEditing ? (
+        <CandidateProfileView
+          profileData={profileData}
+          completionPercentage={completionPercentage}
+          showCompletionBar={true}
+          readOnly={false}
+          onAvatarSuccess={getProfileData}
+          onResumeSuccess={getProfileData}
+          avatarUploadEndpoint="/candidate/profile/photo/"
+        />
+      ) : (
+        <form onSubmit={profileForm.handleSubmit(handleSave)} noValidate>
+          <div className="flex flex-col gap-5">
+            {/* profile picture and resume upload */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <AvatarManager
+                savedAvatar={savedAvatar}
+                initials={initials}
+                displayName={`${profileData?.first_name ?? ""} ${profileData?.last_name ?? ""}`.trim()}
+                uploadEndpoint="/candidate/profile/photo/"
                 onSuccess={getProfileData}
               />
-            </SectionCard>
-          </div>
 
-          {/* Scroll anchor — edit mode scrolls here ── */}
-          <div ref={firstFieldRef} />
+              <SectionCard title="Resume" icon="description">
+                <ResumeManager
+                  savedResume={
+                    profileData?.profile?.resume_url ||
+                    profileData?.profile?.resume
+                  }
+                  savedResumeFilename={profileData?.profile?.resume_filename}
+                  onSuccess={getProfileData}
+                />
+              </SectionCard>
+            </div>
 
-          {/* ── Profile Details ── */}
-          <SectionCard title="Profile Details" icon="person">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Scroll anchor — edit mode scrolls here ── */}
+            <div ref={firstFieldRef} />
 
-              {/* First Name */}
-              <div>
-                <FieldLabel htmlFor="firstName" required>First Name</FieldLabel>
-                {isEditing ? (
+            {/* ── Profile Details ── */}
+            <SectionCard title="Profile Details" icon="person">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* First Name */}
+                <div>
+                  <FieldLabel htmlFor="firstName" required>
+                    First Name
+                  </FieldLabel>
                   <TextInput
                     id="firstName"
                     {...profileForm.register("first_name")}
                     placeholder="Enter first name"
                   />
-                ) : (
-                  <ViewField value={profileData?.first_name} />
-                )}
-                {errors.first_name && (
-                  <p className="mt-1.5 text-[0.7rem] text-red-600 dark:text-red-400 font-medium">
-                    {errors.first_name.message}
-                  </p>
-                )}
-              </div>
+                  {errors.first_name && (
+                    <p className="mt-1.5 text-[0.7rem] text-red-600 dark:text-red-400 font-medium">
+                      {errors.first_name.message}
+                    </p>
+                  )}
+                </div>
 
-              {/* Last Name */}
-              <div>
-                <FieldLabel htmlFor="lastName" required>Last Name</FieldLabel>
-                {isEditing ? (
+                {/* Last Name */}
+                <div>
+                  <FieldLabel htmlFor="lastName" required>
+                    Last Name
+                  </FieldLabel>
                   <TextInput
                     id="lastName"
                     {...profileForm.register("last_name")}
                     placeholder="Enter last name"
                   />
-                ) : (
-                  <ViewField value={profileData?.last_name} />
-                )}
-                {errors.last_name && (
-                  <p className="mt-1.5 text-[0.7rem] text-red-600 dark:text-red-400 font-medium">
-                    {errors.last_name.message}
+                  {errors.last_name && (
+                    <p className="mt-1.5 text-[0.7rem] text-red-600 dark:text-red-400 font-medium">
+                      {errors.last_name.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Email — always read-only */}
+                <div>
+                  <FieldLabel htmlFor="email">Email Address</FieldLabel>
+                  <ViewField value={profileData?.email} icon="email" />
+                  <p className="mt-1.5 text-[0.7rem] text-gray-400 dark:text-gray-500">
+                    Change email from the settings.
                   </p>
-                )}
-              </div>
+                </div>
 
-              {/* Email — always read-only */}
-              <div>
-                <FieldLabel htmlFor="email">Email Address</FieldLabel>
-                <ViewField value={profileData?.email} icon="email" />
-                <p className="mt-1.5 text-[0.7rem] text-gray-400 dark:text-gray-500">
-                  Change email from the settings.
-                </p>
-              </div>
-
-              {/* Experience Years */}
-              <div>
-                <FieldLabel htmlFor="experienceYears">Years of Experience</FieldLabel>
-                {isEditing ? (
+                {/* Experience Years */}
+                <div>
+                  <FieldLabel htmlFor="experienceYears">
+                    Years of Experience
+                  </FieldLabel>
                   <TextInput
                     id="experienceYears"
                     type="number"
@@ -269,27 +271,16 @@ const CandidateProfile = () => {
                     {...profileForm.register("profile.experience_years")}
                     placeholder="e.g. 3"
                   />
-                ) : (
-                  <ViewField
-                    value={
-                      profileData?.profile?.experience_years != null
-                        ? `${profileData.profile.experience_years} ${profileData.profile.experience_years === 1 ? "year" : "years"}`
-                        : null
-                    }
-                    icon="work_history"
-                  />
-                )}
-                {errors.profile?.experience_years && (
-                  <p className="mt-1.5 text-[0.7rem] text-red-600 dark:text-red-400 font-medium">
-                    {errors.profile.experience_years.message}
-                  </p>
-                )}
-              </div>
+                  {errors.profile?.experience_years && (
+                    <p className="mt-1.5 text-[0.7rem] text-red-600 dark:text-red-400 font-medium">
+                      {errors.profile.experience_years.message}
+                    </p>
+                  )}
+                </div>
 
-              {/* Headline — aligned side-by-side, wraps to newline */}
-              <div>
-                <FieldLabel htmlFor="headline">Headline</FieldLabel>
-                {isEditing ? (
+                {/* Headline */}
+                <div>
+                  <FieldLabel htmlFor="headline">Headline</FieldLabel>
                   <div className="relative">
                     <TextArea
                       id="headline"
@@ -300,71 +291,60 @@ const CandidateProfile = () => {
                       {(profileForm.watch("profile.headline") || "").length}/150
                     </span>
                   </div>
-                ) : (
-                  <ViewField
-                    value={profileData?.profile?.headline}
-                    icon="badge"
-                  />
-                )}
-                {errors.profile?.headline && (
-                  <p className="mt-1.5 text-[0.7rem] text-red-600 dark:text-red-400 font-medium">
-                    {errors.profile.headline.message}
-                  </p>
-                )}
-              </div>
+                  {errors.profile?.headline && (
+                    <p className="mt-1.5 text-[0.7rem] text-red-600 dark:text-red-400 font-medium">
+                      {errors.profile.headline.message}
+                    </p>
+                  )}
+                </div>
 
-              {/* Qualification — aligned side-by-side, wraps to newline */}
-              <div>
-                <FieldLabel htmlFor="qualification">Qualification</FieldLabel>
-                {isEditing ? (
+                {/* Qualification */}
+                <div>
+                  <FieldLabel htmlFor="qualification">Qualification</FieldLabel>
                   <TextArea
                     id="qualification"
                     {...profileForm.register("profile.qualification")}
                     placeholder="e.g. B.Tech Computer Science"
                   />
-                ) : (
-                  <ViewField
-                    value={profileData?.profile?.qualification}
-                    icon="school"
+                  {errors.profile?.qualification && (
+                    <p className="mt-1.5 text-[0.7rem] text-red-600 dark:text-red-400 font-medium">
+                      {errors.profile.qualification.message}
+                    </p>
+                  )}
+                </div>
+
+                {/* Professional Skills */}
+                <div className="sm:col-span-2">
+                  <FieldLabel htmlFor="skills">Professional Skills</FieldLabel>
+                  <TagInput
+                    tags={skills}
+                    onChange={(newSkills) => {
+                      setSkills(newSkills);
+                      profileForm.setValue(
+                        "profile.professional_skills",
+                        newSkills,
+                        { shouldValidate: true },
+                      );
+                    }}
+                    isEditing={isEditing}
+                    placeholder="Type a skill and press Enter or comma…"
                   />
-                )}
-                {errors.profile?.qualification && (
-                  <p className="mt-1.5 text-[0.7rem] text-red-600 dark:text-red-400 font-medium">
-                    {errors.profile.qualification.message}
-                  </p>
-                )}
-              </div>
-
-              {/* Professional Skills — full width tag input */}
-              <div className="sm:col-span-2">
-                <FieldLabel htmlFor="skills">Professional Skills</FieldLabel>
-                <TagInput
-                  tags={skills}
-                  onChange={(newSkills) => {
-                    setSkills(newSkills);
-                    profileForm.setValue("profile.professional_skills", newSkills, { shouldValidate: true });
-                  }}
-                  isEditing={isEditing}
-                  placeholder="Type a skill and press Enter or comma…"
-                />
-                {getSkillsErrorMessage() && (
-                  <p className="mt-1.5 text-[0.7rem] text-red-600 dark:text-red-400 font-medium">
-                    {getSkillsErrorMessage()}
-                  </p>
-                )}
-                {isEditing && (
+                  {getSkillsErrorMessage() && (
+                    <p className="mt-1.5 text-[0.7rem] text-red-600 dark:text-red-400 font-medium">
+                      {getSkillsErrorMessage()}
+                    </p>
+                  )}
                   <p className="mt-1.5 text-[0.7rem] text-gray-400 dark:text-gray-500">
-                    Press Enter, Tab, or comma to add a skill. Backspace to remove the last one.
+                    Press Enter, Tab, or comma to add a skill. Backspace to
+                    remove the last one.
                   </p>
-                )}
+                </div>
               </div>
+            </SectionCard>
 
-            </div>
-          </SectionCard>
-
-          {/* ── Action bar — edit mode only ── */}
-          {isEditing && (
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3
+            {/* ── Action bar ── */}
+            <div
+              className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3
               bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 px-6 py-4"
             >
               <div className="flex items-center gap-2.5">
@@ -386,14 +366,16 @@ const CandidateProfile = () => {
                     transition-all duration-200
                     shadow-md shadow-violet-200 dark:shadow-violet-900/30"
                 >
-                  <span className="material-symbols-outlined text-[1rem]">save</span>
+                  <span className="material-symbols-outlined text-[1rem]">
+                    save
+                  </span>
                   Save Changes
                 </button>
               </div>
             </div>
-          )}
-        </div>
-      </form>
+          </div>
+        </form>
+      )}
     </div>
   );
 };

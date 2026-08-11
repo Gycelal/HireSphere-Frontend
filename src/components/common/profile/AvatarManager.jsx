@@ -11,6 +11,7 @@ const AvatarManager = ({
   displayName,
   uploadEndpoint,
   onSuccess,
+  readOnly = false,
 }) => {
   const [draftAvatar, setDraftAvatar] = useState(null); // cropped but unsaved image
   const [isSavingAvatar, setIsSavingAvatar] = useState(false);
@@ -167,80 +168,46 @@ const AvatarManager = ({
                 {avatarError}
               </p>
             )}
-            <div className="flex flex-wrap items-center gap-2 mt-1">
-              {draftAvatar ? (
-                <>
-                  {/* Draft State Buttons */}
-                  <button
-                    type="button"
-                    onClick={handleSaveAvatar}
-                    disabled={isSavingAvatar}
-                    className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold
-                      text-white bg-violet-600 hover:bg-violet-700 active:bg-violet-800
-                      disabled:opacity-60 disabled:cursor-not-allowed
-                      shadow-md shadow-violet-200 dark:shadow-violet-900/30 transition-all duration-200"
-                  >
-                    <span className="material-symbols-outlined text-[0.9rem]">
-                      {isSavingAvatar ? "autorenew" : "save"}
-                    </span>
-                    {isSavingAvatar ? "Saving..." : "Save Photo"}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isSavingAvatar}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
-                      bg-violet-50 dark:bg-violet-950/60
-                      text-violet-700 dark:text-violet-300
-                      border border-violet-200 dark:border-violet-800
-                      hover:bg-violet-100 dark:hover:bg-violet-900/40
-                      transition-colors duration-200"
-                  >
-                    <span className="material-symbols-outlined text-[0.9rem]">
-                      change_circle
-                    </span>
-                    Change Photo
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleCancelDraft}
-                    disabled={isSavingAvatar}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
-                      text-red-500 dark:text-red-400
-                      hover:bg-red-50 dark:hover:bg-red-950/40
-                      transition-colors duration-200"
-                  >
-                    <span className="material-symbols-outlined text-[0.9rem]">
-                      cancel
-                    </span>
-                    Cancel
-                  </button>
-                </>
-              ) : (
-                <>
-                  {/* Viewing Saved State Buttons */}
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
-                      bg-violet-50 dark:bg-violet-950/60
-                      text-violet-700 dark:text-violet-300
-                      border border-violet-200 dark:border-violet-800
-                      hover:bg-violet-100 dark:hover:bg-violet-900/40
-                      transition-colors duration-200"
-                  >
-                    <span className="material-symbols-outlined text-[0.9rem]">
-                      {savedAvatar ? "change_circle" : "upload"}
-                    </span>
-                    {savedAvatar ? "Change Photo" : "Upload Photo"}
-                  </button>
-
-                  {savedAvatar && (
+            {!readOnly && (
+              <div className="flex flex-wrap items-center gap-2 mt-1">
+                {draftAvatar ? (
+                  <>
+                    {/* Draft State Buttons */}
                     <button
                       type="button"
-                      onClick={() => setShowRemoveModal(true)}
+                      onClick={handleSaveAvatar}
+                      disabled={isSavingAvatar}
+                      className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-bold
+                        text-white bg-violet-600 hover:bg-violet-700 active:bg-violet-800
+                        disabled:opacity-60 disabled:cursor-not-allowed
+                        shadow-md shadow-violet-200 dark:shadow-violet-900/30 transition-all duration-200"
+                    >
+                      <span className="material-symbols-outlined text-[0.9rem]">
+                        {isSavingAvatar ? "autorenew" : "save"}
+                      </span>
+                      {isSavingAvatar ? "Saving..." : "Save Photo"}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isSavingAvatar}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
+                        bg-violet-50 dark:bg-violet-950/60
+                        text-violet-700 dark:text-violet-300
+                        border border-violet-200 dark:border-violet-800
+                        hover:bg-violet-100 dark:hover:bg-violet-900/40
+                        transition-colors duration-200"
+                    >
+                      <span className="material-symbols-outlined text-[0.9rem]">
+                        change_circle
+                      </span>
+                      Change Photo
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleCancelDraft}
                       disabled={isSavingAvatar}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
                         text-red-500 dark:text-red-400
@@ -248,14 +215,50 @@ const AvatarManager = ({
                         transition-colors duration-200"
                     >
                       <span className="material-symbols-outlined text-[0.9rem]">
-                        {isSavingAvatar ? "autorenew" : "delete"}
+                        cancel
                       </span>
-                      {isSavingAvatar ? " Removing..." : "Remove Photo"}
+                      Cancel
                     </button>
-                  )}
-                </>
-              )}
-            </div>
+                  </>
+                ) : (
+                  <>
+                    {/* Viewing Saved State Buttons */}
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
+                        bg-violet-50 dark:bg-violet-950/60
+                        text-violet-700 dark:text-violet-300
+                        border border-violet-200 dark:border-violet-800
+                        hover:bg-violet-100 dark:hover:bg-violet-900/40
+                        transition-colors duration-200"
+                    >
+                      <span className="material-symbols-outlined text-[0.9rem]">
+                        {savedAvatar ? "change_circle" : "upload"}
+                      </span>
+                      {savedAvatar ? "Change Photo" : "Upload Photo"}
+                    </button>
+
+                    {savedAvatar && (
+                      <button
+                        type="button"
+                        onClick={() => setShowRemoveModal(true)}
+                        disabled={isSavingAvatar}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
+                          text-red-500 dark:text-red-400
+                          hover:bg-red-50 dark:hover:bg-red-950/40
+                          transition-colors duration-200"
+                      >
+                        <span className="material-symbols-outlined text-[0.9rem]">
+                          {isSavingAvatar ? "autorenew" : "delete"}
+                        </span>
+                        {isSavingAvatar ? " Removing..." : "Remove Photo"}
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
+            )}
 
             {/* Hidden file input */}
             <input

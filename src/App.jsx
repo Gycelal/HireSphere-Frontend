@@ -25,6 +25,7 @@ import RoleSelectionPage from './pages/common/RoleSelectionPage'
 import RecruiterProfile from './pages/recruiter/RecruiterProfile'
 import CandidateProfile from './pages/candidate/CandidateProfile'
 import UserManagementPage from './pages/admin/UserManagementPage'
+import AdminUserProfilePage from './pages/admin/AdminUserProfilePage'
 import FindJobs from './pages/candidate/FindJobs'
 import MyJobPosts from './pages/recruiter/MyJobPosts'
 import PostJobPage from './pages/recruiter/PostJobPage'
@@ -78,7 +79,7 @@ function App () {
                 <Route path='find-jobs' element={<FindJobs />} />
                 <Route path='jobs/:id' element={<HomeJobDetailsPage />} />
               </Route>
-              {/* dashboard routes */}
+              {/* dashboard routes */}Then your behavior becomes:
               <Route element={<DashboardLayout />}>
                 <Route path='overview' element={<CandidateDashboard />} />
                 <Route path='profile' element={<CandidateProfile />} />
@@ -109,6 +110,7 @@ function App () {
                 element={<AdminRecruiterApprovalsPage />}
               />
               <Route path='users' element={<UserManagementPage />} />
+              <Route path='users/:role/:id' element={<AdminUserProfilePage />} />
             </Route>
           </Route>
           <Route path='*' element={<Navigate to='/' replace />} />

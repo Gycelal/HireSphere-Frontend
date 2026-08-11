@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { privateApi } from "../../../services/api";
 
 // ── Resume Manager ────────────────────────────────────────────────────────────
-const ResumeManager = ({ savedResume, savedResumeFilename, onSuccess }) => {
+const ResumeManager = ({ savedResume, savedResumeFilename, onSuccess, readOnly = false }) => {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
@@ -83,9 +83,9 @@ const ResumeManager = ({ savedResume, savedResumeFilename, onSuccess }) => {
 
   return (
     <div
-      onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-      onDragLeave={() => setIsDragging(false)}
-      onDrop={handleDrop}
+      onDragOver={(e) => { if (!readOnly) { e.preventDefault(); setIsDragging(true); } }}
+      onDragLeave={() => { if (!readOnly) setIsDragging(false); }}
+      onDrop={(e) => { if (!readOnly) handleDrop(e); }}
       className={`relative rounded-2xl border-2 border-dashed p-6 transition-all duration-200
         ${isDragging
           ? "border-violet-400 bg-violet-50 dark:bg-violet-950/30"
@@ -134,37 +134,41 @@ const ResumeManager = ({ savedResume, savedResumeFilename, onSuccess }) => {
                 <span className="material-symbols-outlined text-[1.15rem]">open_in_new</span>
               </a>
 
-              {/* Change */}
-              <button
-                type="button"
-                title="Change"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isUploading}
-                className="w-8 h-8 rounded-lg flex items-center justify-center
-                  text-violet-600 dark:text-violet-400
-                  hover:bg-violet-100 dark:hover:bg-violet-900/40
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                  transition-colors duration-200"
-              >
-                <span className="material-symbols-outlined text-[1.15rem]">drive_file_rename_outline</span>
-              </button>
+              {!readOnly && (
+                <>
+                  {/* Change */}
+                  <button
+                    type="button"
+                    title="Change"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center
+                      text-violet-600 dark:text-violet-400
+                      hover:bg-violet-100 dark:hover:bg-violet-900/40
+                      disabled:opacity-50 disabled:cursor-not-allowed
+                      transition-colors duration-200"
+                  >
+                    <span className="material-symbols-outlined text-[1.15rem]">drive_file_rename_outline</span>
+                  </button>
 
-              {/* Delete */}
-              <button
-                type="button"
-                title="Delete"
-                onClick={handleRemove}
-                disabled={isRemoving}
-                className="w-8 h-8 rounded-lg flex items-center justify-center
-                  text-red-500 dark:text-red-400
-                  hover:bg-red-50 dark:hover:bg-red-950/40
-                  disabled:opacity-50 disabled:cursor-not-allowed
-                  transition-colors duration-200"
-              >
-                <span className="material-symbols-outlined text-[1.15rem]">
-                  {isRemoving ? "autorenew" : "delete"}
-                </span>
-              </button>
+                  {/* Delete */}
+                  <button
+                    type="button"
+                    title="Delete"
+                    onClick={handleRemove}
+                    disabled={isRemoving}
+                    className="w-8 h-8 rounded-lg flex items-center justify-center
+                      text-red-500 dark:text-red-400
+                      hover:bg-red-50 dark:hover:bg-red-950/40
+                      disabled:opacity-50 disabled:cursor-not-allowed
+                      transition-colors duration-200"
+                  >
+                    <span className="material-symbols-outlined text-[1.15rem]">
+                      {isRemoving ? "autorenew" : "delete"}
+                    </span>
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -173,18 +177,20 @@ const ResumeManager = ({ savedResume, savedResumeFilename, onSuccess }) => {
         <div className="flex flex-col items-center gap-3 text-center py-2">
           <div className="w-12 h-12 rounded-2xl bg-violet-100 dark:bg-violet-950/60 flex items-center justify-center">
             <span className="material-symbols-outlined text-violet-500 text-[1.5rem]">
-              {isUploading ? "autorenew" : "upload_file"}
+              {isUploading ? "autorenew" : (readOnly ? "description" : "upload_file")}
             </span>
           </div>
           <div>
             <p className="text-sm font-semibold text-gray-800 dark:text-white">
-              {isUploading ? "Uploading…" : "Upload your resume"}
+              {isUploading ? "Uploading…" : (readOnly ? "No Resume Uploaded" : "Upload your resume")}
             </p>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-              PDF or Word · Max 5 MB · Drag &amp; drop or click to browse
-            </p>
+            {!readOnly && (
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                PDF or Word · Max 5 MB · Drag &amp; drop or click to browse
+              </p>
+            )}
           </div>
-          {!isUploading && (
+          {!isUploading && !readOnly && (
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}

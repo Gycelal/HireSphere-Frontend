@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import ConfirmModal from "../../components/common/ConfirmModal";
 import PageHeader from "../../components/common/PageHeader";
@@ -68,10 +69,7 @@ const UserManagementPage = () => {
     setPage(1);
   };
 
-  // Preview details handler
-  const handlePreview = (user) => {
-    console.log("Preview user:", user);
-  };
+
 
   // Action status changes
   const handleToggleStatus = (user) => {
@@ -197,13 +195,13 @@ const UserManagementPage = () => {
         renderActions={(row) => (
           <div className="flex items-center justify-end gap-1.5">
             {/* Preview details */}
-            <button
-              onClick={() => handlePreview(row)}
+            <Link
+              to={`/admin/users/${role}/${row.id}`}
               title="Preview Details"
               className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-150"
             >
               <span className="material-symbols-outlined text-[1.1rem]">visibility</span>
-            </button>
+            </Link>
 
             {/* Suspend/Activate Switch */}
             <button

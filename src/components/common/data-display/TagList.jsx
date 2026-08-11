@@ -1,6 +1,6 @@
-const TagList = ({ tags }) => {
+const TagList = ({ tags, placeHolder = "Not set" }) => {
   if (!tags || tags.length === 0)
-    return <span className="text-sm italic text-gray-400 dark:text-gray-500">Not provided</span>;
+    return <span className="text-sm italic text-gray-400 dark:text-gray-500">{placeHolder}</span>;
   return (
     <div className="flex flex-wrap gap-2">
       {tags.map((t) => (

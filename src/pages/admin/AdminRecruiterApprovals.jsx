@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import ConfirmModal from '../../components/common/ConfirmModal'
 import PageHeader from '../../components/common/PageHeader'
@@ -49,11 +50,11 @@ function RecruiterCell ({ row }) {
 }
 // Call API
 // Action buttons
-function RowActions ({ row, onPreview, onApprove, onReject }) {
+function RowActions ({ row, onApprove, onReject }) {
   return (
     <div className='flex items-center justify-end gap-1.5'>
-      <button
-        onClick={() => onPreview(row)}
+      <Link
+        to={`/admin/users/recruiter/${row.id}`}
         title='Preview'
         className='w-8 h-8 flex items-center justify-center rounded-lg
           text-gray-400 dark:text-gray-500
@@ -64,7 +65,7 @@ function RowActions ({ row, onPreview, onApprove, onReject }) {
         <span className='material-symbols-outlined text-[1.1rem]'>
           visibility
         </span>
-      </button>
+      </Link>
 
       <button
         onClick={() => onApprove(row)}
@@ -140,6 +141,8 @@ export default function AdminRecruiterApprovalsPage () {
   const [action, setAction] = useState(null)
   const [selectedId, setSelectedId] = useState(null)
 
+  const navigate = useNavigate()
+
   const COLUMNS = useMemo(
     () => [
       {
@@ -191,10 +194,7 @@ export default function AdminRecruiterApprovalsPage () {
     }
   }
 
-  // For reviewing recruiter profile
-  const handlePreview = row => {
-    console.log('Preview:', row)
-  }
+
 
   const handleApprove = row => {
     setOpenModal(true)
@@ -276,7 +276,6 @@ export default function AdminRecruiterApprovalsPage () {
         renderActions={row => (
           <RowActions
             row={row}
-            onPreview={handlePreview}
             onApprove={handleApprove}
             onReject={handleReject}
           />
