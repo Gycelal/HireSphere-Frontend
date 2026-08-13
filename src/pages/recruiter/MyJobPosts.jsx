@@ -166,7 +166,7 @@ const MyJobPosts = () => {
 
             {/* Edit */}
             <button
-              onClick={() => navigate(`/recruiter/jobs/${row.id}/edit`)}
+              onClick={() => navigate(`/recruiter/edit-job/${row.id}`)}
               title='Edit'
               className='w-8 h-8 flex items-center justify-center rounded-lg
                 text-gray-400 dark:text-gray-500

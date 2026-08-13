@@ -71,7 +71,10 @@ export default function JobDetailsPage({
     setLoading(true)
     setError(false)
     try {
+      // Artificial delay to demonstrate loading skeleton
+      await new Promise(resolve => setTimeout(resolve, 500))
       const res = await privateApi.get(jobDetailUrl || `jobs/${jobId}/`)
+      console.log("result:", res)
       setJob(res.data)
       // The backend may nest recruiter data under `res.data.recruiter` or `res.data.posted_by`
       setRecruiter(res.data.recruiter ?? res.data.posted_by ?? null)
@@ -83,6 +86,7 @@ export default function JobDetailsPage({
       setLoading(false)
     }
   }
+  console.log("recrutier state:", recruiter)
 
   useEffect(() => {
     if (jobId) fetchJob()
@@ -118,7 +122,7 @@ export default function JobDetailsPage({
     }
   }
 
-  // ── Render states ──────────────────────────────────────────────────────────
+  // Render States
   if (loading) return <LoadingSkeleton />
   if (error)   return <ErrorState onBack={() => (backHref ? navigate(backHref) : navigate(-1))} />
 

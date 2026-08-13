@@ -32,7 +32,7 @@ export default function EditJobPage() {
 
   const handleSubmit = async (data) => {
     try {
-      const res = await privateApi.post()
+      const res = await privateApi.post("/jobs/", jobData)
       console.log("Saving edits:", data);
       toast.success("Job updated successfully!");
       navigate("/recruiter/my-job-posts");
