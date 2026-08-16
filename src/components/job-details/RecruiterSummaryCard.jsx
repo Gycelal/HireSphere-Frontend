@@ -1,28 +1,14 @@
 import { useNavigate } from 'react-router-dom'
 
-/**
- * RecruiterSummaryCard
- *
- * Shown to candidates below the job details.
- * Displays recruiter name, company, logo / avatar, and short bio.
- *
- * Props:
- *   recruiter  – object { id, first_name, last_name, profile: { display_name, profile_picture, company_or_brand_name, bio } }
- *   onApply    – () => void  (called when "Apply Now" is clicked)
- *   applying   – boolean     (loading state for apply button)
- *   applied    – boolean     (true if candidate already applied)
- */
 export default function RecruiterSummaryCard({ recruiter, onApply, applying = false, applied = false }) {
   const navigate = useNavigate()
 
   const displayName =
-    recruiter?.profile?.display_name ||
+    recruiter?.display_name ||
     `${recruiter?.first_name ?? ''} ${recruiter?.last_name ?? ''}`.trim() ||
     'Recruiter'
-
-  const company = recruiter?.profile?.company_or_brand_name
-  const bio     = recruiter?.profile?.bio || recruiter?.profile?.about
-  const logo    = recruiter?.profile?.profile_picture
+  const company = recruiter?.company_or_brand_name
+  const profilePicture    = recruiter?.profile_picture
 
   const initials = displayName
     .split(' ')
@@ -34,7 +20,6 @@ export default function RecruiterSummaryCard({ recruiter, onApply, applying = fa
   return (
     <div className='bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 overflow-hidden'>
 
-      {/* ── Card header ── */}
       <div className='flex items-center gap-2.5 px-6 py-4 border-b border-gray-100 dark:border-gray-800'>
         <span className='material-symbols-outlined text-[1.1rem] text-violet-500'>
           person
@@ -44,17 +29,15 @@ export default function RecruiterSummaryCard({ recruiter, onApply, applying = fa
         </h2>
       </div>
 
-      {/* ── Card body ── */}
       <div className='px-6 py-5 flex flex-col gap-5'>
 
-        {/* Recruiter identity row */}
         <div className='flex items-center gap-4'>
-          {/* Avatar / logo */}
-          {logo ? (
+          {/* Recruiter profile picture*/}
+          {profilePicture ? (
             <img
-              src={logo}
+              src={profilePicture}
               alt={displayName}
-              className='w-14 h-14 rounded-xl object-cover border border-gray-100 dark:border-gray-800 shrink-0'
+              className='w-14 h-14 rounded-xl object-cover border border-purple-500 dark: shrink-0'
             />
           ) : (
             <div
@@ -83,19 +66,11 @@ export default function RecruiterSummaryCard({ recruiter, onApply, applying = fa
           </div>
         </div>
 
-        {/* Bio */}
-        {bio && (
-          <p className='text-sm text-gray-600 dark:text-gray-400 leading-relaxed'>
-            {bio}
-          </p>
-        )}
-
-        {/* ── Divider ── */}
         <div className='border-t border-gray-100 dark:border-gray-800' />
 
-        {/* ── Action buttons ── */}
+        {/* action buttons*/}
         <div className='flex flex-col sm:flex-row gap-2.5'>
-          {/* Apply Now */}
+        
           <button
             id='apply-now-btn'
             onClick={onApply}
