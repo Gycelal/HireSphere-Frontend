@@ -4,6 +4,8 @@ import SectionCard from "../ui/SectionCard";
 import FieldLabel from "../form/FieldLabel";
 import ViewField from "../data-display/ViewField";
 import { RECRUITER_TYPES } from "../../../constants/RecruiterProfileConstants";
+import { useSelector } from "react-redux";
+import { useState } from "react";
 
 const RecruiterProfileView = ({ 
   profileData, 
@@ -16,6 +18,8 @@ const RecruiterProfileView = ({
   const savedAvatar = profileData?.profile?.profile_picture;
   const initials = `${profileData?.first_name?.[0] ?? ""}${profileData?.last_name?.[0] ?? ""}`.toUpperCase();
 
+  const userState = useSelector((state)=> state.auth.user)
+  console.log("user state in redux:", userState)
   return (
     <div className="flex flex-col gap-6">
       {/* ── Profile completion ── */}

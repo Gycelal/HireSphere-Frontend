@@ -78,6 +78,7 @@ function App () {
               <Route element={<HomeLayout />}>
                 <Route path='find-jobs' element={<FindJobs />} />
                 <Route path='jobs/:id' element={<HomeJobDetailsPage />} />
+                <Route path='recruiter/profile/:id' element={<RecruiterProfile/>} />
               </Route>
               {/* dashboard routes */}Then your behavior becomes:
               <Route element={<DashboardLayout />}>
