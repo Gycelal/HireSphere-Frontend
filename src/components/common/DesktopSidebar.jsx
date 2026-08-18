@@ -81,19 +81,44 @@ export default function DesktopSidebar ({ navItems, bottomItems, collapsed, onTo
           <div className={`mt-2 pt-2 border-t border-gray-100 dark:border-gray-800 ${collapsed ? 'mx-1' : 'mx-2'}`}>
             <Link
               to='/recruiter/post-job'
-              title='Post a Job'
+              onClick={(e) => {
+                if (isRecruiterPending) {
+                  e.preventDefault()
+                }
+              }}
               className={[
-                'group flex items-center gap-2.5 rounded-xl text-sm font-medium',
-                'border border-dashed border-violet-300 dark:border-violet-700',
-                'text-violet-600 dark:text-violet-400',
-                'hover:border-violet-400 dark:hover:border-violet-500',
-                'hover:bg-violet-50 dark:hover:bg-violet-950/30',
-                'transition-all duration-200',
+                'group relative flex items-center gap-2.5 rounded-xl text-sm font-medium transition-all duration-200 overflow-visible',
+                'border border-dashed border-violet-300 dark:border-violet-700 text-violet-600 dark:text-violet-400',
+                isRecruiterPending
+                  ? 'opacity-50 cursor-not-allowed'
+                  : 'hover:border-violet-400 dark:hover:border-violet-500 hover:bg-violet-50 dark:hover:bg-violet-950/30',
                 collapsed ? 'justify-center p-2.5' : 'px-3 py-2.5',
               ].join(' ')}
             >
               <span className='material-symbols-outlined text-[1.2rem] shrink-0'>add</span>
               {!collapsed && <span className='truncate'>Post a Job</span>}
+
+              {/* Lock icon */}
+              {!collapsed && isRecruiterPending && (
+                <span className='material-symbols-outlined ml-auto text-[1rem] text-gray-400 dark:text-gray-500'>
+                  lock
+                </span>
+              )}
+
+              {/* Tooltip */}
+              {(collapsed || isRecruiterPending) && (
+                <span
+                  className={`
+                    fixed z-50
+                    whitespace-nowrap rounded-lg bg-gray-900 dark:bg-gray-700
+                    px-2.5 py-1.5 text-xs font-medium text-white shadow-lg
+                    opacity-0 group-hover:opacity-100 transition-all duration-150 pointer-events-none
+                    ${collapsed ? "left-[74px]" : "left-[250px]"}
+                  `}
+                >
+                  {isRecruiterPending ? "Can access only after Admin Approval" : "Post a Job"}
+                </span>
+              )}
             </Link>
           </div>
         )}

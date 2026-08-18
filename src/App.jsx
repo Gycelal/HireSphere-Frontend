@@ -9,7 +9,7 @@ import HomeLayout from './layouts/HomeLayout'
 import LandingPageBody from './pages/LandingPage'
 import ProtectedRoutes from './routes/ProtectedRoutes'
 import RecruiterDashboard from './pages/recruiter/RecruiterDashboard'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { useEffect } from 'react'
 import { Toaster } from 'react-hot-toast'
 import ResetPasswordPage from './pages/auth/ResetPasswordPage'
@@ -33,13 +33,41 @@ import EditJobPage from './pages/recruiter/EditJobPage'
 import RecruiterJobDetailsPage from './pages/recruiter/RecruiterJobDetailsPage'
 import ApplicationsJobDetailsPage from './pages/candidate/ApplicationsJobDetailsPage'
 import HomeJobDetailsPage from './pages/candidate/HomeJobDetailsPage'
+import { fetchCurrentUser } from './store/slices/authSlice'
 
 function App () {
   const mode = useSelector(state => state.theme.mode)
+  const { isAuthenticated } = useSelector(state => state.auth)
+  const dispatch = useDispatch()
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', mode === 'dark')
   }, [mode])
+
+  // For synchronization of user info 
+  useEffect(() => {
+    if (!isAuthenticated) return
+
+    //Fetch latest user on initial mount / reload
+    dispatch(fetchCurrentUser())
+
+    //Fetch on tab focus with throttling (minimum 15s interval)
+    let lastFetchTime = Date.now()
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        const now = Date.now()
+        if (now - lastFetchTime > 15000) {
+          lastFetchTime = now
+          dispatch(fetchCurrentUser())
+        }
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [dispatch, isAuthenticated])
 
   return (
     <>

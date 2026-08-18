@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { fetchCurrentUser } from "../../store/slices/authSlice";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { candidateProfileValidationSchema } from "../../validation/ProfileValidationSchemas";
@@ -15,6 +17,7 @@ import ViewField from "../../components/common/data-display/ViewField";
 import CandidateProfileView from "../../components/common/profile/CandidateProfileView";
 
 const CandidateProfile = () => {
+  const dispatch = useDispatch();
   const [isEditing, setIsEditing] = useState(false);
   const [completionPercentage, setCompletionPercentage] = useState(0);
   const [profileData, setProfileData] = useState(null);
@@ -69,6 +72,7 @@ const CandidateProfile = () => {
       setCompletionPercentage(response.data.completion_percentage || 0);
       setSkills(response.data?.profile?.professional_skills || []);
       setIsEditing(false);
+      dispatch(fetchCurrentUser());
     } catch (error) {
       console.error("Error saving profile:", error);
       if (error.response?.status === 400) {

@@ -1,9 +1,12 @@
 import NavItem from "./NavItem"
 import Logo from "./Logo"
-
-
+import { useSelector } from "react-redux"
 
 export default function MobileDrawer ({ navItems, bottomItems, open, onClose }) {
+  const user = useSelector((state) => state.auth.user);
+  const isRecruiterPending =
+    user?.role === "recruiter" && user?.approval_status !== "approved";
+
   return (
     <>
       {/* Backdrop */}
@@ -76,6 +79,7 @@ export default function MobileDrawer ({ navItems, bottomItems, open, onClose }) 
               item={item}
               collapsed={false}
               onNavigate={onClose}
+              disabled={isRecruiterPending}
             />
           ))}
         </nav>

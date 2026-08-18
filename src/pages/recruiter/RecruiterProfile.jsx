@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect, forwardRef } from "react";
+import { useDispatch } from "react-redux";
+import { fetchCurrentUser } from "../../store/slices/authSlice";
 import ProfileCompletionBar from "../../components/common/ProfileCompletionBar";
 import { privateApi } from "../../services/api";
 import { useForm } from "react-hook-form";
@@ -17,6 +19,7 @@ import RecruiterProfileView from "../../components/common/profile/RecruiterProfi
 
 // ── RecruiterProfilePage
 export default function RecruiterProfile() {
+  const dispatch = useDispatch();
   const [isEditing, setIsEditing] = useState(false);
   const [completionPercentage, setCompletionPercentage] = useState(0);
   const [profileData, setProfileData] = useState(null);
@@ -67,6 +70,7 @@ export default function RecruiterProfile() {
       setProfileData(response.data);
       setCompletionPercentage(response.data.completion_percentage || 0);
       setIsEditing(false);
+      dispatch(fetchCurrentUser());
     } catch (error) {
       console.error("Error saving profile data:", error);
       
