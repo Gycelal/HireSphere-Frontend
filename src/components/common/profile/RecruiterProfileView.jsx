@@ -29,9 +29,7 @@ const RecruiterProfileView = ({
       setCheckingStatus(true);
       const result = await dispatch(fetchCurrentUser()).unwrap();
       const status = result?.approval_status || result?.user?.approval_status;
-      if (status === "approved") {
-        toast.success("Congratulations! Your account has been approved.");
-      } else {
+      if (status !== "approved") {
         toast("Your account is currently pending admin review.", {
           icon: (
             <span className="material-symbols-outlined text-amber-500 text-[1.25rem]">
