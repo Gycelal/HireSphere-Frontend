@@ -103,7 +103,7 @@ export default function JobInformationSection({ job }) {
             icon='laptop_mac'
             label='Work Mode'
             value={WORK_MODE_LABELS[job.work_mode] ?? job.work_mode}
-          />t
+          />
           <MetaChip icon='history_edu'    label='Experience'        value={job.experience_required != null ? `${job.experience_required} yr${job.experience_required !== 1 ? 's' : ''}` : null} />
           <MetaChip icon='group'          label='Vacancies'         value={job.vacancies} />
         </div>

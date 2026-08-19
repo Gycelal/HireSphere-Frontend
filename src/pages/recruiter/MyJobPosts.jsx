@@ -106,7 +106,12 @@ const MyJobPosts = () => {
     {
       key: 'is_active',
       label: 'Status',
-      render: (row) => <JobStatusBadge isActive={row.is_active} />,
+      render: (row) => {
+        const isExpired = row.application_deadline
+          ? new Date(row.application_deadline).setHours(23, 59, 59, 999) < Date.now()
+          : false
+        return <JobStatusBadge isActive={row.is_active} isExpired={isExpired} />
+      },
     },
   ], [page])
 

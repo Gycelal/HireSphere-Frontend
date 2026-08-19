@@ -147,7 +147,14 @@ export default function JobDetailsPage({
             <h1 className='text-2xl font-bold tracking-tight text-gray-900 dark:text-white'>
               {job.title}
             </h1>
-            <JobStatusBadge isActive={job.is_active} />
+            <JobStatusBadge
+              isActive={job.is_active}
+              isExpired={
+                job.application_deadline
+                  ? new Date(job.application_deadline).setHours(23, 59, 59, 999) < Date.now()
+                  : false
+              }
+            />
           </div>
 
           {/* Subtitle: location + type quick-read */}
