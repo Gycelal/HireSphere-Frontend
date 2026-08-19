@@ -1,14 +1,12 @@
 import { useState, useRef, useEffect, forwardRef } from "react";
 import { useDispatch } from "react-redux";
 import { fetchCurrentUser } from "../../store/slices/authSlice";
-import ProfileCompletionBar from "../../components/common/ProfileCompletionBar";
 import { privateApi } from "../../services/api";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { recruiterProfileValidationSchema } from "../../validation/ProfileValidationSchemas";
 import { RECRUITER_TYPES } from "../../constants/RecruiterProfileConstants";
 import toast from "react-hot-toast";
-
 import AvatarManager from "../../components/common/profile/AvatarManager";
 import ViewField from "../../components/common/data-display/ViewField";
 import SectionCard from "../../components/common/ui/SectionCard";
@@ -17,7 +15,7 @@ import TextInput from "../../components/common/form/TextInput";
 import SelectInput from "../../components/common/form/SelectInput";
 import RecruiterProfileView from "../../components/common/profile/RecruiterProfileView";
 
-// ── RecruiterProfilePage
+
 export default function RecruiterProfile() {
   const dispatch = useDispatch();
   const [isEditing, setIsEditing] = useState(false);
@@ -178,7 +176,7 @@ export default function RecruiterProfile() {
         )}
       </div>
 
-      {/* ── View / Edit Render ── */}
+      {/* ── View / Edit ── */}
       {!isEditing ? (
         <RecruiterProfileView
           profileData={profileData}
@@ -191,7 +189,6 @@ export default function RecruiterProfile() {
       ) : (
         <form onSubmit={profileForm.handleSubmit(handleSave)} noValidate>
           <div className="flex flex-col gap-5">
-            {/* ── Profile picture card ── */}
             <AvatarManager
               savedAvatar={profileData?.profile?.profile_picture}
               initials={initials}
@@ -200,10 +197,8 @@ export default function RecruiterProfile() {
               onSuccess={getProfileData}
             />
 
-            {/* Scroll anchor — edit mode scrolls here ── */}
             <div ref={firstFieldRef} />
 
-            {/* ── Personal information ── */}
             <SectionCard title="Personal Information" icon="person">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -262,7 +257,6 @@ export default function RecruiterProfile() {
               </div>
             </SectionCard>
 
-            {/* ── Professional information ── */}
             <SectionCard title="Professional Information" icon="business_center">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -331,12 +325,10 @@ export default function RecruiterProfile() {
               </div>
             </SectionCard>
 
-            {/* ── Action bar ── */}
             <div
               className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-3
               bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 px-6 py-4"
             >
-              {/* Buttons */}
               <div className="flex items-center gap-2.5">
                 <button
                   type="button"

@@ -9,7 +9,7 @@ import TableToolbar from "../../components/table/TableToolBar";
 import { SORT_OPTIONS, PAGE_SIZE } from "../../config/sortOptions";
 import { privateApi } from "../../services/api";
 
-// Status Filter config
+// Status Filters
 const STATUS_FILTERS = [
   { label: "All Status", value: "all" },
   { label: "Active", value: "active" },
@@ -29,10 +29,9 @@ const UserManagementPage = () => {
 
   // Modals state
   const [openConfirmModal, setOpenConfirmModal] = useState(false);
-  const [action, setAction] = useState(null); // "activate" or "suspend"
+  const [action, setAction] = useState(null); 
   const [selectedUser, setSelectedUser] = useState(null);
 
-  // Fetch users whenever status, search, role, page, or sort changes
   useEffect(() => {
     fetchUsers();
   }, [role, search, status, sort, page]);
@@ -82,7 +81,8 @@ const UserManagementPage = () => {
     if (!selectedUser) return;
     try {
       const updatedStatus = action === "activate";
-      await privateApi.patch(`users/${selectedUser.id}/`, {
+      console.log("selected user id:", selectedUser)
+      await privateApi.patch(`admin/users/${selectedUser.id}/`, {
         is_active: updatedStatus,
       });
 
@@ -90,7 +90,7 @@ const UserManagementPage = () => {
       setOpenConfirmModal(false);
       setSelectedUser(null);
       setAction(null);
-      fetchUsers(); // Refresh details list
+      fetchUsers(); 
     } catch (error) {
       console.error("Status update error:", error);
       toast.error(error?.response?.data?.message || `Failed to ${action} user.`);
@@ -142,14 +142,13 @@ const UserManagementPage = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Header & Role Toggle Wrapper */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <PageHeader
           title="User Management"
           description="Manage user accounts and permissions"
         />
 
-        {/* Responsive Role Toggle */}
+        {/* Role Toggle */}
         <div className="flex p-1 bg-gray-100 dark:bg-gray-800 rounded-xl w-full sm:w-auto self-start sm:self-center">
           <button
             onClick={() => { setRole("candidate"); setPage(1); }}
@@ -173,8 +172,6 @@ const UserManagementPage = () => {
           </button>
         </div>
       </div>
-
-      {/* Table Toolbar */}
       <TableToolbar
         searchValue={search}
         onSearchChange={handleSearch}
@@ -187,14 +184,12 @@ const UserManagementPage = () => {
         onSortChange={handleSort}
       />
 
-      {/* Data Table */}
       <DataTable
         columns={columns}
         data={data || []}
         emptyMessage={`No ${role}s found...`}
         renderActions={(row) => (
           <div className="flex items-center justify-end gap-1.5">
-            {/* Preview details */}
             <Link
               to={`/admin/users/${role}/${row.id}`}
               title="Preview Details"
@@ -202,8 +197,6 @@ const UserManagementPage = () => {
             >
               <span className="material-symbols-outlined text-[1.1rem]">visibility</span>
             </Link>
-
-            {/* Suspend/Activate Switch */}
             <button
               onClick={() => handleToggleStatus(row)}
               title={row.is_active ? "Suspend User" : "Activate User"}
@@ -221,7 +214,6 @@ const UserManagementPage = () => {
         )}
       />
 
-      {/* Pagination */}
       <Pagination
         page={page}
         totalPages={Math.ceil(totalCount / PAGE_SIZE)}
@@ -230,7 +222,6 @@ const UserManagementPage = () => {
         totalItems={totalCount}
       />
 
-      {/* Action Confirmation Modal */}
       <ConfirmModal
         open={openConfirmModal}
         title={action === "activate" ? "Activate User?" : "Suspend User?"}
