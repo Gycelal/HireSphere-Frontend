@@ -10,7 +10,7 @@ import LandingPageBody from './pages/LandingPage'
 import ProtectedRoutes from './routes/ProtectedRoutes'
 import RecruiterDashboard from './pages/recruiter/RecruiterDashboard'
 import { useDispatch, useSelector } from 'react-redux'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Toaster } from 'react-hot-toast'
 import ResetPasswordPage from './pages/auth/ResetPasswordPage'
 import DashboardLayout from './layouts/DashboardLayout'
@@ -34,24 +34,37 @@ import RecruiterJobDetailsPage from './pages/recruiter/RecruiterJobDetailsPage'
 import ApplicationsJobDetailsPage from './pages/candidate/ApplicationsJobDetailsPage'
 import HomeJobDetailsPage from './pages/candidate/HomeJobDetailsPage'
 import { fetchCurrentUser } from './store/slices/authSlice'
+import toast from 'react-hot-toast'
 
 function App () {
   const mode = useSelector(state => state.theme.mode)
-  const { isAuthenticated } = useSelector(state => state.auth)
+  const { isAuthenticated, user } = useSelector(state => state.auth)
+  const previousApprovalStatus = useRef(user?.approval_status)
   const dispatch = useDispatch()
 
+  // For listening to theme change
   useEffect(() => {
     document.documentElement.classList.toggle('dark', mode === 'dark')
   }, [mode])
 
+  // for listening to recruiters approval status change for informing user
+  useEffect(()=>{
+    if (user?.role === "recruiter"){
+      if(
+        previousApprovalStatus.current &&
+        previousApprovalStatus.current !== "approved" &&
+        user.approval_status === "approved"
+      ){
+        toast.success("Congratulations! Your recruiter account has been approved by admin.")
+      }
+    }
+    previousApprovalStatus.current = user?.approval_status
+  }, [user?.approval_status, user?.role])
+
   // For synchronization of user info 
   useEffect(() => {
     if (!isAuthenticated) return
-
-    //Fetch latest user on initial mount / reload
     dispatch(fetchCurrentUser())
-
-    //Fetch on tab focus with throttling (minimum 15s interval)
     let lastFetchTime = Date.now()
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
@@ -68,6 +81,8 @@ function App () {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
   }, [dispatch, isAuthenticated])
+
+  
 
   return (
     <>

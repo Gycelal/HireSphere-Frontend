@@ -138,7 +138,7 @@ export default function RecruiterProfile() {
 
   function handleCancel() {
     setIsEditing(false);
-    profileForm.reset(profileData); // revert form to last saved state
+    profileForm.reset(profileData);
   }
 
   // Avatar logic
@@ -148,7 +148,7 @@ export default function RecruiterProfile() {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* ── Page header ── */}
+      
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
@@ -161,7 +161,6 @@ export default function RecruiterProfile() {
           </p>
         </div>
 
-        {/* Edit Profile button — view mode only */}
         {!isEditing && (
           <button
             type="button"
