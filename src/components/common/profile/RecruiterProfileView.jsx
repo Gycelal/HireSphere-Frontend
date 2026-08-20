@@ -19,7 +19,8 @@ const RecruiterProfileView = ({
 }) => {
   const [checkingStatus, setCheckingStatus] = useState(false);
   const dispatch = useDispatch();
-  const savedAvatar = profileData?.profile?.profile_picture;
+  const savedAvatar =
+    profileData?.profile?.profile_picture || profileData?.profile_picture;
   const initials = `${profileData?.first_name?.[0] ?? ""}${profileData?.last_name?.[0] ?? ""}`.toUpperCase();
 
   const userState = useSelector((state)=> state.auth.user)
@@ -104,7 +105,12 @@ const RecruiterProfileView = ({
         <AvatarManager
           savedAvatar={savedAvatar}
           initials={initials}
-          displayName={profileData?.profile?.display_name || `${profileData?.first_name} ${profileData?.last_name}`}
+          displayName={
+            profileData?.profile?.display_name ||
+            profileData?.display_name ||
+            `${profileData?.first_name ?? ''} ${profileData?.last_name ?? ''}`.trim() ||
+            'Recruiter'
+          }
           readOnly={readOnly}
           uploadEndpoint={avatarUploadEndpoint}
           onSuccess={onAvatarSuccess}
@@ -130,7 +136,12 @@ const RecruiterProfileView = ({
 
             <div>
               <FieldLabel htmlFor="displayName">Display Name</FieldLabel>
-              <ViewField value={profileData?.profile?.display_name} />
+              <ViewField
+                value={
+                  profileData?.profile?.display_name ||
+                  profileData?.display_name
+                }
+              />
             </div>
           </div>
         </SectionCard>
@@ -142,9 +153,12 @@ const RecruiterProfileView = ({
               <FieldLabel htmlFor="recruiterType">Recruiter Type</FieldLabel>
               <ViewField
                 value={
-                  profileData?.profile?.recruiter_type
+                  (profileData?.profile?.recruiter_type || profileData?.recruiter_type)
                     ? RECRUITER_TYPES.find(
-                        (t) => t.value === profileData.profile.recruiter_type
+                        (t) =>
+                          t.value ===
+                          (profileData?.profile?.recruiter_type ||
+                            profileData?.recruiter_type)
                       )?.label
                     : null
                 }
@@ -155,7 +169,10 @@ const RecruiterProfileView = ({
             <div>
               <FieldLabel htmlFor="company">Company / Brand Name</FieldLabel>
               <ViewField
-                value={profileData?.profile?.company_or_brand_name}
+                value={
+                  profileData?.profile?.company_or_brand_name ||
+                  profileData?.company_or_brand_name
+                }
                 icon="business"
               />
             </div>
@@ -163,7 +180,10 @@ const RecruiterProfileView = ({
             <div>
               <FieldLabel htmlFor="website">Website URL</FieldLabel>
               <ViewField
-                value={profileData?.profile?.website_url}
+                value={
+                  profileData?.profile?.website_url ||
+                  profileData?.website_url
+                }
                 icon="link"
               />
             </div>
@@ -171,7 +191,10 @@ const RecruiterProfileView = ({
             <div>
               <FieldLabel htmlFor="location">Location</FieldLabel>
               <ViewField
-                value={profileData?.profile?.location}
+                value={
+                  profileData?.profile?.location ||
+                  profileData?.location
+                }
                 icon="location_on"
               />
             </div>

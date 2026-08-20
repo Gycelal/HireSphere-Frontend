@@ -4,6 +4,8 @@ import { privateApi } from "../../services/api";
 import PageHeader from "../../components/common/PageHeader";
 import CandidateProfileView from "../../components/common/profile/CandidateProfileView";
 import RecruiterProfileView from "../../components/common/profile/RecruiterProfileView";
+import PageSkeleton from "../../components/common/ui/PageSkeleton";
+import ErrorState from "../../components/common/error-components/ErrorState";
 import toast from "react-hot-toast";
 
 const AdminUserProfilePage = () => {
@@ -38,22 +40,17 @@ const AdminUserProfilePage = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex flex-col gap-6 items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-violet-600"></div>
-        <p className="text-gray-500">Loading profile...</p>
-      </div>
-    );
+    return <PageSkeleton hasSidebar={false} cardsCount={2} />;
   }
 
   if (!profileData) {
     return (
-      <div className="flex flex-col gap-6 items-center justify-center min-h-[50vh]">
-        <p className="text-gray-500">Profile not found.</p>
-        <button onClick={handleBack} className="text-violet-600 font-semibold hover:underline">
-          Go Back
-        </button>
-      </div>
+      <ErrorState
+        onBack={handleBack}
+        title="Profile Not Found"
+        message="Could not find user profile details."
+        icon="person_off"
+      />
     );
   }
 

@@ -1,6 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 
-export default function RecruiterSummaryCard({ recruiter, onApply, applying = false, applied = false }) {
+export default function RecruiterSummaryCard({
+  jobId,
+  recruiter,
+  onApply,
+  applying = false,
+  applied = false,
+}) {
   const navigate = useNavigate()
 
   const displayName =
@@ -93,7 +99,11 @@ export default function RecruiterSummaryCard({ recruiter, onApply, applying = fa
           {/* View Recruiter Profile */}
           <button
             id='view-recruiter-profile-btn'
-            onClick={() => navigate(`/candidate/recruiter/${recruiter?.id}`)}
+            onClick={() =>
+              navigate(`/candidate/recruiter/${recruiter?.id}`, {
+                state: { recruiter, jobId },
+              })
+            }
             className='flex-1 inline-flex items-center justify-center gap-2
               px-5 py-2.5 rounded-xl text-sm font-semibold
               text-violet-600 dark:text-violet-400

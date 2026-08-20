@@ -33,6 +33,7 @@ import EditJobPage from './pages/recruiter/EditJobPage'
 import RecruiterJobDetailsPage from './pages/recruiter/RecruiterJobDetailsPage'
 import ApplicationsJobDetailsPage from './pages/candidate/ApplicationsJobDetailsPage'
 import HomeJobDetailsPage from './pages/candidate/HomeJobDetailsPage'
+import CandidateRecruiterProfilePage from './pages/candidate/CandidateRecruiterProfilePage'
 import { fetchCurrentUser } from './store/slices/authSlice'
 import toast from 'react-hot-toast'
 
@@ -121,9 +122,10 @@ function App () {
               <Route element={<HomeLayout />}>
                 <Route path='find-jobs' element={<FindJobs />} />
                 <Route path='jobs/:id' element={<HomeJobDetailsPage />} />
-                <Route path='recruiter/profile/:id' element={<RecruiterProfile/>} />
+                <Route path='recruiter/:id' element={<CandidateRecruiterProfilePage />} />
+                <Route path='recruiter/profile/:id' element={<CandidateRecruiterProfilePage />} />
               </Route>
-              {/* dashboard routes */}Then your behavior becomes:
+              {/* dashboard routes */}
               <Route element={<DashboardLayout />}>
                 <Route path='overview' element={<CandidateDashboard />} />
                 <Route path='profile' element={<CandidateProfile />} />
