@@ -10,6 +10,7 @@ import TableToolbar from '../../components/table/TableToolBar'
 import { PAGE_SIZE } from '../../config/sortOptions'
 import { EMPLOYMENT_TYPE_LABELS, JOB_POST_STATUS_FILTERS, JOB_SORT_OPTIONS } from '../../constants/JobPostConstants'
 import { privateApi } from '../../services/api'
+import { isJobExpired } from '../../utils/dateUtils'
 
 
 
@@ -106,12 +107,12 @@ const MyJobPosts = () => {
     {
       key: 'is_active',
       label: 'Status',
-      render: (row) => {
-        const isExpired = row.application_deadline
-          ? new Date(row.application_deadline).setHours(23, 59, 59, 999) < Date.now()
-          : false
-        return <JobStatusBadge isActive={row.is_active} isExpired={isExpired} />
-      },
+      render: (row) => (
+        <JobStatusBadge
+          isActive={row.is_active}
+          isExpired={isJobExpired(row.application_deadline)}
+        />
+      ),
     },
   ], [page])
 
@@ -154,51 +155,65 @@ const MyJobPosts = () => {
         columns={columns}
         data={data}
         emptyMessage='No job posts found.'
-        renderActions={(row) => (
-          <div className='flex items-center justify-end gap-1.5'>
-            {/* View */}
-            <button
-              onClick={() => navigate(`/recruiter/jobs/${row.id}`)}
-              title='View'
-              className='w-8 h-8 flex items-center justify-center rounded-lg
-                text-gray-400 dark:text-gray-500
-                hover:bg-gray-100 dark:hover:bg-gray-800
-                hover:text-gray-700 dark:hover:text-gray-200
-                transition-colors duration-150'
-            >
-              <span className='material-symbols-outlined text-[1.1rem]'>visibility</span>
-            </button>
+        renderActions={(row) => {
+          const isExpired = isJobExpired(row.application_deadline)
+          const isReopenDisabled = !row.is_active && isExpired
 
-            {/* Edit */}
-            <button
-              onClick={() => navigate(`/recruiter/edit-job/${row.id}`)}
-              title='Edit'
-              className='w-8 h-8 flex items-center justify-center rounded-lg
-                text-gray-400 dark:text-gray-500
-                hover:bg-violet-50 dark:hover:bg-violet-950/40
-                hover:text-violet-600 dark:hover:text-violet-400
-                transition-colors duration-150'
-            >
-              <span className='material-symbols-outlined text-[1.1rem]'>edit</span>
-            </button>
+          return (
+            <div className='flex items-center justify-end gap-1.5'>
+              {/* profile View */}
+              <button
+                onClick={() => navigate(`/recruiter/jobs/${row.id}`)}
+                title='View'
+                className='w-8 h-8 flex items-center justify-center rounded-lg
+                  text-gray-400 dark:text-gray-500
+                  hover:bg-gray-100 dark:hover:bg-gray-800
+                  hover:text-gray-700 dark:hover:text-gray-200
+                  transition-colors duration-150'
+              >
+                <span className='material-symbols-outlined text-[1.1rem]'>visibility</span>
+              </button>
 
-            {/* Close / Open */}
-            <button
-              onClick={() => handleToggleStatus(row)}
-              title={row.is_active ? 'Close Job' : 'Reopen Job'}
-              className={`w-8 h-8 flex items-center justify-center rounded-lg
-                transition-colors duration-150 ${
-                  row.is_active
-                    ? 'text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40'
-                    : 'text-green-500 hover:bg-green-50 dark:hover:bg-green-950/40'
-                }`}
-            >
-              <span className='material-symbols-outlined text-[1.1rem]'>
-                {row.is_active ? 'lock' : 'lock_open'}
-              </span>
-            </button>
-          </div>
-        )}
+              {/* Edit Job*/}
+              <button
+                onClick={() => navigate(`/recruiter/edit-job/${row.id}`)}
+                title='Edit'
+                className='w-8 h-8 flex items-center justify-center rounded-lg
+                  text-gray-400 dark:text-gray-500
+                  hover:bg-violet-50 dark:hover:bg-violet-950/40
+                  hover:text-violet-600 dark:hover:text-violet-400
+                  transition-colors duration-150'
+              >
+                <span className='material-symbols-outlined text-[1.1rem]'>edit</span>
+              </button>
+
+              {/* Close / Open */}
+              <button
+                onClick={() => handleToggleStatus(row)}
+                disabled={isReopenDisabled}
+                title={
+                  isReopenDisabled
+                    ? 'Extend the application deadline before reopening this job.'
+                    : row.is_active
+                      ? 'Close Job'
+                      : 'Reopen Job'
+                }
+                className={`w-8 h-8 flex items-center justify-center rounded-lg
+                  transition-colors duration-150 ${
+                    isReopenDisabled
+                      ? 'text-gray-300 dark:text-gray-600 cursor-not-allowed opacity-40 hover:bg-transparent'
+                      : row.is_active
+                        ? 'text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40'
+                        : 'text-green-500 hover:bg-green-50 dark:hover:bg-green-950/40'
+                  }`}
+              >
+                <span className='material-symbols-outlined text-[1.1rem]'>
+                  {row.is_active ? 'lock' : 'lock_open'}
+                </span>
+              </button>
+            </div>
+          )
+        }}
       />
       <Pagination
         page={page}

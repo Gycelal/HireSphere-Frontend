@@ -42,7 +42,7 @@ const JobPostWizard = ({
       salary_max: initialData?.salary_max ?? "",
       description: initialData?.description ?? "",
       experience_required: initialData?.experience_required ?? "",
-      application_deadline: initialData?.application_deadline ?? "",
+      application_deadline: initialData?.application_deadline ? String(initialData.application_deadline).split("T")[0] : "",
       skills_required: initialData?.skills_required ?? [],
       responsibilities: initialData?.responsibilities ?? [],
     }

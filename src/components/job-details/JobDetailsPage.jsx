@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { privateApi } from '../../services/api'
+import { isJobExpired } from '../../utils/dateUtils'
 import JobStatusBadge from './JobStatusBadge'
 import JobInformationSection from './JobInformationSection'
 import RecruiterSummaryCard from './RecruiterSummaryCard'
@@ -149,11 +150,7 @@ export default function JobDetailsPage({
             </h1>
             <JobStatusBadge
               isActive={job.is_active}
-              isExpired={
-                job.application_deadline
-                  ? new Date(job.application_deadline).setHours(23, 59, 59, 999) < Date.now()
-                  : false
-              }
+              isExpired={isJobExpired(job.application_deadline)}
             />
           </div>
 
@@ -187,6 +184,7 @@ export default function JobDetailsPage({
               <JobActionSection
                 jobId={jobId}
                 isActive={job.is_active}
+                isExpired={isJobExpired(job.application_deadline)}
                 onToggle={handleToggle}
               />
             )}

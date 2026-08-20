@@ -181,7 +181,7 @@ export const Step2 = ({ register, control, errors }) => {
             <TextInput
               id="deadline"
               type="date"
-              min={new Date().toISOString().split('T')[0]}
+              min={new Date().toLocaleDateString('en-CA')}
               {...register("application_deadline")}
             />
             <ErrorMsg message={errors.application_deadline?.message} />

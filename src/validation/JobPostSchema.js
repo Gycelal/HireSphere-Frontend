@@ -1,5 +1,17 @@
 import { z } from "zod";
 
+// Helper to parse date string (YYYY-MM-DD) into local Date without UTC offset shifts
+const parseLocalDate = (val) => {
+  if (!val) return null;
+  const datePart = typeof val === "string" ? val.split("T")[0] : "";
+  const parts = datePart.split("-").map(Number);
+  if (parts.length !== 3 || parts.some(isNaN)) return null;
+  const [year, month, day] = parts;
+  const date = new Date(year, month - 1, day);
+  date.setHours(0, 0, 0, 0);
+  return date;
+};
+
 // Reusable optional positive integer field (accepts '' as "no value")
 const optionalSalary = z.union([
   z.literal("").transform(() => undefined),
@@ -22,15 +34,18 @@ const jobPostSchema = z
     experience_required: z.coerce.number().int("Must be an integer").min(0, "Experience cannot be negative.").max(50, "Experience cannot exceed 50 years."),
     application_deadline: z.string().min(1, "Deadline is required.")
       .refine((val) => {
-        const selected = new Date(val);
+        const selected = parseLocalDate(val);
+        if (!selected || isNaN(selected.getTime())) return false;
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        return !isNaN(selected.getTime()) && selected > today;
-      }, "Deadline must be in the future.")
+        return selected >= today;
+      }, "Deadline must be today or a future date.")
       .refine((val) => {
-        const selected = new Date(val);
+        const selected = parseLocalDate(val);
+        if (!selected || isNaN(selected.getTime())) return false;
         const maxDate = new Date();
         maxDate.setFullYear(maxDate.getFullYear() + 1);
+        maxDate.setHours(23, 59, 59, 999);
         return selected <= maxDate;
       }, "Deadline cannot be more than 1 year in the future."),
     skills_required: z.array(z.string())

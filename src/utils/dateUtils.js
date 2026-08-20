@@ -19,3 +19,9 @@ export const formatDate = (dateString) => {
     year: "numeric" 
   });
 };
+
+export const isJobExpired = (deadline) => {
+  if (!deadline) return false;
+  return new Date(deadline).setHours(23, 59, 59, 999) < Date.now();
+};
+
