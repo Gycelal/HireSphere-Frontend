@@ -151,10 +151,8 @@ function App () {
           <Route element={<ProtectedRoutes allowedRole={'admin'} />}>
             <Route path='admin' element={<DashboardLayout />}>
               <Route path='dashboard' element={<AdminDashboard />} />
-              <Route
-                path='recruiter-approvals'
-                element={<AdminRecruiterApprovalsPage />}
-              />
+              <Route path='recruiter-approvals' element={<AdminRecruiterApprovalsPage />}/>
+              <Route path='recruiter-approvals/:id' element={<AdminUserProfilePage/>}/>
               <Route path='users' element={<UserManagementPage />} />
               <Route path='users/:role/:id' element={<AdminUserProfilePage />} />
             </Route>

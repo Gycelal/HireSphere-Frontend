@@ -9,7 +9,7 @@ const GoogleButton = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const handleSuccess = async credentialResponse => {
+  const handleSuccess = async (credentialResponse) => {
     try {
       const res = await publicApi.post('/accounts/google/', {
         id_token: credentialResponse.credential
@@ -33,8 +33,7 @@ const GoogleButton = () => {
         navigate('/', { replace: true })
       }
     } catch (error) {
-      console.error('Google login failed', error)
-      toast.error("Google failed.")
+      toast.error(error?.response?.data?.message || 'Failed to login with Google.')
     }
   }
 

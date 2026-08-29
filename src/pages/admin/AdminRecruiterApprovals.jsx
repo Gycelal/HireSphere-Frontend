@@ -54,7 +54,7 @@ function RowActions ({ row, onApprove, onReject }) {
   return (
     <div className='flex items-center justify-end gap-1.5'>
       <Link
-        to={`/admin/users/recruiter/${row.id}`}
+        to={`/admin/recruiter-approvals/${row.id}`}
         title='Preview'
         className='w-8 h-8 flex items-center justify-center rounded-lg
           text-gray-400 dark:text-gray-500
@@ -96,27 +96,6 @@ function RowActions ({ row, onApprove, onReject }) {
       >
         <span className='material-symbols-outlined text-[1.1rem]'>cancel</span>
       </button>
-    </div>
-  )
-}
-
-// Summary stat card
-function StatCard ({ label, value, icon, colorClass }) {
-  return (
-    <div className='bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-4 flex items-center gap-4'>
-      <div
-        className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${colorClass}`}
-      >
-        <span className='material-symbols-outlined text-[1.15rem]'>{icon}</span>
-      </div>
-      <div className='min-w-0'>
-        <p className='text-2xl font-bold text-gray-900 dark:text-white leading-none'>
-          {value}
-        </p>
-        <p className='text-xs text-gray-400 dark:text-gray-500 mt-0.5'>
-          {label}
-        </p>
-      </div>
     </div>
   )
 }
@@ -186,7 +165,7 @@ export default function AdminRecruiterApprovalsPage () {
       const res = await privateApi.get(`admin/recruiters/?${params.toString()}`)
 
       // Update state
-      console.log('recruiters:', res.data)
+      console.log('recruiters data fetched:', res.data)
       setData(res.data.results)
       setTotalCount(res.data.count)
     } catch (err) {
@@ -247,13 +226,6 @@ export default function AdminRecruiterApprovalsPage () {
         description='Review and approve recruiter accounts before they can access the platform.'
       />
 
-      {/* Summary stats */}
-      {/* <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard label="Total Recruiters" value={counts.total}    icon="group"         colorClass="bg-violet-50 dark:bg-violet-950/50 text-violet-600 dark:text-violet-400"/>
-        <StatCard label="Pending Review"   value={counts.pending}  icon="schedule"      colorClass="bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400"/>
-        <StatCard label="Approved"         value={counts.approved} icon="check_circle"  colorClass="bg-green-50 dark:bg-green-950/50 text-green-600 dark:text-green-400"/>
-        <StatCard label="Rejected"         value={counts.rejected} icon="cancel"        colorClass="bg-red-50 dark:bg-red-950/50 text-red-500 dark:text-red-400"/>
-      </div> */}
 
       {/* Toolbar */}
       <TableToolbar
