@@ -7,6 +7,7 @@ import RecruiterProfileView from "../../components/common/profile/RecruiterProfi
 import PageSkeleton from "../../components/common/ui/PageSkeleton";
 import ErrorState from "../../components/common/error-components/ErrorState";
 import ConfirmModal from "../../components/common/ConfirmModal";
+import InfoPill from "../../components/common/data-display/InfoPill";
 import { formatDate } from "../../utils/dateUtils";
 import toast from "react-hot-toast";
 
@@ -131,15 +132,11 @@ const AdminUserProfilePage = () => {
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-center">
-          {/* Joined Date Badge */}
-          {profileData?.date_joined && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-gray-50 dark:bg-gray-800/80 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-700/80">
-              <span className="material-symbols-outlined text-[1rem] text-gray-400 dark:text-gray-500">
-                calendar_today
-              </span>
-              Joined {formatDate(profileData.date_joined)}
-            </span>
-          )}
+          {/* Joined Date Pill */}
+          <InfoPill
+            icon="calendar_today"
+            text={profileData?.date_joined ? `Joined ${formatDate(profileData.date_joined)}` : null}
+          />
 
           {isApprovalView ? (
             <>
