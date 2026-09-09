@@ -18,10 +18,9 @@ const CandidateProfileView = ({
   const savedAvatar = profileData?.profile?.profile_picture;
   const initials = `${profileData?.first_name?.[0] ?? ""}${profileData?.last_name?.[0] ?? ""}`.toUpperCase();
   const skills = profileData?.profile?.professional_skills || [];
-
+  console.log("profileData",profileData)
   return (
     <div className="flex flex-col gap-6">
-      {/* ── Profile completion ── */}
       {showCompletionBar && profileData && completionPercentage < 100 && (
         <>
           <div className="bg-yellow-50 dark:bg-yellow-950/30 rounded-2xl border border-yellow-200 dark:border-yellow-800 px-6 py-4">
@@ -39,7 +38,6 @@ const CandidateProfileView = ({
       )}
 
       <div className="flex flex-col gap-5">
-        {/* ── Profile picture + Resume — side by side on md+ screens ── */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <AvatarManager
             savedAvatar={savedAvatar}
@@ -52,36 +50,31 @@ const CandidateProfileView = ({
 
           <SectionCard title="Resume" icon="description">
             <ResumeManager
-              savedResume={profileData?.profile?.resume_url || profileData?.profile?.resume}
-              savedResumeFilename={profileData?.profile?.resume_filename}
+              savedResume={profileData?.profile?.default_resume?.file_url}
+              savedResumeFilename={profileData?.profile?.default_resume?.file_name}
               readOnly={readOnly}
               onSuccess={onResumeSuccess}
             />
           </SectionCard>
         </div>
 
-        {/* ── Profile Details ── */}
         <SectionCard title="Profile Details" icon="person">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* First Name */}
             <div>
               <FieldLabel htmlFor="firstName">First Name</FieldLabel>
               <ViewField value={profileData?.first_name} />
             </div>
 
-            {/* Last Name */}
             <div>
               <FieldLabel htmlFor="lastName">Last Name</FieldLabel>
               <ViewField value={profileData?.last_name} />
             </div>
 
-            {/* Email */}
             <div>
               <FieldLabel htmlFor="email">Email Address</FieldLabel>
               <ViewField value={profileData?.email} icon="email" />
             </div>
 
-            {/* Experience Years */}
             <div>
               <FieldLabel htmlFor="experienceYears">Years of Experience</FieldLabel>
               <ViewField
@@ -94,19 +87,16 @@ const CandidateProfileView = ({
               />
             </div>
 
-            {/* Headline */}
             <div>
               <FieldLabel htmlFor="headline">Headline</FieldLabel>
               <ViewField value={profileData?.profile?.headline} icon="badge" />
             </div>
 
-            {/* Qualification */}
             <div>
               <FieldLabel htmlFor="qualification">Qualification</FieldLabel>
               <ViewField value={profileData?.profile?.qualification} icon="school" />
             </div>
 
-            {/* Professional Skills */}
             <div className="sm:col-span-2">
               <FieldLabel htmlFor="skills">Professional Skills</FieldLabel>
               <TagList tags={skills} placeHolder="No skills added"/>

@@ -65,21 +65,10 @@ export default function JobDetailsPage({
     }
   }
 
-  // Apply for candidate
-  const handleApply = async () => {
+  // Apply for candidate - navigate to resume selection page
+  const handleApply = () => {
     if (applied) return
-    setApplying(true)
-    try {
-      await privateApi.post(applyUrl || `jobs/${jobId}/apply/`)
-      toast.success('Application submitted successfully!')
-      setApplied(true)
-    } catch (err) {
-      console.error('Apply error:', err)
-      const msg = err?.response?.data?.detail || err?.response?.data?.message || 'Failed to submit application.'
-      toast.error(msg)
-    } finally {
-      setApplying(false)
-    }
+    navigate(`/candidate/jobs/${jobId}/apply`)
   }
 
   // Render States
