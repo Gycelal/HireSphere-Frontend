@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { privateApi } from '../../../services/api';
+import { validateResumeFile, uploadResumeToCloudinary } from '../../../utils/resumeUtils';
 
 export default function ResumeUploadZone({
   onUploadSuccess,
@@ -12,47 +13,14 @@ export default function ResumeUploadZone({
   const fileInputRef = useRef(null);
 
   const validateAndUpload = async (file) => {
-    if (!file) return;
-
-    const allowedMimeTypes = [
-      'application/pdf',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    ];
-
-    const isAllowedExt = /\.(pdf|doc|docx)$/i.test(file.name);
-
-    if (!allowedMimeTypes.includes(file.type) && !isAllowedExt) {
-      toast.error('Only PDF or Word documents (.pdf, .doc, .docx) are allowed.');
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('File size must be under 5 MB.');
-      return;
-    }
+    if (!validateResumeFile(file)) return;
 
     setIsUploading(true);
-    setUploadProgress(15);
+    setUploadProgress(20);
 
     try {
-      // 1. Upload to Cloudinary
-      const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/auto/upload`;
-      const cloudData = new FormData();
-      cloudData.append('file', file);
-      cloudData.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
-
-      setUploadProgress(40);
-      const cloudRes = await fetch(cloudinaryUrl, {
-        method: 'POST',
-        body: cloudData,
-      });
-
-      if (!cloudRes.ok) {
-        throw new Error('Failed to upload file to storage.');
-      }
-
-      const cloudJson = await cloudRes.json();
+      setUploadProgress(50);
+      const cloudJson = await uploadResumeToCloudinary(file);
       setUploadProgress(75);
 
       // 2. Post to backend endpoint
