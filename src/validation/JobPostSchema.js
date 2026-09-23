@@ -30,7 +30,7 @@ const jobPostSchema = z
     vacancies: z.coerce.number().int("Must be an integer").min(1, "Enter at least 1 vacancy.").max(200, "Maximum vacancies is 200."),
     salary_min: optionalSalary,
     salary_max: optionalSalary,
-    description: z.string().trim().min(1, "Job description is required.").min(10, "Job description must be at least 10 characters.").max(500, "Job description must not exceed 500 characters."),
+    description: z.string().trim().min(1, "Job description is required.").min(10, "Job description must be at least 10 characters.").max(1000, "Job description must not exceed 500 characters."),
     experience_required: z.coerce.number().int("Must be an integer").min(0, "Experience cannot be negative.").max(50, "Experience cannot exceed 50 years."),
     application_deadline: z.string().min(1, "Deadline is required.")
       .refine((val) => {

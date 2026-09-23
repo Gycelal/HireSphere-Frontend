@@ -31,26 +31,20 @@ export default function JobDetailsPage({
     setLoading(true)
     setError(false)
     try {
-      // Artificial delay 
       await new Promise(resolve => setTimeout(resolve, 500))
       const res = await privateApi.get(jobDetailUrl || `jobs/${jobId}/`)
-      console.log("result:", res)
       setJob(res.data)
-      // The backend may nest recruiter data under `res.data.recruiter` or `res.data.posted_by`
       setRecruiter(res.data.recruiter ?? res.data.posted_by ?? null)
       setApplied(res.data.has_applied ?? false)
     } catch (err) {
-      console.error('Failed to load job:', err)
       setError(true)
     } finally {
       setLoading(false)
     }
   }
-  console.log("recrutier state:", recruiter)
 
   useEffect(() => {
     if (jobId) fetchJob()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jobId])
 
   // Toggle Job Status for recruiter
@@ -60,18 +54,19 @@ export default function JobDetailsPage({
       toast.success(job.is_active ? 'Job closed successfully.' : 'Job reopened successfully.')
       setJob((prev) => ({ ...prev, is_active: !prev.is_active }))
     } catch (err) {
-      console.error('Toggle error:', err)
       toast.error(err?.response?.data?.message || 'Failed to update job status.')
     }
   }
 
-  // Apply for candidate - navigate to resume selection page
+  // Apply for candidate
   const handleApply = () => {
     if (applied) return
-    navigate(`/candidate/jobs/${jobId}/apply`)
+    navigate(`/candidate/jobs/${jobId}/apply`, {
+      state: { job },
+    })
   }
 
-  // Render States
+  // different render states - loading/errorstate/jobdetails
   if (loading) return <PageSkeleton hasSidebar={true} cardsCount={4} />
   if (error) {
     return (

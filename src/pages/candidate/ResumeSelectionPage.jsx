@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect } from "react"
 import toast from 'react-hot-toast';
 import { privateApi } from '../../services/api';
 import ResumeSelectCard from '../../components/candidate/apply/ResumeSelectCard';
@@ -8,10 +8,10 @@ import ResumeUploadZone from '../../components/candidate/apply/ResumeUploadZone'
 export default function ResumeSelectionPage() {
   const { id: jobId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Job details state
-  const [job, setJob] = useState(null);
-  const [loadingJob, setLoadingJob] = useState(true);
+  const [job, setJob] = useState(location.state?.job || null);
+  const [loadingJob, setLoadingJob] = useState(!location.state?.job);
 
   // Resume states
   const [defaultResume, setDefaultResume] = useState(null);
@@ -20,24 +20,34 @@ export default function ResumeSelectionPage() {
   const [selectedResume, setSelectedResume] = useState(null);
   const [loadingResumes, setLoadingResumes] = useState(true);
 
-  // Fetch job details using jobId
+  // Fetch job details using jobId if not available from navigation state
   useEffect(() => {
+    if (job || !jobId) return;
+
+    let isMounted = true;
     const fetchJobDetails = async () => {
-      if (!jobId) return;
       setLoadingJob(true);
       try {
         const res = await privateApi.get(`jobs/${jobId}/`);
-        setJob(res.data);
+        if (isMounted) {
+          setJob(res.data);
+        }
       } catch (err) {
         toast.error('Failed to load job details');
         navigate('/find-jobs');
       } finally {
-        setLoadingJob(false);
+        if (isMounted) {
+          setLoadingJob(false);
+        }
       }
     };
 
     fetchJobDetails();
-  }, [jobId, navigate]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [jobId, job, navigate]);
 
   // Fetch default resume and recently used resumes
   useEffect(() => {
@@ -49,7 +59,7 @@ export default function ResumeSelectionPage() {
       let fetchedDefault = null;
       let fetchedRecents = [];
 
-      //Fetches Candidate Profile and get default resume from profile if exists
+      //default resume
       try {
         const profileRes = await privateApi.get('candidate/profile/');
         const defaultResume = profileRes.data?.profile?.default_resume;
@@ -57,14 +67,12 @@ export default function ResumeSelectionPage() {
           fetchedDefault = defaultResume;
         }
       } catch (err) {
-        console.error('Failed to load default resume:', err);
         toast.error('Failed to load default resume');
       }
 
-      // Fetch Recently Used Resumes
+      //Recently Used Resumes
       try {
         const recentRes = await privateApi.get('candidate/resume/recent/');
-        console.log("recentRes", recentRes.data)
         fetchedRecents = recentRes.data || [];
       } catch (err) {
         console.warn('Could not fetch recently used resumes from endpoint:', err);
@@ -104,11 +112,9 @@ export default function ResumeSelectionPage() {
       toast.error('Please select or upload a resume to proceed.');
       return;
     }
-
-    // Pass chosen resume & jobId to the next stage (AI analysis / review)
-    navigate(`/candidate/jobs/${jobId}/ai-analysis`, {
+    navigate(`/candidate/jobs/${jobId}/ai-analysis?selectedResumeId=${selectedResume.id}`, {
       state: {
-        jobId,
+        job,
         selectedResume,
       },
     });
