@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useId } from 'react';
 import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { privateApi } from '../../services/api';
+import ApplyBottomBar from '../../components/candidate/apply/ApplyBottomBar';
 
 export default function AIAnalysisPage() {
   const { id: jobId } = useParams();
@@ -66,7 +67,7 @@ export default function AIAnalysisPage() {
     let isMounted = true;
     const fetchSelectedResume = async () => {
       try {
-        const res = await privateApi.get(`candidate/resumes/${selectedResumeId}/`);
+        const res = await privateApi.get(`candidate/resume/${selectedResumeId}/`);
         if (isMounted) {
           setSelectedResume(res.data);
         }
@@ -446,9 +447,8 @@ export default function AIAnalysisPage() {
             </div>
           </div>
 
-          {/* ── 3 Insight Cards Grid ── */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* 1. Matching Strengths */}
+            {/* Matching Strengths */}
             <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm flex flex-col gap-4">
               <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
                 <div className="flex items-center gap-2.5">
@@ -487,7 +487,7 @@ export default function AIAnalysisPage() {
               )}
             </div>
 
-            {/* 2. Gaps Identified */}
+            {/* Gaps Identified */}
             <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm flex flex-col gap-4">
               <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
                 <div className="flex items-center gap-2.5">
@@ -529,7 +529,7 @@ export default function AIAnalysisPage() {
             </div>
           </div>
 
-          {/* 3. Actionable Framing Suggestions */}
+          {/* Suggestions */}
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm flex flex-col gap-4">
             <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
               <div className="flex items-center gap-2.5">
@@ -575,81 +575,62 @@ export default function AIAnalysisPage() {
         </div>
       ) : null}
 
-      {/* ── Cover Letter Option & Bottom Sticky Action Bar ── */}
-      <div className="sticky bottom-4 z-20 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-2xl border border-gray-200/80 dark:border-gray-800 p-4 sm:p-5 shadow-xl shadow-gray-900/5 dark:shadow-black/40">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          {/* Left summary chip */}
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <div className="w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-950/70 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-[1.3rem]">
-                {analysis?.match_score ? 'insights' : 'description'}
-              </span>
-            </div>
-            <div className="min-w-0">
-              <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">
-                Ready to Proceed
-              </p>
-              <p className="text-sm font-bold text-gray-900 dark:text-white truncate max-w-[220px] sm:max-w-xs">
-                {selectedResume ? selectedResume.file_name : 'No resume selected'}
-              </p>
-            </div>
-          </div>
+      <ApplyBottomBar
+        icon={analysis?.match_score ? 'insights' : 'description'}
+        title="Ready to Proceed"
+        subtitle={selectedResume?.file_name || 'No resume selected'}
+        isActive={Boolean(selectedResume)}
+      >
+        <button
+          type="button"
+          id="add-cover-letter-btn"
+          onClick={() => {
+            navigate(`/candidate/jobs/${jobId}/ai-analysis/cover-letter`, {
+              state: {
+                jobId,
+                selectedResume,
+                job,
+                aiAnalysis: analysis,
+              },
+            });
+          }}
+          className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4.5 py-2.5 rounded-xl text-sm font-semibold
+            text-violet-700 dark:text-violet-300
+            bg-violet-50 dark:bg-violet-950/60
+            border border-violet-200 dark:border-violet-800
+            hover:bg-violet-100 dark:hover:bg-violet-900/60
+            active:scale-[0.98] transition-all duration-200 shadow-sm cursor-pointer"
+        >
+          <span className="material-symbols-outlined text-[1.15rem]">
+            edit_note
+          </span>
+          <span>Add Cover Letter</span>
+        </button>
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-3 w-full sm:w-auto justify-end flex-wrap">
-            {/* Minimal Add Cover Letter Button */}
-            <button
-              type="button"
-              id="add-cover-letter-btn"
-              onClick={() => {
-                navigate(`/candidate/jobs/${jobId}/cover-letter`, {
-                  state: {
-                    jobId,
-                    selectedResume,
-                    job,
-                    aiAnalysis: analysis,
-                  },
-                });
-              }}
-              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4.5 py-2.5 rounded-xl text-sm font-semibold
-                text-violet-700 dark:text-violet-300
-                bg-violet-50 dark:bg-violet-950/60
-                border border-violet-200 dark:border-violet-800
-                hover:bg-violet-100 dark:hover:bg-violet-900/60
-                active:scale-[0.98] transition-all duration-200 shadow-sm cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-[1.15rem]">
-                edit_note
-              </span>
-              <span>Add Cover Letter</span>
-            </button>
-
-            {/* Direct Proceed Button */}
-            <button
-              type="button"
-              id="proceed-application-btn"
-              onClick={() => {
-                navigate(`/candidate/jobs/${jobId}/review`, {
-                  state: {
-                    jobId,
-                    selectedResume,
-                    job,
-                    aiAnalysis: analysis,
-                  },
-                });
-              }}
-              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white
-                bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700
-                active:scale-[0.98] transition-all duration-200 shadow-md shadow-violet-500/25 dark:shadow-violet-950/50 cursor-pointer"
-            >
-              <span>Continue Application</span>
-              <span className="material-symbols-outlined text-[1.1rem]">
-                arrow_forward
-              </span>
-            </button>
-          </div>
-        </div>
-      </div>
+        {/* Direct Proceed Button */}
+        <button
+          type="button"
+          id="proceed-application-btn"
+          onClick={() => {
+            navigate(`/candidate/jobs/${jobId}/review`, {
+              state: {
+                jobId,
+                selectedResume,
+                job,
+                aiAnalysis: analysis,
+              },
+            });
+          }}
+          className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white
+            bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700
+            active:scale-[0.98] transition-all duration-200 shadow-md shadow-violet-500/25 dark:shadow-violet-950/50 cursor-pointer"
+        >
+          <span>Continue Application</span>
+          <span className="material-symbols-outlined text-[1.1rem]">
+            arrow_forward
+          </span>
+        </button>
+      </ApplyBottomBar>
     </div>
   );
 }

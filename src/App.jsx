@@ -38,6 +38,7 @@ import AIAnalysisPage from './pages/candidate/AIAnalysisPage'
 import CandidateRecruiterProfilePage from './pages/candidate/CandidateRecruiterProfilePage'
 import { fetchCurrentUser } from './store/slices/authSlice'
 import toast from 'react-hot-toast'
+import CoverLetter from './pages/candidate/CoverLetter'
 
 function App () {
   const mode = useSelector(state => state.theme.mode)
@@ -126,6 +127,7 @@ function App () {
                 <Route path='jobs/:id' element={<HomeJobDetailsPage />} />
                 <Route path='jobs/:id/apply' element={<ResumeSelectionPage />} />
                 <Route path='jobs/:id/ai-analysis' element={<AIAnalysisPage />} />
+                <Route path='jobs/:id/ai-analysis/cover-letter' element={<CoverLetter />} />
                 <Route path='recruiter/:id' element={<CandidateRecruiterProfilePage />} />
                 <Route path='recruiter/profile/:id' element={<CandidateRecruiterProfilePage />} />
               </Route>

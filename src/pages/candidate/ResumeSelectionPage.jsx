@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { privateApi } from '../../services/api';
 import ResumeSelectCard from '../../components/candidate/apply/ResumeSelectCard';
 import ResumeUploadZone from '../../components/candidate/apply/ResumeUploadZone';
+import ApplyBottomBar from '../../components/candidate/apply/ApplyBottomBar';
 
 export default function ResumeSelectionPage() {
   const { id: jobId } = useParams();
@@ -316,73 +317,45 @@ export default function ResumeSelectionPage() {
         </div>
       )}
 
-      {/*  Bottom Sticky Action Bar */}
-      <div className="sticky bottom-4 z-20 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md rounded-2xl border border-gray-200/80 dark:border-gray-800 p-4 sm:p-5 shadow-xl shadow-gray-900/5 dark:shadow-black/40">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <div
-              className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors
-                ${
-                  selectedResume
-                    ? 'bg-violet-100 dark:bg-violet-950/70 text-violet-600 dark:text-violet-400'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-400'
-                }
-              `}
-            >
-              <span className="material-symbols-outlined text-[1.3rem]">
-                {selectedResume ? 'task_alt' : 'touch_app'}
-              </span>
-            </div>
+      {/* Bottom Sticky Action Bar */}
+      <ApplyBottomBar
+        icon={selectedResume ? 'task_alt' : 'touch_app'}
+        title="Selected Resume"
+        subtitle={selectedResume ? selectedResume.file_name : 'Please select a resume above'}
+        isActive={Boolean(selectedResume)}
+      >
+        <button
+          type="button"
+          onClick={() => navigate(`/candidate/jobs/${jobId}`)}
+          className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl text-sm font-semibold
+            text-gray-600 dark:text-gray-300
+            border border-gray-200 dark:border-gray-700
+            hover:bg-gray-50 dark:hover:bg-gray-800
+            transition-all duration-200"
+        >
+          Cancel
+        </button>
 
-            <div className="min-w-0">
-              <p className="text-xs text-gray-400 dark:text-gray-500 font-medium">
-                Selected Resume
-              </p>
-              <p
-                className="text-sm font-bold text-gray-900 dark:text-white truncate max-w-[200px] sm:max-w-xs md:max-w-md"
-                title={selectedResume?.file_name || 'No resume selected'}
-              >
-                {selectedResume ? selectedResume.file_name : 'Please select a resume above'}
-              </p>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-            <button
-              type="button"
-              onClick={() => navigate(`/candidate/jobs/${jobId}`)}
-              className="flex-1 sm:flex-initial px-5 py-2.5 rounded-xl text-sm font-semibold
-                text-gray-600 dark:text-gray-300
-                border border-gray-200 dark:border-gray-700
-                hover:bg-gray-50 dark:hover:bg-gray-800
-                transition-all duration-200"
-            >
-              Cancel
-            </button>
-
-            <button
-              type="button"
-              id="continue-to-analysis-btn"
-              onClick={handleContinue}
-              disabled={!selectedResume}
-              className={`flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white
-                transition-all duration-200 shadow-md
-                ${
-                  selectedResume
-                    ? 'bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 active:scale-[0.98] shadow-violet-500/25 dark:shadow-violet-950/50 cursor-pointer'
-                    : 'bg-gray-300 dark:bg-gray-800 text-gray-500 dark:text-gray-600 opacity-60 cursor-not-allowed shadow-none'
-                }
-              `}
-            >
-              <span>Continue</span>
-              <span className="material-symbols-outlined text-[1.1rem]">
-                arrow_forward
-              </span>
-            </button>
-          </div>
-        </div>
-      </div>
+        <button
+          type="button"
+          id="continue-to-analysis-btn"
+          onClick={handleContinue}
+          disabled={!selectedResume}
+          className={`flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white
+            transition-all duration-200 shadow-md
+            ${
+              selectedResume
+                ? 'bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 active:scale-[0.98] shadow-violet-500/25 dark:shadow-violet-950/50 cursor-pointer'
+                : 'bg-gray-300 dark:bg-gray-800 text-gray-500 dark:text-gray-600 opacity-60 cursor-not-allowed shadow-none'
+            }
+          `}
+        >
+          <span>Continue</span>
+          <span className="material-symbols-outlined text-[1.1rem]">
+            arrow_forward
+          </span>
+        </button>
+      </ApplyBottomBar>
     </div>
   );
 }
